@@ -1,0 +1,34 @@
+####################
+### Introduction ###
+####################
+NevoChess is a Chinese Chess (XiangQi) application for iPhone/iPod-Touch devices. It currently supports only Playing with Robot (Artificial Intelligent or AI). In the near future, it will support playing online with other players via services provided by PlayXiangQi.com, which is made by our dedicate team .
+
+
+#########################
+### Build Instructions ##
+#########################
+This project is based on iPhone SDK 3.0.
+Just open 'NevoChess.xcodeproj' directly in XCode 3.1 under Mac OS X, and click on "Build and Go".
+
+
+########################
+### How to report Bug ##
+########################
+You can always file bugs or enter your wishlist via email (see the contact information below) at the GoogleCode project page at:
+   http://code.google.com/p/nevochess/issues/list.
+
+We welcome and appreciate all your suggestions.
+
+
+##########################
+### Contact Information ##
+##########################
+Contact Us at: nevochess@playxiangqi.com
+Hope you will enjoy!
+
+---
+Nevo Hua
+The iPhone/Mobile project leader at PlayXiangQi.com
+
+
+################################### End of File #########################
