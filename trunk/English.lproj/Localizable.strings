@@ -1,0 +1,51 @@
+/* 
+   Localizable.strings (English version)
+   NevoChess
+
+   Created by Huy Phan on 9/23/09.
+   Copyright 2009 PlayXiangqi. All rights reserved.
+ */
+
+"About_NevoChess_Key" = "<body style=\"background-image:url(board_320x480.png);\"><h3>NevoChess %@</h3><div><b>NevoChess</b> is an open source XiangQi application for iPhone/iPod touch, hosted on <a href=\"http://nevochess.googlecode.com\">Google Code</a>. Please contact us at <a href=\"mailto:nevochess@playxiangqi.com\"><font face=\"Times New Roman\">nevochess@PlayXiangqi.com</font></a></div><h3>Developers</h3><div>Nevo Hua (Beijing, China) <br/>Huy Phan (San Francisco, USA) </div><h3>Acknowledgement</h3><div><p><b>XQWLight</b> is an open source AI engine written by Huang Chen at <a href=\"http://www.elephantbase.net\">elephantbase.net</a></p><p><b>HaQiKi D</b> is an AI engine written by H.G. Muller at <a href=\"http://home.hccnet.nl/h.g.muller/XQhaqikid.html\">home.hccnet.nl/h.g.muller</a></p></div><div>%@</div></body>";
+"Home" = "Home";
+"HOME" = "HOME";
+"RESET" = "RESET";
+
+/* These HOME keys need a single space in the front to separate an icon. */
+"Home_Play" = " Play";
+"Home_Settings" = " Settings";
+"Home_About" = " About";
+
+"Settings" = "Settings";
+"General" = "General";
+"Default" = "Default";
+"AI" = "AI";
+"You win,congratulations!" = "You win,congratulations!";
+"Computer wins. Don't give up, please try again!" = "Computer wins. Don't give up, please try again!";
+"You lose. You may try again!" = "You lose. You may try again!";
+"Sorry,we are in draw!" = "Sorry,we are in draw!";
+"Sorry,we made too many moves, please restart again!" = "Sorry,we made too many moves, please restart again!";
+"Resume game?" = "Resume game?";
+"New game?" = "New game?";
+"Yes" = "Yes";
+"No" = "No";
+
+/* Other keys */
+"HOME_Key" = "HOME";
+"DEFAULT_Key" = "DEFAULT";
+"Difficulty_Key" = "Difficulty (AI)";
+"Easy_Key" = "easy";
+"Hard_Key" = "hard";
+"Mins_Key" = "mins";
+"Time_Key" = "Time (mins)";
+"AI_Setting_Key" = "AI";
+"Sound_Key" = "Sound";
+"PieceStyle_Key" = "Piece Style";
+"Chinese_Key" = "Chinese";
+"Western_Key" = "Western";
+"NewGame_Key" = "NEW GAME";
+"Options_Key" = "OPTIONS";
+"About_Key" = "ABOUT";
+
+/* Move review label (not used?) */
+"MOVE" = "move";

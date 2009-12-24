@@ -1,0 +1,4 @@
+#ifndef NEVOCHESS_VERSION
+#define NEVOCHESS_BUILD_INFO "build200912241238.35PSTrexported"
+#endif
+
