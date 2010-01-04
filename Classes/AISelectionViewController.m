@@ -20,7 +20,7 @@
 #import "AISelectionViewController.h"
 #import "QuartzUtils.h"
 #import "NevoChessAppDelegate.h"
-#define ENABLE_XQWLIGHT_OBJC
+//#define ENABLE_XQWLIGHT_OBJC
 static char ai_selections[][128] = {
     "XQWLight",
     "HaQiKiD",
