@@ -29,8 +29,8 @@ typedef struct _BookItem {
 #define BOOK_SIZE 16384
 
 @interface Book : NSObject {
-    int nBookSize;                 // 开局库大小
-    BookItem *BookTable; // 开局库
+    int nBookSize;        // 开局库大小
+    BookItem *BookTable;  // 开局库
 }
 
 - (id)initWithBook:(NSString*)bookfile;

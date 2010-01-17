@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/*ENABLE MTDF Search*/
+// ENABLE MTDF Search
 //#define USE_MTDF
 //#define ENABLE_DEBUG
 
@@ -1724,14 +1724,14 @@ ret:
 }
 
 #pragma mark  MTD tree search (experimental)
-/*
- * Current XQLight AI is quite slow when setting timeout to a bigger value , whereas it's weak when using a small value.
- * Beside this, because we r not using opening book at this moment, it seems the first ply for AI is quite predictable 
- * although XQLight has already randomized the evalatuated value (see search_root). This leads me to think how to make the
- * openning more unpredictable. My idea here is use MTD tree search which is faster than NegaScout(same with PVS) to search
- * the first ply.
- * The algorithm can be found at http://people.csail.mit.edu/plaat/mtdf.html
- */
+//
+// Current XQLight AI is quite slow when setting timeout to a bigger value , whereas it's weak when using a small value.
+// Beside this, because we r not using opening book at this moment, it seems the first ply for AI is quite predictable 
+// although XQLight has already randomized the evalatuated value (see search_root). This leads me to think how to make the
+// openning more unpredictable. My idea here is use MTD tree search which is faster than NegaScout(same with PVS) to search
+// the first ply.
+// The algorithm can be found at http://people.csail.mit.edu/plaat/mtdf.html
+//
 - (int)mtdf_search:(int)depth guess:(int)guess
 {
     int g, beta;

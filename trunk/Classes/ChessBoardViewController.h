@@ -35,28 +35,28 @@
     NSTimer *_timer;
 
     NSThread *robot;
-    NSPort *_robotPort; /*the port is used to instruct the robot to do works*/
-    CFRunLoopRef _robotLoop; /*the loop robot is on, used to control its lifecycle*/
+    NSPort *_robotPort;       // the port is used to instruct the robot to do works
+    CFRunLoopRef _robotLoop;  //the loop robot is on, used to control its lifecycle
 
     AudioHelper *_audioHelper;
     
-    /* Members to keep track of (H)igh(L)ight moves (e.g., move-hints). */
+    // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
     int    _hl_moves[MAX_GEN_MOVES];
     int    _hl_nMoves;
-    int    _hl_lastMove; /* The last Move that was highlighted. */
+    int    _hl_lastMove;      // The last Move that was highlighted.
 
     Piece *_selectedPiece;
     
     CChessGame *_game;
 
-    int _initialTime; /* The initial time (in seconds) */
-    int _redTime;     /* RED   time (in seconds)       */
-    int _blackTime;   /* BLACK time (in seconds)       */
+    int _initialTime;  // The initial time (in seconds)
+    int _redTime;      // RED   time (in seconds)
+    int _blackTime;    // BLACK time (in seconds)
     
-    NSMutableArray *_moves;     /* MOVE history              */
-    int             _nthMove;   /* pivot for the Move Review */
+    NSMutableArray *_moves;       // MOVE history
+    int             _nthMove;     // pivot for the Move Review
     BOOL            _inReview;
-    int             _latestMove; /* Latest Move waiting to be UI-updated. */
+    int             _latestMove;  // Latest Move waiting to be UI-updated.
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;

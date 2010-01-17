@@ -29,7 +29,7 @@
 #define ROW(sq)              ((sq) / 16 - 3)
 
 
-/* Possible game result */
+// Possible game result
 enum{
     kXiangQi_Unknown = -1,
     kXiangQi_InPlay,
@@ -41,12 +41,12 @@ enum{
     kXiangQi_OverMoves,
 };
 
-/* Possible AI engines.
- * TODO: We should use prefix "kNevoChess" to make our constants
- *       unique from others (to avoid naming conflicts).
- *       Also, once we are done with the AI framework, then there will be
- *       no need for these constants.
- */
+// Possible AI engines.
+// TODO: We should use prefix "kNevoChess" to make our constants
+// unique from others (to avoid naming conflicts).
+// Also, once we are done with the AI framework, then there will be
+// no need for these constants.
+//
 enum {
     kNevoChess_AI_xqwlight,
     kNevoChess_AI_haqikid,

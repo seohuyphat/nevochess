@@ -20,27 +20,27 @@
 #import <Foundation/Foundation.h>
 
 
-/**
- * NevoChess Referee 's error codes (or Return-Codes).
- */
+//
+// NevoChess Referee 's error codes (or Return-Codes).
+//
 #define POC_RC_REF_UNKNOWN       -1
-#define POC_RC_REF_OK             0  /* A generic success       */
-#define POC_RC_REF_ERR            1  /* A generic error         */
+#define POC_RC_REF_OK             0  // A generic success
+#define POC_RC_REF_ERR            1  // A generic error
 
-/**
- * Constants required as a result of porting XQWLight source code.
- */
+//
+// Constants required as a result of porting XQWLight source code.
+//
 #define MAX_GEN_MOVES      128
 #define SRC(mv)            ((mv) & 255)
 #define DST(mv)            ((mv) >> 8)
 #define MOVE(sqSrc, sqDst) ((sqSrc) + (sqDst) * 256)
 
-/**
- * The Referee to judge a given Game.
- */
+//
+// The Referee to judge a given Game.
+//
 @interface Referee : NSObject
 {
-    /* Empty */
+    // Empty
 }
 
 - (id)   init;

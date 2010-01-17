@@ -22,7 +22,7 @@
 
 #define DEFAULT_WAV_SOUND_PATH "sounds/xqwizard-wave"
 
-//playback callback
+// playback callback
 static void playbackCallback (
 							  void					*inUserData,
 							  AudioQueueRef			inAudioQueue,
@@ -63,21 +63,21 @@ static void playbackCallback (
 		
 	} else {
         AudioQueueStop(inAudioQueue, NO);
-        //always rewind to the start
+        // always rewind to the start
         player.startingPacketNumber = 0;
         playbackCallback(inUserData, inAudioQueue, bufferReference);
 	}
 }
 
 @implementation AudioData
-@synthesize bufferByteSize;						// the number of bytes to use in each audio queue buffer
-@synthesize numPacketsToRead;					// the number of audio data packets to read into each audio queue buffer
+@synthesize bufferByteSize;    // the number of bytes to use in each audio queue buffer
+@synthesize numPacketsToRead;  // the number of audio data packets to read into each audio queue buffer
 
-@synthesize gain;								// the gain (relative audio level) for the playback audio queue
+@synthesize gain;			   // the gain (relative audio level) for the playback audio queue
 
 @synthesize mQueue;  
 
-@synthesize audioFileID;					// the identifier for the audio file to play
+@synthesize audioFileID;	   // the identifier for the audio file to play
 @synthesize audioFormat;
 @synthesize audioLevels;
 @synthesize startingPacketNumber;
@@ -114,7 +114,7 @@ static void playbackCallback (
 {
     AudioFileOpenURL (
 					  url,
-					  0x01, //fsRdPerm,						// read only
+					  0x01,  //fsRdPerm (read only)
                       kAudioFileWAVEType,
 					  //kAudioFileCAFType,
 					  &audioFileID
@@ -137,7 +137,7 @@ static void playbackCallback (
 						 self, 
 						 CFRunLoopGetCurrent (),
 						 kCFRunLoopCommonModes,
-						 0,								// run loop flags
+						 0,  // run loop flags
 						 &mQueue
 						 );
 	
@@ -151,7 +151,7 @@ static void playbackCallback (
 							);
 	
 	[self enableLevelMetering];
-    //adjust buffer size to 0.5 seconds before starting
+    // adjust buffer size to 0.5 seconds before starting
     [self calculateSizesFor:0.5f];
     // prime the queue with some data before starting
     for (int i = 0; i < kNumberBuffers; ++i) {
@@ -166,7 +166,7 @@ static void playbackCallback (
     if(toggle_sound)
         AudioQueueStart (
                          mQueue,
-                         NULL			// start time. NULL means ASAP.
+                         NULL  // start time. NULL means ASAP.
                          );
 }
 
@@ -199,8 +199,8 @@ static void playbackCallback (
 						  &maxPacketSize
 						  );
 	
-	static const int maxBufferSize = 0x10000;	// limit maximum size to 64K
-	static const int minBufferSize = 0x4000;	// limit minimum size to 16K
+	static const int maxBufferSize = 0x10000;  // limit maximum size to 64K
+	static const int minBufferSize = 0x4000;   // limit minimum size to 16K
 	
 	if (audioFormat.mFramesPerPacket) {
 		Float64 numPacketsForTime = audioFormat.mSampleRate / audioFormat.mFramesPerPacket * seconds;
