@@ -1,0 +1,45 @@
+/* 
+   Localizable.strings (Chinese version)
+   NevoChess
+
+   Created by Huy Phan on 9/23/09.
+   Copyright 2009 PlayXiangqi. All rights reserved.
+ */
+
+"About_NevoChess_Key" = "<body style=\"background-image:url(board_320x480.png);\"><h3>NevoChess %@</h3><div><b>NevoChess</b>是一款支持iPhone/iPod touch设备的开源中国象棋游戏, 项目主页位于 <a href=\"http://nevochess.googlecode.com\">Google Code</a>. 您可以通过以下邮箱联系我们 <a href=\"mailto:nevochess@playxiangqi.com\"><font face=\"Times New Roman\">nevochess@PlayXiangqi.com</font></a></div><h3>开发团队</h3><div>华雪亮(北京, 中国) <br/>Huy Phan (旧金山, 美国) </div><h3>特别声明</h3><div><p><b>XQWLight</b> 是由黄晨编写的开源象棋人工智能引擎,请参见 <a href=\"http://www.elephantbase.net\">elephantbase.net</a></p><p><b>HaQiKi D</b> 是由 H.G. Muller 编写的象棋人工智能引擎,请参见 <a href=\"http://home.hccnet.nl/h.g.muller/XQhaqikid.html\">home.hccnet.nl/h.g.muller</a></p></div><div>%@</div></body>";
+"Home" = "主菜单";
+"HOME" = "主菜单";
+"RESET" = "重新开始";
+
+/* These HOME keys need a single space in the front to separate an icon. */
+"Home_Play" = " 开始游戏";
+"Home_Settings" = " 设置";
+"Home_About" = " 关于";
+
+"Settings" = "设置";
+"Default" = "默认";
+"General" = "一般设置";
+"AI" = "机器对战AI";
+"You win,congratulations!" = "祝贺您，您赢了！";
+"Computer wins. Don't give up, please try again!" = "机器AI获胜。不要放弃，请再试一次！";
+"You lose. You may try again!" = "您输了，您可以再试一次！";
+"Sorry,we are in draw!" = "很抱歉,当前和局！";
+"Sorry,we made too many moves, please restart again!" = "很抱歉，超过最多允许着法，请重新开始了！";
+"Resume game?" = "是否继续上次游戏？";
+"New game?" = "是否开始新游戏?";
+"Yes" = "是";
+"No" = "否";
+
+/* Other keys */
+"AI_Setting_Key" = "AI设置";
+"Chinese_Key" = "中国";
+"Western_Key" = "西方";
+"Time_Key" = "时间 (分钟)";
+"Difficulty_Key" = "难度 (AI)";
+"Easy_Key" = "简单";
+"Hard_Key" = "困难";
+"Sound_Key" = "声音";
+"PieceStyle_Key" = "棋子";
+
+/* Move review label (not used?) */
+"MOVE" = "步";
