@@ -36,9 +36,9 @@ extern const char* HaQiKiD_GenerateNextMove();
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- * Convert our Move to an 'HaQiKiD' Move. 
- */
+//
+// Convert our Move to an 'HaQiKiD' Move. 
+//
 static char*
 _moveToHaQiKiD( int row1, int col1, int row2, int col2 )
 {
@@ -50,9 +50,9 @@ _moveToHaQiKiD( int row1, int col1, int row2, int col2 )
     return szMove;
 }
 
-/**
- * Convert an 'HaQiKiD' Move to our Move. 
- */
+//
+// Convert an 'HaQiKiD' Move to our Move. 
+//
 static void
 _HaQiKiDToMove( const char* szMove,
                 int* pRow1, int* pCol1, int* pRow2, int* pCol2 )

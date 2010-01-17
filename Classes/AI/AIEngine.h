@@ -20,18 +20,18 @@
 #import <Foundation/Foundation.h>
 
 
-/**
- * AI error codes (or Return-Codes).
- */
+//
+// AI error codes (or Return-Codes).
+//
 #define AI_RC_UNKNOWN       -1
-#define AI_RC_OK             0  /* A generic success       */
-#define AI_RC_ERR            1  /* A generic error         */
-#define AI_RC_NOT_FOUND      2  /* Something not found     */
-#define AI_RC_NOT_SUPPORTED  3  /* Something not supported */
+#define AI_RC_OK             0  // A generic success
+#define AI_RC_ERR            1  // A generic error
+#define AI_RC_NOT_FOUND      2  // Something not found
+#define AI_RC_NOT_SUPPORTED  3  // Something not supported
 
-/**
- * Abstract superclass for all AI Engines.
- */
+//
+// Abstract superclass for all AI Engines.
+//
 @interface AIEngine : NSObject
 {
     // Empty.

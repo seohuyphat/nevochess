@@ -66,7 +66,7 @@
     position.x = CGRectGetMidX(frame);
     position.y = CGRectGetMidY(frame); 
     CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
-    //western or Chinese?
+    // western or Chinese?
     BOOL toggleWestern = [[NSUserDefaults standardUserDefaults] boolForKey:@"toggle_western"];
     if(toggleWestern) {
         imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil inDirectory:@"pieces/alfaerie_31x31"];
@@ -95,7 +95,7 @@
     piece.position = position;
     piece.holder = s;
     if(piece.superlayer == nil) {
-        //restore the captured piece during reset
+        // restore the captured piece during reset
         [_board addSublayer:piece];
     }
 }
@@ -287,42 +287,42 @@
 
 - (void)resetCChessPieces
 {
-    //reset the pieces in pieceBox by the order they are created
-    //chariot
+    // reset the pieces in pieceBox by the order they are created
+    // chariot
     [self x_movePiece:[_pieceBox objectAtIndex:0] toRow:0 toCol:0];
     [self x_movePiece:[_pieceBox objectAtIndex:1] toRow:0 toCol:8];
     [self x_movePiece:[_pieceBox objectAtIndex:2] toRow:9 toCol:0];
     [self x_movePiece:[_pieceBox objectAtIndex:3] toRow:9 toCol:8];
     
-    //horse
+    // horse
     [self x_movePiece:[_pieceBox objectAtIndex:4] toRow:0 toCol:1];
     [self x_movePiece:[_pieceBox objectAtIndex:5] toRow:0 toCol:7];
     [self x_movePiece:[_pieceBox objectAtIndex:6] toRow:9 toCol:1];
     [self x_movePiece:[_pieceBox objectAtIndex:7] toRow:9 toCol:7];
     
-    //elephant
+    // elephant
     [self x_movePiece:[_pieceBox objectAtIndex:8] toRow:0 toCol:2];
     [self x_movePiece:[_pieceBox objectAtIndex:9] toRow:0 toCol:6];
     [self x_movePiece:[_pieceBox objectAtIndex:10] toRow:9 toCol:2];
     [self x_movePiece:[_pieceBox objectAtIndex:11] toRow:9 toCol:6];
     
-    //advisor
+    // advisor
     [self x_movePiece:[_pieceBox objectAtIndex:12] toRow:0 toCol:3];
     [self x_movePiece:[_pieceBox objectAtIndex:13] toRow:0 toCol:5];
     [self x_movePiece:[_pieceBox objectAtIndex:14] toRow:9 toCol:3];
     [self x_movePiece:[_pieceBox objectAtIndex:15] toRow:9 toCol:5];
     
-    //king
+    // king
     [self x_movePiece:[_pieceBox objectAtIndex:16] toRow:0 toCol:4];
     [self x_movePiece:[_pieceBox objectAtIndex:17] toRow:9 toCol:4];
     
-    //cannon
+    // cannon
     [self x_movePiece:[_pieceBox objectAtIndex:18] toRow:2 toCol:1];
     [self x_movePiece:[_pieceBox objectAtIndex:19] toRow:2 toCol:7];
     [self x_movePiece:[_pieceBox objectAtIndex:20] toRow:7 toCol:1];
     [self x_movePiece:[_pieceBox objectAtIndex:21] toRow:7 toCol:7];
     
-    //pawn
+    // pawn
     [self x_movePiece:[_pieceBox objectAtIndex:22] toRow:3 toCol:0];
     [self x_movePiece:[_pieceBox objectAtIndex:23] toRow:3 toCol:2];
     [self x_movePiece:[_pieceBox objectAtIndex:24] toRow:3 toCol:4];
@@ -338,41 +338,41 @@
 
 - (void)setupCChessPieces
 {
-    //chariot      
+    // chariot      
     [self x_createPiece:@"bchariot.png" row:0 col:0 forPlayer:0];
     [self x_createPiece:@"bchariot.png" row:0 col:8 forPlayer:0];         
     [self x_createPiece:@"rchariot.png" row:9 col:0 forPlayer:1];     
     [self x_createPiece:@"rchariot.png" row:9 col:8 forPlayer:1];  
 
-    //horse    
+    // horse    
     [self x_createPiece:@"bhorse.png" row:0 col:1 forPlayer:0];        
     [self x_createPiece:@"bhorse.png" row:0 col:7 forPlayer:0];         
     [self x_createPiece:@"rhorse.png" row:9 col:1 forPlayer:1];      
     [self x_createPiece:@"rhorse.png" row:9 col:7 forPlayer:1];
     
-    //elephant      
+    // elephant      
     [self x_createPiece:@"belephant.png" row:0 col:2 forPlayer:0];        
     [self x_createPiece:@"belephant.png" row:0 col:6 forPlayer:0];        
     [self x_createPiece:@"relephant.png" row:9 col:2 forPlayer:1];     
     [self x_createPiece:@"relephant.png" row:9 col:6 forPlayer:1]; 
     
-    //advisor      
+    // advisor      
     [self x_createPiece:@"badvisor.png" row:0 col:3 forPlayer:0];         
     [self x_createPiece:@"badvisor.png" row:0 col:5 forPlayer:0];         
     [self x_createPiece:@"radvisor.png" row:9 col:3 forPlayer:1];        
     [self x_createPiece:@"radvisor.png" row:9 col:5 forPlayer:1];
     
-    //king       
+    // king       
     [self x_createPiece:@"bking.png" row:0 col:4 forPlayer:0];       
     [self x_createPiece:@"rking.png" row:9 col:4 forPlayer:1];
     
-    //cannon     
+    // cannon     
     [self x_createPiece:@"bcannon.png" row:2 col:1 forPlayer:0];       
     [self x_createPiece:@"bcannon.png" row:2 col:7 forPlayer:0];          
     [self x_createPiece:@"rcannon.png" row:7 col:1 forPlayer:1];        
     [self x_createPiece:@"rcannon.png" row:7 col:7 forPlayer:1];
 
-    //pawn       
+    // pawn       
     [self x_createPiece:@"bpawn.png" row:3 col:0 forPlayer:0];         
     [self x_createPiece:@"bpawn.png" row:3 col:2 forPlayer:0];         
     [self x_createPiece:@"bpawn.png" row:3 col:4 forPlayer:0];        
