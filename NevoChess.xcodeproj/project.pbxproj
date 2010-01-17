@@ -65,6 +65,7 @@
 		AFA63FEF106FAC8F00D7B220 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA63FEE106FAC8F00D7B220 /* board_320x480.png */; };
 		AFB08A14106A663E00038488 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFB08A12106A663E00038488 /* Localizable.strings */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
+		DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DE3A5C1111033D12006D3CD3 /* DataManager.m */; };
 		DE964FCD1082511E00980CF6 /* GenericSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */; };
 		DE964FCE1082511E00980CF6 /* OptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCC1082511E00980CF6 /* OptionsView.xib */; };
 /* End PBXBuildFile section */
@@ -159,6 +160,8 @@
 		AFB08A15106A665300038488 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		AFF89D0F106FEF2B00E2136D /* Enums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enums.h; sourceTree = "<group>"; };
+		DE3A5C1011033D12006D3CD3 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
+		DE3A5C1111033D12006D3CD3 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
 		DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericSettingViewController.xib; sourceTree = "<group>"; };
 		DE964FCC1082511E00980CF6 /* OptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionsView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -184,6 +187,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				DE3A5C0F11033C82006D3CD3 /* Managers */,
+				DE3A5C0E11033C4D006D3CD3 /* Models */,
 				AF07E8A8107A302B00FE19B7 /* Referee */,
 				AF75F8D91065B6CD002A371B /* AI */,
 				4BBB5ECA1032FAFD00243E55 /* xiangqi */,
@@ -358,6 +363,22 @@
 			path = images;
 			sourceTree = "<group>";
 		};
+		DE3A5C0E11033C4D006D3CD3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		DE3A5C0F11033C82006D3CD3 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				DE3A5C1011033D12006D3CD3 /* DataManager.h */,
+				DE3A5C1111033D12006D3CD3 /* DataManager.m */,
+			);
+			name = Managers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -490,6 +511,7 @@
 				AF8CF66B107315E50071CAE2 /* AI_XQWLight.m in Sources */,
 				AF07E7F0107A272200FE19B7 /* XQWLight_Referee.cpp in Sources */,
 				AF07E8C1107A30F700FE19B7 /* Referee.m in Sources */,
+				DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
