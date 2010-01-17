@@ -47,7 +47,7 @@
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     ((UITableView*)self.view).rowHeight = 60;
     
-    // make right navigation bar button to default
+    //make right navigation bar button to default
     UIBarButtonItem *defaultButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Default", @"")
                                                                           style:UIBarButtonItemStylePlain 
                                                                          target:self 
@@ -191,7 +191,7 @@
     }
     switch (indexPath.section) {
         case 0:
-            // difficulty
+            //difficulty
             difficulty_setting.frame = CGRectMake(9.0, 9.0, 284, 23);
             [cell.contentView addSubview:difficulty_setting];
             _min = (UILabel*)[cell.contentView viewWithTag:10];
@@ -201,7 +201,7 @@
             return cell;
             break;
         case 1:
-            // time
+            //time
             _min = (UILabel*)[cell.contentView viewWithTag:10];
             _max = (UILabel*)[cell.contentView viewWithTag:11];
             time_setting.frame = CGRectMake(9.0, 9.0, 284, 23);
@@ -212,7 +212,7 @@
             return cell;
             break;
         case 2:
-            // sound/pieces setting
+            //sound/pieces setting
         {
             cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
             if(!cell) {

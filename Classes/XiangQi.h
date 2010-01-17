@@ -123,10 +123,10 @@
 - (int)search_full_for_depth:(int)nDepth alpha:(int)vlAlpha beta:(int)vlBeta;
 - (void)SearchMain;
 
-// quiescent search
+/*quiescent search*/
 - (int)search_quiescent_for_alpha:(int)alpha beta:(int)beta;
 
-// mtdf root search
+/*mtdf root search*/
 - (int)search_root_mtdf:(int)depth;
 - (int)searchBook;
 

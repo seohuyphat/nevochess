@@ -19,9 +19,9 @@
 
 #import "AI_XQWLight.h"
 
-#define XQWLight_DEFAULT_LEVEL 3  // AI Default difficulty level
+#define XQWLight_DEFAULT_LEVEL 3  /* AI Default difficulty level */
 
-// Declarations of methods defined under "XQWLight.cpp"
+/** Declarations of methods defined under "XQWLight.cpp" */
 extern void XQWLight_init_engine( int searchDepth );
 extern void XQWLight_init_game();
 extern void XQWLight_generate_move( int* pRow1, int* pCol1, int* pRow2, int* pCol2 );

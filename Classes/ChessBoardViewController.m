@@ -52,7 +52,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 
 @end
 
-// move review holder unit
+/*move review holder unit*/
 @interface MoveAtom : NSObject {
     id move;
     id srcPiece;
@@ -109,11 +109,11 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 @synthesize black_time;
 @synthesize _timer;
 
-//
-// The designated initializer.
-// Override if you create the controller programmatically and want to perform
-// customization that is not appropriate for viewDidLoad.
-//
+/**
+ * The designated initializer.
+ * Override if you create the controller programmatically and want to perform
+ * customization that is not appropriate for viewDidLoad.
+ */
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
@@ -144,11 +144,11 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 
 - (void)_ticked:(NSTimer*)timer
 {
-    // NOTE: On networked games, at least one Move made by EACH player before
-    //       the timer is started. However, it is more user-friendly for
-    //       this App (with AI only) to start the timer right after one Move
-    //       is made (by RED).
-    //
+    /* NOTE: On networked games, at least one Move made by EACH player before
+     *       the timer is started. However, it is more user-friendly for
+     *       this App (with AI only) to start the timer right after one Move
+     *       is made (by RED).
+     */
     if ( _game.game_result == kXiangQi_InPlay && [_moves count] > 0 ) {
         [self _updateTimer:[_game get_sdPlayer]];
     }
@@ -168,7 +168,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
     // connect myself to the controller
     [[NSRunLoop currentRunLoop] addPort:_robotPort forMode:NSDefaultRunLoopMode];
     
-    do  // Let the run loop process things.
+    do   // Let the run loop process things.
     {
         // Start the run loop but return after each source is handled.
         SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, NO);
@@ -185,12 +185,12 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
     [activity stopAnimating];
     if(restart) {
         [[NSRunLoop currentRunLoop] cancelPerformSelectorsWithTarget:self];
-        // only after or before AI induce begins
+        //only after or before AI induce begins
         // NOTE: We "reset" the Board's data *here* inside the AI Thread to
         //       avoid clearing data while the AI is thinking of a Move.
         [self _resetBoard];
     }else{
-        // FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
+        //FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
         CFRunLoopStop(_robotLoop);
         [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
@@ -198,10 +198,10 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 }
 
 
-//
-// Implement viewDidLoad to do additional setup after loading the view,
-// typically from a nib.
-//
+/**
+ * Implement viewDidLoad to do additional setup after loading the view,
+ * typically from a nib.
+ */
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -229,16 +229,16 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
     [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
 }
 
-//
-// Called when the view is about to made visible. Default does nothing
-//
+/**
+ * Called when the view is about to made visible. Default does nothing
+ */
 - (void)viewWillAppear:(BOOL)animated
 {
 }
 
-//
-// Handle the "OK" button in the END-GAME and RESUME-GAME alert dialogs. 
-//
+/**
+ * Handle the "OK" button in the END-GAME and RESUME-GAME alert dialogs. 
+ */
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
     if ( alertView.tag == POC_ALERT_END_GAME ) {
@@ -314,7 +314,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ( [_moves count] == 0 ) return;  // Do nothing if game not yet started.
+    if ( [_moves count] == 0 ) return; // Do nothing if game not yet started.
 
     UIAlertView *alert =
         [[UIAlertView alloc] initWithTitle:@"NevoChess"
@@ -333,7 +333,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
         return;
     }
 
-    _inReview = YES;  // Enter the Move-Review mode immediately!
+    _inReview = YES; // Enter the Move-Review mode immediately!
 
     MoveAtom *pMove = [_moves objectAtIndex:--_nthMove];
     int move = [(NSNumber*)pMove.move intValue];
@@ -341,10 +341,10 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
     int sqDst = DST(move);
     [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
 
-    // For Move-Review, just reverse the move order (sqDst->sqSrc)
-    // Since it's only a review, no need to make actual move in
-    // the underlying game logic.
-    //
+    /* For Move-Review, just reverse the move order (sqDst->sqSrc)
+     * Since it's only a review, no need to make actual move in
+     * the underlying game logic.
+     */
     [_game x_movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
     if (pMove.capturedPiece) {
         [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
@@ -361,10 +361,10 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 
 - (IBAction)moveNextPressed:(id)sender
 {
-    BOOL bNext = NO; // One "Next" click was serviced.
-                     // This variable is introduced to enforce the rule:
-                     // "Only one Move is replayed PER click".
-                     //
+    BOOL bNext = NO; /* One "Next" click was serviced.
+                      * This variable is introduced to enforce the rule:
+                      * "Only one Move is replayed PER click".
+                      */
     int nMoves = [_moves count];
     if (_nthMove >= 0 && _nthMove < nMoves) {
         MoveAtom *pMove = [_moves objectAtIndex:_nthMove++];
@@ -372,7 +372,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
         int sqDst = DST(move);
         int row2 = ROW(sqDst);
         int col2 = COLUMN(sqDst);
-        [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
+        [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
         Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
         if (capture) {
             [capture removeFromSuperlayer];
@@ -382,7 +382,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
         bNext = YES;
     }
 
-    if (_nthMove == nMoves)  // Are we reaching the latest Move end?
+    if (_nthMove == nMoves) // Are we reaching the latest Move end?
     {
         if ( _latestMove == INVALID_MOVE ) {
             _inReview = NO;
@@ -475,17 +475,17 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
             }
         }
     } else {
-        [self _setHighlightCells:NO];  // Clear highlighted.
+        [self _setHighlightCells:NO]; // Clear highlighted.
     }
 
-    _selectedPiece = nil;  // Reset selected state.
+    _selectedPiece = nil; // Reset selected state.
 }
 
 - (void) _resetBoard
 {
     [self _setHighlightCells:NO];
     _selectedPiece = nil;
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    [self _showHighlightOfMove:INVALID_MOVE]; // Clear the last highlight.
     _redTime = _blackTime = _initialTime * 60;
     memset(_hl_moves, 0x0, sizeof(_hl_moves));
     red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
@@ -576,7 +576,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
 - (void) _handleNewMove:(NSNumber *)moveInfo
 {
     int  move     = [moveInfo integerValue];
-    BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
+    BOOL isAI     = ([_game get_sdPlayer] == 0); // AI just made this Move.
 
     // Delay update the UI if in Preview mode.
     if ( _inReview ) {
@@ -651,7 +651,7 @@ static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtoco
             msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
             break;
         default:
-            break;  // Do nothing
+            break; /* Do nothing */
     }
     
     if ( !sound ) return;

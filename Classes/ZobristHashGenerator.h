@@ -19,9 +19,9 @@
 
 #import <Foundation/Foundation.h>
 
-//
-// Generate Zobrish Hash Value for indexing transitional table
-//
+/**
+ * Generate Zobrish Hash Value for indexing transitional table
+ */
 @class RC4Generator;
 
 @interface ZobristHashGenerator : NSObject {
@@ -41,9 +41,9 @@
 
 @end
 
-//
-// RC4 key generator
-//
+/**
+ * RC4 key generator
+ */
 @interface RC4Generator : NSObject {
     unsigned char s[256];
     int x, y;

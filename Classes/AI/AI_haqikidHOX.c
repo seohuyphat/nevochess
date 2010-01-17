@@ -21,7 +21,7 @@
 // Compiler switches to control search features. Remove leading X to enable.
 #define ALPHABETA
 #define NULLMOVE
-#define KILLERS 2   // set to 0 or 2
+#define KILLERS 2   /* set to 0 or 2 */
 #define XHASH
 #define DEPTHPREF
 #define CHECKEXT
@@ -41,17 +41,17 @@
 #define BLACK 32
 #define COLOR (WHITE|BLACK)
 
-// Global variables visible to engine. Normally they 
-// would be replaced by the names under which these
-// are known to your engine, so that they can be
-// manipulated directly by the interface.
+/* Global variables visible to engine. Normally they */
+/* would be replaced by the names under which these  */
+/* are known to your engine, so that they can be     */
+/* manipulated directly by the interface.            */
 
 int Side;
-int Post = 0;            // set to 1 to see machine thinking printed
-int MaxDepth  = 60;      // must be set 2 higher than actual depth!
-int MaxTime   = 1200000; // Time per session, msec
-int MaxMoves  = 40;      // moves per session; 0 = entire game
-int TimeInc   = 0;       // extra time per move in msec
+int Post = 0;           /* set to 1 to see machine thinking printed */
+int MaxDepth  = 60;     /* must be set 2 higher than actual depth!  */
+int MaxTime   = 1200000; /* Time per session, msec                   */
+int MaxMoves  = 40;     /* moves per session; 0 = entire game       */
+int TimeInc   = 0;      /* extra time per move in msec              */
 int TimeLeft;
 int MovesLeft;
 //int Ticks, tlim;
@@ -273,7 +273,7 @@ unsigned char firstDirTab[] = { // points to null-terminated lists in steps[]
 };
 
 unsigned int firstDir[48] =
-{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                               // unused
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                           // unused
     447,0,0,10,10,200,200,451,451,400,400,251,251,251,251,251,  // white pieces
     307,0,0,10,10,200,200,311,311,300,300,210,210,210,210,210   // black pieces
 };
@@ -437,8 +437,8 @@ void InitMaterial()
                             total += (nA+nE)*((13-density)*(13-density)/10 - 5);
                             materialTable[i] = total;
                             if(total > 127 || total < -128) exit(0);
-                            // Commented by HPHAN: total += 25*nP + 112*(nC+nH) + 225*nR - 50*nA - 35*nE;
-                            // devaluate superfluous defenders
+                            /* Commented by HPHAN: total += 25*nP + 112*(nC+nH) + 225*nR - 50*nA - 35*nE; */
+                            /* devaluate superfluous defenders */
                             defenders = 2*nA + 2*nE;
                             attackers = 8*nR + 4*nH + 2*nC + 3*nP;
                             if(defenders > attackers ,0)
@@ -583,7 +583,7 @@ int StupidInCheck(int stm, int to)
     return 0;
 }
 
-// simple alpha-beta search for mailbox + piece list
+/* simple alpha-beta search for mailbox + piece list */
 int Search(int origAlpha, int beta, int lastPly, int PV, int depth)
 {
     int alpha, curEval, curMove, lastMove, bestMove, capts, nonCapts, iterDep;
@@ -827,7 +827,7 @@ if(hashMove) {
     }
 }
 #endif
-// Commented by HPHAN: alphaMoves = capts;
+/* Commented by HPHAN: alphaMoves = capts; */
 
 if(depth<=0) {
     if(curEval > origAlpha) {
@@ -1096,22 +1096,22 @@ stm ^= COLOR;
 return bestScore + (bestScore < curEval);
 }
 
-// The engine is invoked through the following
-// subroutines, that can draw on the global vaiables
-// that are maintained by the interface:
-// Side         side to move
-// TimeLeft     ms left to next time control
-// MovesLeft    nr of moves to play within TimeLeft
-// MaxDepth     search-depth limit in ply
-// Post         boolean to invite engine babble
-// Randomize    if set, first 4 moves are randomized
+/* The engine is invoked through the following       */
+/* subroutines, that can draw on the global vaiables */
+/* that are maintained by the interface:             */
+/* Side         side to move                         */
+/* TimeLeft     ms left to next time control         */
+/* MovesLeft    nr of moves to play within TimeLeft  */
+/* MaxDepth     search-depth limit in ply            */
+/* Post         boolean to invite engine babble      */
+/* Randomize    if set, first 4 moves are randomized */
 
-// InitEngine() progran start-up initialization
-// InitGame()   initialization to start new game
-//              (sets Side, but not time control)
+/* InitEngine() progran start-up initialization      */
+/* InitGame()   initialization to start new game     */
+/*              (sets Side, but not time control)    */
 
-// define this to the codes used in your engine,
-// if the engine hasn't defined it already.
+/* define this to the codes used in your engine,     */
+/* if the engine hasn't defined it already.          */
 
 int initDone = 0;
 
@@ -1170,8 +1170,8 @@ void MakeMove()
     ^ Zobrist[board[gameMove.u.from]][gameMove.u.to]
     ^ Zobrist[board[gameMove.u.to]][gameMove.u.to];
     hashKeyH ^= Zobrist[board[gameMove.u.from]][gameMove.u.from+1] // kludge to save
-    ^ Zobrist[board[gameMove.u.from]][gameMove.u.to+1]             // table space:
-    ^ Zobrist[board[gameMove.u.to]][gameMove.u.to+1];              // overlap tables
+    ^ Zobrist[board[gameMove.u.from]][gameMove.u.to+1]   //   table space:
+    ^ Zobrist[board[gameMove.u.to]][gameMove.u.to+1];  //   overlap tables
     repStack[--repSP] = hashKeyL;
     repCheck[repSP] = StupidInCheck(Side,pos[Side]);
     materialIndex -= mval[board[gameMove.u.to]];
@@ -1187,15 +1187,15 @@ void HaQiKiD_OnOpponentMove(const char *line)
 {
     int m;
     
-    // command not recognized, assume input move
+    /* command not recognized, assume input move */
     m = line[0]<'a' | line[0]>'i' | line[1]<'0' | line[1]>'9' |
     line[2]<'a' | line[2]>'i' | line[3]<'0' | line[3]>'9';
     {const char *c=line;  gameMove.u.from=c[0]-'a'+20*(c[1]-'0');
         gameMove.u.to  =c[2]-'a'+20*(c[3]-'0');}
     if (m)
-        printf("Bad move syntax: %s\n", line);  // doesn't have move syntax
-    else 
-        MakeMove();  // legal move, perform it
+    /* doesn't have move syntax */
+        printf("Bad move syntax: %s\n", line);
+    else MakeMove();  /* legal move, perform it */
 }
 
 const char* HaQiKiD_GenerateNextMove()
@@ -1203,14 +1203,14 @@ const char* HaQiKiD_GenerateNextMove()
     static char move[5];
     int m;
     
-    // determine time to sepend on next move
+    /* determine time to sepend on next move */
     Ticks = GetTickCount();
     m = MovesLeft<=0 ? 40 : MovesLeft;
     tlim = 0.5*(TimeLeft+(m-1)*TimeInc)/(m+7);
     if(10*tlim > TimeLeft) tlim = TimeLeft/10;
     tlim2 = 2*tlim;
     
-    // now call the AI
+    /* now call the AI */
     nodeCnt=0;
     stm = Side ^ COLOR;
     if (Search(-INF, INF, gameMove.m, 0, 1000) > 1-INF) {
@@ -1222,7 +1222,7 @@ const char* HaQiKiD_GenerateNextMove()
         
         m = GetTickCount() - Ticks;
         
-        // time-control accounting
+        /* time-control accounting */
         TimeLeft -= m;
         TimeLeft += TimeInc;
         if(--MovesLeft == 0) {

@@ -35,7 +35,7 @@
 typedef unsigned char       BYTE;
 typedef int                 BOOL;
 typedef unsigned short      WORD;
-// Not work on Ubuntu: typedef unsigned long       DWORD;
+/* Not work on Ubuntu: typedef unsigned long       DWORD; */
 typedef unsigned int       DWORD;
 #ifndef FALSE
 #  define FALSE               0
@@ -54,11 +54,13 @@ const int BOARD_EDGE = 8;
 const int BOARD_WIDTH = BOARD_EDGE + SQUARE_SIZE * 9 + BOARD_EDGE;
 const int BOARD_HEIGHT = BOARD_EDGE + SQUARE_SIZE * 10 + BOARD_EDGE;
 
+// 棋盘范围
 const int RANK_TOP = 3;
 const int RANK_BOTTOM = 12;
 const int FILE_LEFT = 3;
 const int FILE_RIGHT = 11;
 
+// 棋子编号
 const int PIECE_KING = 0;
 const int PIECE_ADVISOR = 1;
 const int PIECE_BISHOP = 2;
@@ -67,13 +69,15 @@ const int PIECE_ROOK = 4;
 const int PIECE_CANNON = 5;
 const int PIECE_PAWN = 6;
 
-const int MAX_GEN_MOVES = 128;
-const int MAX_MOVES = 256;
-const int MATE_VALUE = 10000;
-const int BAN_VALUE = MATE_VALUE - 100;
-const int WIN_VALUE = MATE_VALUE - 200;
-const int DRAW_VALUE = 20;
+// 其他常数
+const int MAX_GEN_MOVES = 128; // 最大的生成走法数
+const int MAX_MOVES = 256;     // 最大的历史走法数
+const int MATE_VALUE = 10000;  // 最高分值，即将死的分值
+const int BAN_VALUE = MATE_VALUE - 100; // 长将判负的分值，低于该值将不写入置换表
+const int WIN_VALUE = MATE_VALUE - 200; // 搜索出胜负的分值界限，超出此值就说明已经搜索出杀棋了
+const int DRAW_VALUE = 20;     // 和棋时返回的分数(取负值)
 
+// 判断棋子是否在棋盘中的数组
 static const char ccInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -93,6 +97,7 @@ static const char ccInBoard[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+// 判断棋子是否在九宫的数组
 static const char ccInFort[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -112,6 +117,7 @@ static const char ccInFort[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+// 判断步长是否符合特定走法的数组，1=帅(将)，2=仕(士)，3=相(象)
 static const char ccLegalSpan[512] = {
                        0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -148,6 +154,7 @@ static const char ccLegalSpan[512] = {
   0, 0, 0, 0, 0, 0, 0
 };
 
+// 根据步长判断马是否蹩腿的数组
 static const char ccKnightPin[512] = {
                               0,  0,  0,  0,  0,  0,  0,  0,  0,
   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -184,11 +191,16 @@ static const char ccKnightPin[512] = {
   0,  0,  0,  0,  0,  0,  0
 };
 
+// 帅(将)的步长
 static const char ccKingDelta[4] = {-16, -1, 1, 16};
+// 仕(士)的步长
 static const char ccAdvisorDelta[4] = {-17, -15, 15, 17};
+// 马的步长，以帅(将)的步长作为马腿
 static const char ccKnightDelta[4][2] = {{-33, -31}, {-18, 14}, {-14, 18}, {31, 33}};
+// 马被将军的步长，以仕(士)的步长作为马腿
 static const char ccKnightCheckDelta[4][2] = {{-33, -18}, {-31, -14}, {14, 31}, {18, 33}};
 
+// 棋盘初始设置
 static const BYTE cucpcStartup[256] = {
   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -208,8 +220,9 @@ static const BYTE cucpcStartup[256] = {
   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 };
 
+// 子力位置价值表
 static const BYTE cucvlPiecePos[7][256] = {
-  {
+  { // 帅(将)
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -226,7 +239,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 仕(士)
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -243,7 +256,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 相(象)
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -260,7 +273,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 马
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -277,7 +290,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 车
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -294,7 +307,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 炮
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -311,7 +324,7 @@ static const BYTE cucvlPiecePos[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-  }, {
+  }, { // 兵(卒)
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -331,96 +344,118 @@ static const BYTE cucvlPiecePos[7][256] = {
   }
 };
 
+// 判断棋子是否在棋盘中
 inline BOOL IN_BOARD(int sq) {
   return ccInBoard[sq] != 0;
 }
 
+// 判断棋子是否在九宫中
 inline BOOL IN_FORT(int sq) {
   return ccInFort[sq] != 0;
 }
 
+// 获得格子的横坐标
 inline int RANK_Y(int sq) {
   return sq >> 4;
 }
 
+// 获得格子的纵坐标
 inline int FILE_X(int sq) {
   return sq & 15;
 }
 
+// 翻转格子
 inline int SQUARE_FLIP(int sq) {
   return 254 - sq;
 }
 
+// 格子水平镜像
 inline int SQUARE_FORWARD(int sq, int sd) {
   return sq - 16 + (sd << 5);
 }
 
+// 走法是否符合帅(将)的步长
 inline BOOL KING_SPAN(int sqSrc, int sqDst) {
   return ccLegalSpan[sqDst - sqSrc + 256] == 1;
 }
 
+// 走法是否符合仕(士)的步长
 inline BOOL ADVISOR_SPAN(int sqSrc, int sqDst) {
   return ccLegalSpan[sqDst - sqSrc + 256] == 2;
 }
 
+// 走法是否符合相(象)的步长
 inline BOOL BISHOP_SPAN(int sqSrc, int sqDst) {
   return ccLegalSpan[sqDst - sqSrc + 256] == 3;
 }
 
+// 相(象)眼的位置
 inline int BISHOP_PIN(int sqSrc, int sqDst) {
   return (sqSrc + sqDst) >> 1;
 }
 
+// 马腿的位置
 inline int KNIGHT_PIN(int sqSrc, int sqDst) {
   return sqSrc + ccKnightPin[sqDst - sqSrc + 256];
 }
 
+// 是否未过河
 inline BOOL HOME_HALF(int sq, int sd) {
   return (sq & 0x80) != (sd << 7);
 }
 
+// 是否已过河
 inline BOOL AWAY_HALF(int sq, int sd) {
   return (sq & 0x80) == (sd << 7);
 }
 
+// 是否在河的同一边
 inline BOOL SAME_HALF(int sqSrc, int sqDst) {
   return ((sqSrc ^ sqDst) & 0x80) == 0;
 }
 
+// 是否在同一行
 inline BOOL SAME_RANK(int sqSrc, int sqDst) {
   return ((sqSrc ^ sqDst) & 0xf0) == 0;
 }
 
+// 是否在同一列
 inline BOOL SAME_FILE(int sqSrc, int sqDst) {
   return ((sqSrc ^ sqDst) & 0x0f) == 0;
 }
 
+// 获得红黑标记(红子是8，黑子是16)
 inline int SIDE_TAG(int sd) {
   return 8 + (sd << 3);
 }
 
+// 获得对方红黑标记
 inline int OPP_SIDE_TAG(int sd) {
   return 16 - (sd << 3);
 }
 
+// 获得走法的起点
 inline int SRC(int mv) {
   return mv & 255;
 }
 
+// 获得走法的终点
 inline int DST(int mv) {
   return mv >> 8;
 }
 
+// 根据起点和终点获得走法
 inline int MOVE(int sqSrc, int sqDst) {
   return sqSrc + sqDst * 256;
 }
 
+// RC4密码流生成器
 struct _RC4Struct {
   BYTE s[256];
   int x, y;
 
-  void InitZero(void);
-  BYTE NextByte(void) {
+  void InitZero(void);   // 用空密钥初始化密码流生成器
+  BYTE NextByte(void) {  // 生成密码流的下一个字节
     BYTE uc;
     x = (x + 1) & 255;
     y = (y + s[x]) & 255;
@@ -429,7 +464,7 @@ struct _RC4Struct {
     s[y] = uc;
     return s[(s[x] + s[y]) & 255];
   }
-  DWORD NextLong(void) {
+  DWORD NextLong(void) { // 生成密码流的下四个字节
     BYTE uc0, uc1, uc2, uc3;
     uc0 = NextByte();
     uc1 = NextByte();
@@ -439,6 +474,7 @@ struct _RC4Struct {
   }
 };
 
+// 用空密钥初始化密码流生成器
 void _RC4Struct::InitZero(void) {
   int i, j;
   BYTE uc;
@@ -455,18 +491,19 @@ void _RC4Struct::InitZero(void) {
   }
 }
 
+// Zobrist结构
 struct ZobristStruct {
   DWORD dwKey, dwLock0, dwLock1;
 
-  void InitZero(void) {
+  void InitZero(void) {                 // 用零填充Zobrist
     dwKey = dwLock0 = dwLock1 = 0;
   }
-  void InitRC4(_RC4Struct &rc4) {
+  void InitRC4(_RC4Struct &rc4) {        // 用密码流填充Zobrist
     dwKey = rc4.NextLong();
     dwLock0 = rc4.NextLong();
     dwLock1 = rc4.NextLong();
   }
-  void Xor(const ZobristStruct &zobr) {
+  void Xor(const ZobristStruct &zobr) { // 执行XOR操作
     dwKey ^= zobr.dwKey;
     dwLock0 ^= zobr.dwLock0;
     dwLock1 ^= zobr.dwLock1;
@@ -478,11 +515,13 @@ struct ZobristStruct {
   }
 };
 
+// Zobrist表
 static struct {
   ZobristStruct Player;
   ZobristStruct Table[14][256];
 } Zobrist;
 
+// 初始化Zobrist表
 static void InitZobrist(void) {
   int i, j;
   _RC4Struct rc4;
@@ -496,6 +535,7 @@ static void InitZobrist(void) {
   }
 }
 
+// 历史走法信息(占4字节)
 struct _MoveStruct
 {
   WORD wmv;
@@ -510,31 +550,33 @@ struct _MoveStruct
   }
 };
 
+// 局面结构
 struct _PositionStruct
 {
-  int sdPlayer;
-  BYTE ucpcSquares[256];
-  int vlWhite, vlBlack;
-  int nDistance, nMoveNum;
-  _MoveStruct mvsList[MAX_MOVES];
+  int sdPlayer;                   // 轮到谁走，0=红方，1=黑方
+  BYTE ucpcSquares[256];          // 棋盘上的棋子
+  int vlWhite, vlBlack;           // 红、黑双方的子力价值
+  int nDistance, nMoveNum;        // 距离根节点的步数，历史走法数
+  _MoveStruct mvsList[MAX_MOVES];  // 历史走法信息列表
   ZobristStruct zobr;             // Zobrist
 
-  void ClearBoard(void) {
+  void ClearBoard(void) {         // 清空棋盘
     sdPlayer = vlWhite = vlBlack = nDistance = 0;
     memset(ucpcSquares, 0, 256);
     zobr.InitZero();
   }
-  void SetIrrev(void) {
+  void SetIrrev(void) {           // 清空(初始化)历史走法信息
     mvsList[0].Set(0, 0, Checked(), zobr.dwKey);
     nMoveNum = 1;
   }
-  void Startup(unsigned char board[10][9]);
-  void ChangeSide(void) {
+  void Startup(unsigned char board[10][9]);             // 初始化棋盘
+  void ChangeSide(void) {         // 交换走子方
     sdPlayer = 1 - sdPlayer;
     zobr.Xor(Zobrist.Player);
   }
-  void AddPiece(int sq, int pc) {
+  void AddPiece(int sq, int pc) { // 在棋盘上放一枚棋子
     ucpcSquares[sq] = pc;
+    // 红方加分，黑方(注意"cucvlPiecePos"取值要颠倒)减分
     if (pc < 16) {
       vlWhite += cucvlPiecePos[pc - 8][sq];
       zobr.Xor(Zobrist.Table[pc - 8][sq]);
@@ -543,8 +585,9 @@ struct _PositionStruct
       zobr.Xor(Zobrist.Table[pc - 9][sq]);
     }
   }
-  void DelPiece(int sq, int pc) {
+  void DelPiece(int sq, int pc) { // 从棋盘上拿走一枚棋子
     ucpcSquares[sq] = 0;
+    // 红方减分，黑方(注意"cucvlPiecePos"取值要颠倒)加分
     if (pc < 16) {
       vlWhite -= cucvlPiecePos[pc - 8][sq];
       zobr.Xor(Zobrist.Table[pc - 8][sq]);
@@ -554,32 +597,33 @@ struct _PositionStruct
     }
   }
 
-  BOOL InCheck(void) const {
+  BOOL InCheck(void) const {      // 是否被将军
     return mvsList[nMoveNum - 1].ucbCheck;
   }
-  BOOL Captured(void) const {
+  BOOL Captured(void) const {     // 上一步是否吃子
     return mvsList[nMoveNum - 1].ucpcCaptured != 0;
   }
-  int MovePiece(int mv);
-  void UndoMovePiece(int mv, int pcCaptured);
-  BOOL MakeMove(int mv, int* ppcCaptured = NULL);
-  void UndoMakeMove(void) {
+  int MovePiece(int mv);                      // 搬一步棋的棋子
+  void UndoMovePiece(int mv, int pcCaptured); // 撤消搬一步棋的棋子
+  BOOL MakeMove(int mv, int* ppcCaptured = NULL);            // 走一步棋
+  void UndoMakeMove(void) {                   // 撤消走一步棋
     nDistance --;
     nMoveNum --;
     ChangeSide();
     UndoMovePiece(mvsList[nMoveNum].wmv, mvsList[nMoveNum].ucpcCaptured);
   }
 
+  // 生成所有走法，如果"bCapture"为"TRUE"则只生成吃子走法
   int GenerateMoves(int *mvs, BOOL bCapture = FALSE) const;
   int GenerateMovesFrom(int sqSrc, int *mvs, BOOL bCapture = FALSE) const;
-  BOOL LegalMove(int mv) const;
-  BOOL Checked(void) const;
-  BOOL IsMate(void);
-  int DrawValue(void) const {
+  BOOL LegalMove(int mv) const;               // 判断走法是否合理
+  BOOL Checked(void) const;                   // 判断是否被将军
+  BOOL IsMate(void);                          // 判断是否被杀
+  int DrawValue(void) const {                 // 和棋分值
     return (nDistance & 1) == 0 ? -DRAW_VALUE : DRAW_VALUE;
   }
-  int RepStatus(int nRecur = 1) const;
-  int RepValue(int nRepStatus) const {
+  int RepStatus(int nRecur = 1) const;        // 检测重复局面
+  int RepValue(int nRepStatus) const {        // 重复局面分值
     int vlReturn;
     vlReturn = ((nRepStatus & 2) == 0 ? 0 : nDistance - BAN_VALUE) +
         ((nRepStatus & 4) == 0 ? 0 : BAN_VALUE - nDistance);
@@ -587,6 +631,7 @@ struct _PositionStruct
   }
 };
 
+// 初始化棋盘
 void _PositionStruct::Startup(unsigned char board[10][9]) {
   int sq;
   ClearBoard();
@@ -613,6 +658,7 @@ void _PositionStruct::Startup(unsigned char board[10][9]) {
   SetIrrev();
 }
 
+// 搬一步棋的棋子
 int _PositionStruct::MovePiece(int mv) {
   int sqSrc, sqDst, pc, pcCaptured;
   sqSrc = SRC(mv);
@@ -627,6 +673,7 @@ int _PositionStruct::MovePiece(int mv) {
   return pcCaptured;
 }
 
+// 撤消搬一步棋的棋子
 void _PositionStruct::UndoMovePiece(int mv, int pcCaptured) {
   int sqSrc, sqDst, pc;
   sqSrc = SRC(mv);
@@ -639,6 +686,7 @@ void _PositionStruct::UndoMovePiece(int mv, int pcCaptured) {
   }
 }
 
+// 走一步棋
 BOOL _PositionStruct::MakeMove(int mv, int* ppcCaptured /*= NULL*/) {
   int pcCaptured;
   DWORD dwKey;
@@ -675,20 +723,24 @@ int _PositionStruct::GenerateMoves(int *mvs, BOOL bCapture) const {
     return nGenMoves;
 }
 
+// 生成所有走法，如果"bCapture"为"TRUE"则只生成吃子走法
 int _PositionStruct::GenerateMovesFrom(int sqSrc, int *mvs, BOOL bCapture) const {
   int i, j, nGenMoves, nDelta, sqDst;
   int pcSelfSide, pcOppSide, pcSrc, pcDst;
+  // 生成所有走法，需要经过以下几个步骤：
 
   nGenMoves = 0;
   pcSelfSide = SIDE_TAG(sdPlayer);
   pcOppSide = OPP_SIDE_TAG(sdPlayer);
   if (sqSrc >= 0 && sqSrc < 256) {
 
+    // 1. 找到一个本方棋子，再做以下判断：
     pcSrc = ucpcSquares[sqSrc];
     if ((pcSrc & pcSelfSide) == 0) {
       return nGenMoves;
     }
 
+    // 2. 根据棋子确定走法
     switch (pcSrc - pcSelfSide) {
     case PIECE_KING:
       for (i = 0; i < 4; i ++) {
@@ -828,10 +880,13 @@ int _PositionStruct::GenerateMovesFrom(int sqSrc, int *mvs, BOOL bCapture) const
   return nGenMoves;
 }
 
+// 判断走法是否合理
 BOOL _PositionStruct::LegalMove(int mv) const {
   int sqSrc, sqDst, sqPin;
   int pcSelfSide, pcSrc, pcDst, nDelta;
+  // 判断走法是否合法，需要经过以下的判断过程：
 
+  // 1. 判断起始格是否有自己的棋子
   sqSrc = SRC(mv);
   pcSrc = ucpcSquares[sqSrc];
   pcSelfSide = SIDE_TAG(sdPlayer);
@@ -839,12 +894,14 @@ BOOL _PositionStruct::LegalMove(int mv) const {
     return FALSE;
   }
 
+  // 2. 判断目标格是否有自己的棋子
   sqDst = DST(mv);
   pcDst = ucpcSquares[sqDst];
   if ((pcDst & pcSelfSide) != 0) {
     return FALSE;
   }
 
+  // 3. 根据棋子的类型检查走法是否合理
   switch (pcSrc - pcSelfSide) {
   case PIECE_KING:
     return IN_FORT(sqDst) && KING_SPAN(sqSrc, sqDst);
@@ -890,17 +947,20 @@ BOOL _PositionStruct::LegalMove(int mv) const {
   }
 }
 
+// 判断是否被将军
 BOOL _PositionStruct::Checked() const {
   int i, j, sqSrc, sqDst;
   int pcSelfSide, pcOppSide, pcDst, nDelta;
   pcSelfSide = SIDE_TAG(sdPlayer);
   pcOppSide = OPP_SIDE_TAG(sdPlayer);
+  // 找到棋盘上的帅(将)，再做以下判断：
 
   for (sqSrc = 0; sqSrc < 256; sqSrc ++) {
     if (ucpcSquares[sqSrc] != pcSelfSide + PIECE_KING) {
       continue;
     }
 
+    // 1. 判断是否被对方的兵(卒)将军
     if (ucpcSquares[SQUARE_FORWARD(sqSrc, sdPlayer)] == pcOppSide + PIECE_PAWN) {
       return TRUE;
     }
@@ -910,6 +970,7 @@ BOOL _PositionStruct::Checked() const {
       }
     }
 
+    // 2. 判断是否被对方的马将军(以仕(士)的步长当作马腿)
     for (i = 0; i < 4; i ++) {
       if (ucpcSquares[sqSrc + ccAdvisorDelta[i]] != 0) {
         continue;
@@ -921,7 +982,8 @@ BOOL _PositionStruct::Checked() const {
         }
       }
     }
-    
+
+    // 3. 判断是否被对方的车或炮将军(包括将帅对脸)
     for (i = 0; i < 4; i ++) {
       nDelta = ccKingDelta[i];
       sqDst = sqSrc + nDelta;
@@ -952,7 +1014,7 @@ BOOL _PositionStruct::Checked() const {
   return FALSE;
 }
 
-
+// 判断是否被杀
 BOOL _PositionStruct::IsMate(void) {
   int i, nGenMoveNum, pcCaptured;
   int mvs[MAX_GEN_MOVES];
@@ -970,7 +1032,7 @@ BOOL _PositionStruct::IsMate(void) {
   return TRUE;
 }
 
-
+// 检测重复局面
 int _PositionStruct::RepStatus(int nRecur) const {
   BOOL bSelfSide, bPerpCheck, bOppPerpCheck;
   const _MoveStruct *lpmvs;
@@ -1004,13 +1066,13 @@ static _PositionStruct pos; // 局面实例
 ////////////////// HPHAN Code addition //////////////////////
 
 extern "C" void
-Referee_init_game() // unsigned char board[10][9] = NULL
+Referee_init_game( /*unsigned char board[10][9] = NULL */ )
 {
-    const char    side = 'w'; // NOTE: Hard-coded starting side.
+    const char    side = 'w'; /* NOTE: Hard-coded starting side. */
 
     srand((DWORD) time(NULL));
     InitZobrist();
-    pos.Startup(NULL);
+    pos.Startup(NULL /*board*/);
 
     if ( side == 'b' )
     {
@@ -1019,21 +1081,21 @@ Referee_init_game() // unsigned char board[10][9] = NULL
 }
 
 extern "C" int
-Referee_generate_move_from(int sqSrc, int *mvs)
+Referee_generate_move_from( int sqSrc, int *mvs )
 {
-    return pos.GenerateMovesFrom( sqSrc, mvs, FALSE);
+    return pos.GenerateMovesFrom( sqSrc, mvs, FALSE /* bCapture */ );
 }
 
 extern "C" int
-Referee_is_legal_move(int mv)
+Referee_is_legal_move( int mv )
 {
-    int bLegal = 1; // Default: legal
+    int bLegal = 1; /* Default: legal */
 
     if ( ! pos.LegalMove( mv ) ) {
-        return 0; // illegal
+        return 0; /* illegal */
     }
     
-    // Make sure you are not in check after you make your move.
+    /* Make sure you are not in check after you make your move. */
     int pcCaptured = pos.MovePiece(mv);
     if ( pos.Checked() ) {
         bLegal = 0;
@@ -1043,7 +1105,7 @@ Referee_is_legal_move(int mv)
 }
 
 extern "C" void
-Referee_make_move(int mv, int* ppcCaptured)
+Referee_make_move( int mv, int* ppcCaptured )
 {
     pos.MakeMove( mv, ppcCaptured );
 }

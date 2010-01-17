@@ -19,7 +19,7 @@
 
 #import "Referee.h"
 
-// Declarations of methods defined under "XQWLight_Referee.cpp"
+/** Declarations of methods defined under "XQWLight_Referee.cpp" */
 extern void Referee_init_game();
 extern int  Referee_generate_move_from( int sqSrc, int *mvs );
 extern int  Referee_is_legal_move( int mv );
