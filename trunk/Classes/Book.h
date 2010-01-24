@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright 2009 Nevo Hua  <nevo.hua@playxiangqi.com>                    *
+ *  Copyright 2009-2010 Nevo Hua  <nevo.hua@playxiangqi.com>               *
  *                                                                         * 
  *  This file is part of NevoChess.                                        *
  *                                                                         *
