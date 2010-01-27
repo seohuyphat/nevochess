@@ -68,6 +68,8 @@
 		DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DE3A5C1111033D12006D3CD3 /* DataManager.m */; };
 		DE964FCD1082511E00980CF6 /* GenericSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */; };
 		DE964FCE1082511E00980CF6 /* OptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCC1082511E00980CF6 /* OptionsView.xib */; };
+		DEE1A160110C91F700171BE1 /* GameDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DEE1A15F110C91F700171BE1 /* GameDataManager.m */; };
+		DEE1A16E110C92C100171BE1 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DEE1A16D110C92C100171BE1 /* CoreData.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -164,6 +166,9 @@
 		DE3A5C1111033D12006D3CD3 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
 		DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericSettingViewController.xib; sourceTree = "<group>"; };
 		DE964FCC1082511E00980CF6 /* OptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionsView.xib; sourceTree = "<group>"; };
+		DEE1A15E110C91F700171BE1 /* GameDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameDataManager.h; sourceTree = "<group>"; };
+		DEE1A15F110C91F700171BE1 /* GameDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameDataManager.m; sourceTree = "<group>"; };
+		DEE1A16D110C92C100171BE1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +183,7 @@
 				4BBB5F67103304F000243E55 /* QuartzCore.framework in Frameworks */,
 				4B3454761053DC6500362ED5 /* CoreAudio.framework in Frameworks */,
 				4B3454AC1053E7EC00362ED5 /* AudioToolbox.framework in Frameworks */,
+				DEE1A16E110C92C100171BE1 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +261,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DEE1A16D110C92C100171BE1 /* CoreData.framework */,
 				4B3454AB1053E7EC00362ED5 /* AudioToolbox.framework */,
 				4B3454751053DC6500362ED5 /* CoreAudio.framework */,
 				4BBB5F64103304F000243E55 /* CoreGraphics.framework */,
@@ -375,6 +382,8 @@
 			children = (
 				DE3A5C1011033D12006D3CD3 /* DataManager.h */,
 				DE3A5C1111033D12006D3CD3 /* DataManager.m */,
+				DEE1A15E110C91F700171BE1 /* GameDataManager.h */,
+				DEE1A15F110C91F700171BE1 /* GameDataManager.m */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -512,6 +521,7 @@
 				AF07E7F0107A272200FE19B7 /* XQWLight_Referee.cpp in Sources */,
 				AF07E8C1107A30F700FE19B7 /* Referee.m in Sources */,
 				DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */,
+				DEE1A160110C91F700171BE1 /* GameDataManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
