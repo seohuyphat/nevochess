@@ -34,6 +34,13 @@
    git checkout <revision-commint-sha>
 }}}
 
+=== How to push local commits into different svn branch ===
+{{{
+  git rebase remotes/xxx
+  git svn dcommit --dry-run # this check if the commits go to the right remote branch
+  git svn dcommit
+}}}
+
 === How to find more helps ===
 {{{
   git help svn
