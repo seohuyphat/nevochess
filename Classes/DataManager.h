@@ -26,4 +26,6 @@
 
 }
 
++ (DataManager*)getDataManager;
+
 @end

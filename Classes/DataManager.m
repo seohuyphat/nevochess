@@ -21,5 +21,21 @@
 
 
 @implementation DataManager
+- (id)init
+{
+    self = [super init];
+    return self;
+}
+
+- (void)dealloc
+{
+    [super dealloc];
+}
+
++ (DataManager*)getDataManager
+{
+    NSAssert(YES, @"Unexpected getDataManager called, please implement this function in DataManager sub-class!");
+    return nil;
+}
 
 @end
