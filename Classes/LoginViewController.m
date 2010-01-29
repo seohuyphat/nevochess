@@ -17,39 +17,53 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+#import "LoginViewController.h"
 
-#import "BoardViewController.h"
 
-@interface ChessBoardViewController : BoardViewController
-{
-    
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+@implementation LoginViewController
 
-    /*
-    // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
-    int    _hl_moves[MAX_GEN_MOVES];
-    int    _hl_nMoves;
-    int    _hl_lastMove;      // The last Move that was highlighted.
+@synthesize delegate;
 
-    Piece *_selectedPiece;
-    
-    NSMutableArray *_moves;       // MOVE history
-    int             _nthMove;     // pivot for the Move Review
-    BOOL            _inReview;
-    int             _latestMove;  // Latest Move waiting to be UI-updated.
-    */
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
 }
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [_username becomeFirstResponder]; // to have the first keyboard focus
+}
 
-- (IBAction)movePrevPressed:(id)sender;
-- (IBAction)moveNextPressed:(id)sender;
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
 
-- (void) saveGame;
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
 
-- (void) _resetBoard;
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (IBAction)loginButtonPressed:(id)sender
+{
+    NSLog(@"%s: ENTER. [%@]", __FUNCTION__, _username.text);
+    [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
+}
+
+- (IBAction)cancelButtonPressed:(id)sender
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [delegate handleLoginRequest:nil username:nil password:nil];
+}
 
 @end

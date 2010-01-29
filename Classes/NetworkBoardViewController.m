@@ -17,31 +17,26 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "ChessBoardViewController.h"
+#import "NetworkBoardViewController.h"
 #import "Enums.h"
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
 #import "Piece.h"
 #import "ChessBoardView.h"
 
-//static BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
-//static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Private methods
-//
-///////////////////////////////////////////////////////////////////////////////
+@interface NetworkBoardViewController (PrivateMethods)
+- (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
+- (void) handleNetworkEvent_I_MOVES:(NSString*)event;
+- (void) handleNetworkEvent_MOVE:(NSString*)event;
 
-@interface ChessBoardViewController (PrivateMethods)
+- (NSString*) _generateGuestUserName;
+- (int) _generateRandomNumber:(unsigned int)max_value;
 
 - (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _showHighlightOfMove:(int)move;
 - (void) _handleNewMove:(NSNumber *)pMove;
 - (void) _handleEndGameInUI;
-- (void) _displayResumeGameAlert;
-- (void) _loadPendingGame:(NSString *)sPendingGame;
-
 @end
 
 
@@ -51,169 +46,74 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-@implementation ChessBoardViewController
+@implementation NetworkBoardViewController
 
-//
-// The designated initializer.
-// Override if you create the controller programmatically and want to perform
-// customization that is not appropriate for viewDidLoad.
-//
+@synthesize _tableId;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        _username = nil;
+        _password = nil;
+        _tableId  = nil;
 
-        // Restore pending game, if any.
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
-            [self _displayResumeGameAlert];
-        }
+        _connection = [[NetworkConnection alloc] init];
+        _connection.delegate = self;
+        [_connection connect];
     }
     
     return self;
 }
 
-- (void)robotThread:(void*)param
-{
- 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	BOOL done = NO;
-    
-    robot = [NSThread currentThread];
-    _robotLoop = CFRunLoopGetCurrent();
-    
-    // Set the priority to the highest so that Robot can utilize more time to think
-    [NSThread setThreadPriority:1.0f];
-    
-    // connect myself to the controller
-    [[NSRunLoop currentRunLoop] addPort:_robotPort forMode:NSDefaultRunLoopMode];
-    
-    do  // Let the run loop process things.
-    {
-        // Start the run loop but return after each source is handled.
-        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, NO);
-        // If a source explicitly stopped the run loop, go and exit the loop
-        if (result == kCFRunLoopRunStopped)
-            done = YES;
-    } while (!done);
-	
-    [pool release];   
-}
-
-- (void)resetRobot:(id)restart
-{
-    [activity stopAnimating];
-    if(restart) {
-        [[NSRunLoop currentRunLoop] cancelPerformSelectorsWithTarget:self];
-        // only after or before AI induce begins
-        // NOTE: We "reset" the Board's data *here* inside the AI Thread to
-        //       avoid clearing data while the AI is thinking of a Move.
-        [self _resetBoard];
-    }else{
-        // FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
-        //       thinking is still on going. So trying to stop the runloop
-        CFRunLoopStop(_robotLoop);
-        [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
-    }
-}
-
-
-//
-// Implement viewDidLoad to do additional setup after loading the view,
-// typically from a nib.
-//
 - (void)viewDidLoad
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
+} 
 
-    // Robot
-    _robotPort = [[NSMachPort port] retain]; //retain here otherwise it will be autoreleased
-    [_robotPort setDelegate:self];
-    [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
-}
-
-//
-// Called when the view is about to made visible. Default does nothing
-//
-- (void)viewWillAppear:(BOOL)animated
+- (void)viewDidAppear:(BOOL)animated 
 {
-}
-
-//
-// Handle the "OK" button in the END-GAME and RESUME-GAME alert dialogs. 
-//
-- (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
-{
-    if ( alertView.tag == POC_ALERT_END_GAME ) {
-        [self _resetBoard];
-    }
-    else if (    alertView.tag == POC_ALERT_RESUME_GAME
-              && buttonIndex != [alertView cancelButtonIndex] )
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [super viewDidAppear:animated];
+    if (_username == nil)
     {
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
-            [self _loadPendingGame:sPendingGame];
-        }
+        LoginViewController *loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
+        loginController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        loginController.delegate = self;
+        [self presentModalViewController:loginController animated:YES];
     }
-    else if (    alertView.tag == POC_ALERT_RESET_GAME
-             && buttonIndex != [alertView cancelButtonIndex] )
-    {
-        [activity setHidden:NO];
-        [activity startAnimating];
-        
-        [self rescheduleTimer];
-        
-        [self performSelector:@selector(resetRobot:) onThread:robot withObject:self waitUntilDone:NO];
-    }
-}
-
-- (void)didReceiveMemoryWarning
-{
-	// Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-	
-	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload
-{
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
 }
 
 - (void)dealloc
 {
-    [_robotPort release];
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_connection release];
     [super dealloc];
 }
 
-#pragma mark Button actions
 
 - (IBAction)homePressed:(id)sender
 {
-    [activity setHidden:NO];
-    [activity startAnimating];
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_connection send_LOGOUT];
 
-    if (self._timer) [self._timer invalidate];
-    self._timer = nil;
-
-    [self performSelector:@selector(resetRobot:) onThread:robot withObject:nil waitUntilDone:NO];
-    [self saveGame];
-    // Not needed: [self _resetBoard];
+    // !!!!!!!!!!!!!!!!!!!
+    // NOTE: Let the handler for the 'NSStreamEventEndEncountered' event
+    //       take care of closing the IO streams.
+    // !!!!!!!!!!!!!!!!!!!
 }
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ( [_moves count] == 0 ) return;  // Do nothing if game not yet started.
-
-    UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:@"NevoChess"
-                                   message:NSLocalizedString(@"New game?", @"")
-                                  delegate:self 
-                         cancelButtonTitle:NSLocalizedString(@"No", @"")
-                         otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = POC_ALERT_RESET_GAME;
-    [alert show];
-    [alert release];
+    [_connection send_LIST];
+    
+    /*
+    TableListViewController *listController = [[TableListViewController alloc] initWithList:@"SomeList"];
+    listController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    listController.delegate = self;
+    [self presentModalViewController:listController animated:YES];
+     */
 }
 
 - (IBAction)movePrevPressed:(id)sender
@@ -221,15 +121,15 @@
     if (_nthMove < 1) {  // No Move made yet?
         return;
     }
-
+    
     _inReview = YES;  // Enter the Move-Review mode immediately!
-
+    
     MoveAtom *pMove = [_moves objectAtIndex:--_nthMove];
     int move = [(NSNumber*)pMove.move intValue];
     int sqSrc = SRC(move);
     int sqDst = DST(move);
     [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
-
+    
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
@@ -238,7 +138,7 @@
     if (pMove.capturedPiece) {
         [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     }
-
+    
     int prevMove = INVALID_MOVE;
     if (_nthMove > 0) {  // No more Move?
         int prevIndex = _nthMove - 1;
@@ -251,9 +151,9 @@
 - (IBAction)moveNextPressed:(id)sender
 {
     BOOL bNext = NO; // One "Next" click was serviced.
-                     // This variable is introduced to enforce the rule:
-                     // "Only one Move is replayed PER click".
-                     //
+    // This variable is introduced to enforce the rule:
+    // "Only one Move is replayed PER click".
+    //
     int nMoves = [_moves count];
     if (_nthMove >= 0 && _nthMove < nMoves) {
         MoveAtom *pMove = [_moves objectAtIndex:_nthMove++];
@@ -270,7 +170,7 @@
         [self _showHighlightOfMove:move];
         bNext = YES;
     }
-
+    
     if (_nthMove == nMoves)  // Are we reaching the latest Move end?
     {
         if ( _latestMove == INVALID_MOVE ) {
@@ -286,31 +186,15 @@
     }
 }
 
-#pragma mark AI move 
-- (void)AIMove
-{
-    int captured = 0;
-    int move = [_game getRobotMove:&captured];
-    if (move == INVALID_MOVE) {
-        NSLog(@"ERROR: %s: Invalid move [%d].", __FUNCTION__, move); 
-        return;
-    }
-
-    NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-    [self performSelectorOnMainThread:@selector(_handleNewMove:)
-                           withObject:moveInfo waitUntilDone:NO];
-}
-
-#pragma mark Touch event handling
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if ( [[event allTouches] count] != 1 // Valid for single touch only
-      ||  _inReview    // Do nothing if we are in the middle of Move-Review.
-      || [_game get_sdPlayer] ) // Ignore any touch when it is robot's turn.
+        ||  _inReview    // Do nothing if we are in the middle of Move-Review.
+        || [_game get_sdPlayer] ) // Ignore any touch when it is robot's turn.
     { 
         return;
     }
-
+    
     ChessBoardView *view = (ChessBoardView*) self.view;
     GridCell *holder = nil;
     
@@ -323,7 +207,7 @@
         if(!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
             int sqSrc = TOSQUARE(holder._row, holder._column);
             [self _setHighlightCells:NO]; // Clear old highlight.
-
+            
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
             [self _setHighlightCells:YES];
             _selectedPiece = piece;
@@ -334,11 +218,11 @@
     } else {
         holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsBitHolder offset:NULL];
     }
-
+    
     // Make a Move from the last selected cell to the current selected cell.
     if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
         [self _setHighlightCells:NO]; // Clear highlighted.
-
+        
         int sqDst = TOSQUARE(holder._row, holder._column);
         GridCell *cell = (GridCell*)_selectedPiece.holder;
         int sqSrc = TOSQUARE(cell._row, cell._column);
@@ -346,48 +230,100 @@
         if([_game isLegalMove:move])
         {
             [_game humanMove:cell._row fromCol:cell._column toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
+            
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
             [self _handleNewMove:moveInfo];
-
+            
+            // Send over the network.
+            NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", cell._column, cell._row, COLUMN(sqDst), ROW(sqDst)];
+            [_connection send_MOVE:_tableId move:moveStr];
+            
             // AI's turn.
-            if ( _game.game_result == kXiangQi_InPlay ) {
-                [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
-            }
+            //if ( _game.game_result == kXiangQi_InPlay ) {
+            //    [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+            //}
         }
     } else {
         [self _setHighlightCells:NO];  // Clear highlighted.
     }
-
+    
     _selectedPiece = nil;  // Reset selected state.
 }
 
-- (void) _resetBoard
+- (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd
 {
-    [self _setHighlightCells:NO];
-    _selectedPiece = nil;
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
-    _redTime = _blackTime = _initialTime * 60;
-    memset(_hl_moves, 0x0, sizeof(_hl_moves));
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
-
-    [_game reset_game];
-    [_moves removeAllObjects];
-    _nthMove = -1;
-    _inReview = NO;
-    _latestMove = INVALID_MOVE;
+    if (button != nil)
+    {
+        NSLog(@"%s: Username = [%@:%@]", __FUNCTION__, name, passwd);
+        _username = ([name length] == 0 ? [self _generateGuestUserName] : name);
+        _password = passwd;
+        [_connection setLoginInfo:_username password:_password];
+        [_connection send_LOGIN];
+    }
+    [self dismissModalViewControllerAnimated:YES];
 }
 
+- (void) handeTableJoin:(NSString *)tableId color:(NSString*)joinColor
+{
+    NSLog(@"%s: ENTER. table = [%@]", __FUNCTION__, tableId);
+    [self dismissModalViewControllerAnimated:YES];
+    self._tableId = tableId;
+    [_connection send_JOIN:tableId color:joinColor];
+}
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Implementation of Private methods
-//
-///////////////////////////////////////////////////////////////////////////////
+- (void) handleNetworkEvent:(ConnectionEventEnum)code event:(NSString*)event
+{
+    switch(code)
+    {
+        case NC_CONN_EVENT_OPEN:
+        {
+            NSLog(@"%s: Got NC_CONN_EVENT_OPEN.", __FUNCTION__);
+            break;
+        }
+        case NC_CONN_EVENT_DATA:
+        {
+            NSLog(@"%s: A new event [%@].", __FUNCTION__, event);
+            NSMutableDictionary* newEvent = [self _allocNewEvent:event];
+            NSString* op = [newEvent objectForKey:@"op"];
+            NSString* content = [newEvent objectForKey:@"content"];
 
-#pragma mark -
-#pragma mark Private methods
+            if ([op isEqualToString:@"LIST"]) {
+                TableListViewController *listController = [[TableListViewController alloc] initWithList:content];
+                listController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+                listController.delegate = self;
+                [self presentModalViewController:listController animated:YES];
+            } else if ([op isEqualToString:@"I_TABLE"]) {
+                NSLog(@"%s: Got I_TABLE: [%@]", __FUNCTION__, content);
+            } else if ([op isEqualToString:@"I_MOVES"]) {
+                [self handleNetworkEvent_I_MOVES:content];
+            } else if ([op isEqualToString:@"MOVE"]) {
+                [self handleNetworkEvent_MOVE:content];
+            }
+
+            [newEvent release];
+            break;
+        }
+        case NC_CONN_EVENT_END:
+        {
+            NSLog(@"%s: Got NC_CONN_EVENT_END.", __FUNCTION__);
+            [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
+            break;
+        }
+    }
+}
+
+- (NSMutableDictionary*) _allocNewEvent:(NSString*)event
+{
+    NSMutableDictionary* entries = [[NSMutableDictionary alloc] init];
+    
+    NSArray *components = [event componentsSeparatedByString:@"&"];
+    for (NSString *entry in components) {
+        NSArray *pair = [entry componentsSeparatedByString:@"="];
+        [entries setValue:[pair objectAtIndex:1] forKey:[pair objectAtIndex:0]];
+    }
+    
+    return entries;
+}
 
 - (void) _setHighlightCells:(BOOL)bHighlight
 {
@@ -401,7 +337,7 @@
         }
         ((XiangQiSquare*)[_game._grid cellAtRow:row column:col])._highlighted = bHighlight;
     }
-
+    
     if ( ! bHighlight ) {
         _hl_nMoves = 0;
     }
@@ -427,7 +363,7 @@
 {
     int  move     = [moveInfo integerValue];
     BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
-
+    
     // Delay update the UI if in Preview mode.
     if ( _inReview ) {
         NSAssert1(_latestMove == INVALID_MOVE,
@@ -442,12 +378,12 @@
     int col1 = COLUMN(sqSrc);
     int row2 = ROW(sqDst);
     int col2 = COLUMN(sqDst);
-
+    
     NSString *sound = @"MOVE";
-
+    
     Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
     Piece *piece = [_game x_getPieceAtRow:row1 col:col1];
-
+    
     if (capture != nil) {
         [capture removeFromSuperlayer];
         sound = (isAI ? @"CAPTURE2" : @"CAPTURE");
@@ -457,7 +393,7 @@
     
     [_game x_movePiece:piece toRow:row2 toCol:col2];
     [self _showHighlightOfMove:move];
-
+    
     // Check End-Game status.
     int nGameResult = [_game checkGameStatus:isAI];
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
@@ -478,7 +414,7 @@
 {
     NSString *sound = nil;
     NSString *msg   = nil;
-
+    
     switch ( _game.game_result ) {
         case kXiangQi_YouWin:
             sound = @"WIN";
@@ -505,9 +441,9 @@
     }
     
     if ( !sound ) return;
-
+    
     [_audioHelper play_wav_sound:sound];
-
+    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
                                                     message:msg
                                                    delegate:self 
@@ -518,68 +454,72 @@
     [alert release];
 }
 
-- (void) _displayResumeGameAlert
+- (void) handleNetworkEvent_I_MOVES:(NSString*)event
 {
-    UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:@"NevoChess"
-                                   message:NSLocalizedString(@"Resume game?", @"")
-                                  delegate:self 
-                         cancelButtonTitle:NSLocalizedString(@"No", @"")
-                         otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = POC_ALERT_RESUME_GAME;
-    [alert show];
-    [alert release];
-}
-
-- (void) saveGame
-{
-    NSMutableString *sMoves = [NSMutableString new];
-
-    if ( _game.game_result == kXiangQi_InPlay ) {
-        for (MoveAtom *pMove in _moves) {
-            NSNumber *move = pMove.move;
-            if ([sMoves length]) [sMoves appendString:@","];
-            [sMoves appendFormat:@"%d",[move integerValue]];
-        }
-    }
-
-    [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
-    [sMoves release];
-}
-
-- (void) _loadPendingGame:(NSString *)sPendingGame
-{
-    NSArray *moves = [sPendingGame componentsSeparatedByString:@","];
-    int move = 0;
-    int sqSrc = 0;
-    int sqDst = 0;
-    BOOL bAIturn = NO;
-
-    for (NSNumber *pMove in moves) {
-        move  = [pMove integerValue];
-        sqSrc = SRC(move);
-        sqDst = DST(move);
-
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* movesStr = [components objectAtIndex:1];
+    NSLog(@"%s: [#%@: %@].", __FUNCTION__, tableId, movesStr);
+    NSArray* moves = [movesStr componentsSeparatedByString:@"/"];
+    for (NSString *moveStr in moves) {
+        
+        int row1 = [moveStr characterAtIndex:1] - '0';
+        int col1 = [moveStr characterAtIndex:0] - '0';
+        int row2 = [moveStr characterAtIndex:3] - '0';
+        int col2 = [moveStr characterAtIndex:2] - '0';
+        NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
+        
+        int sqSrc = TOSQUARE(row1, col1);
+        int sqDst = TOSQUARE(row2, col2);
+        int move = MOVE(sqSrc, sqDst);
+        
         [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                    toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
+        
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
         [self _handleNewMove:moveInfo];
-        
-        bAIturn = !bAIturn;
-    }
-
-    // If it is AI's turn after the game is loaded, then inform the AI.
-    if ( bAIturn && _game.game_result == kXiangQi_InPlay ) {
-        [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }
 
-#pragma mark NSMachPort message handle 
-// Handle messages from the controller thread.
-- (void)handlePortMessage:(NSPortMessage *)portMessage
+- (void) handleNetworkEvent_MOVE:(NSString*)event
 {
-    //TODO: implement communication message between robot and controller
-}
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* moveStr = [components objectAtIndex:2];
         
+    int row1 = [moveStr characterAtIndex:1] - '0';
+    int col1 = [moveStr characterAtIndex:0] - '0';
+    int row2 = [moveStr characterAtIndex:3] - '0';
+    int col2 = [moveStr characterAtIndex:2] - '0';
+    NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
+    
+    int sqSrc = TOSQUARE(row1, col1);
+    int sqDst = TOSQUARE(row2, col2);
+    int move = MOVE(sqSrc, sqDst);
+    
+    [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+               toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    
+    NSNumber *moveInfo = [NSNumber numberWithInteger:move];
+    [self _handleNewMove:moveInfo];
+}
+
+- (NSString*) _generateGuestUserName
+{
+    const const char* GUEST_PREFIX  = "Guest#";
+    const unsigned int MAX_GUEST_ID = 10000;
+
+    const int randNum = [self _generateRandomNumber:MAX_GUEST_ID];
+    NSString* sGuestId = [NSString stringWithFormat:@"%sip%d", GUEST_PREFIX, randNum];
+    return sGuestId;
+}
+
+- (int) _generateRandomNumber:(unsigned int)max_value
+{        
+    const unsigned int _RAND_MAX = (2<<31)-1;
+    const int randNum =
+        1 + (int) ((double)max_value * (arc4random() / (_RAND_MAX + 1.0)));
+    
+    return randNum;
+}
+
 @end

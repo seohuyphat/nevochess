@@ -18,16 +18,34 @@
  ***************************************************************************/
 
 
-#import "BoardViewController.h"
+#import <UIKit/UIKit.h>
+#import "CChessGame.h"
+#import "AudioHelper.h"
 
-@interface ChessBoardViewController : BoardViewController
+BOOL layerIsBit( CALayer* layer );
+BOOL layerIsBitHolder( CALayer* layer );
+
+enum AlertViewEnum
+{
+    POC_ALERT_END_GAME,
+    POC_ALERT_RESUME_GAME,
+    POC_ALERT_RESET_GAME
+};
+
+@interface BoardViewController : UIViewController
 {
     
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+    IBOutlet UIToolbar   *nav_toolbar;
+    IBOutlet UILabel     *red_label;
+    IBOutlet UILabel     *black_label;
+    IBOutlet UITextField *red_time;
+    IBOutlet UITextField *black_time;
+    IBOutlet UIActivityIndicatorView *activity;
+    
+    NSTimer *_timer;
 
-    /*
+    AudioHelper *_audioHelper;
+    
     // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
     int    _hl_moves[MAX_GEN_MOVES];
     int    _hl_nMoves;
@@ -35,12 +53,25 @@
 
     Piece *_selectedPiece;
     
+    CChessGame *_game;
+
+    int _initialTime;  // The initial time (in seconds)
+    int _redTime;      // RED   time (in seconds)
+    int _blackTime;    // BLACK time (in seconds)
+    
     NSMutableArray *_moves;       // MOVE history
     int             _nthMove;     // pivot for the Move Review
     BOOL            _inReview;
     int             _latestMove;  // Latest Move waiting to be UI-updated.
-    */
 }
+
+@property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
+@property (nonatomic, retain) IBOutlet UILabel *red_label;
+@property (nonatomic, retain) IBOutlet UILabel *black_label;
+@property (nonatomic, retain) IBOutlet UITextField *red_time;
+@property (nonatomic, retain) IBOutlet UITextField *black_time;
+
+@property (nonatomic, retain) NSTimer* _timer;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
@@ -50,6 +81,27 @@
 
 - (void) saveGame;
 
-- (void) _resetBoard;
+- (void) rescheduleTimer;
+
+- (id)   _initSoundSystem;
+
+@end
+
+
+////////////////////////////////////////////////////////////////////
+//
+// Move review holder unit
+//
+////////////////////////////////////////////////////////////////////
+
+@interface MoveAtom : NSObject {
+    id move;
+    id srcPiece;
+    id capturedPiece;
+}
+
+@property(nonatomic,retain) id move;
+@property(nonatomic,retain) id srcPiece;
+@property(nonatomic,retain) id capturedPiece;
 
 @end

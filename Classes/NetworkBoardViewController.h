@@ -19,37 +19,24 @@
 
 
 #import "BoardViewController.h"
+#import "LoginViewController.h"
+#import "TableListViewController.h"
+#import "NetworkConnection.h"
 
-@interface ChessBoardViewController : BoardViewController
+@interface NetworkBoardViewController : BoardViewController <LoginDelegate, TableListDelegate, NetworkHandler>
 {
-    
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
-
-    /*
-    // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
-    int    _hl_moves[MAX_GEN_MOVES];
-    int    _hl_nMoves;
-    int    _hl_lastMove;      // The last Move that was highlighted.
-
-    Piece *_selectedPiece;
-    
-    NSMutableArray *_moves;       // MOVE history
-    int             _nthMove;     // pivot for the Move Review
-    BOOL            _inReview;
-    int             _latestMove;  // Latest Move waiting to be UI-updated.
-    */
+    NSString*          _username;
+    NSString*          _password;
+    NSString*          _tableId;
+    NetworkConnection* _connection;
 }
+
+@property (nonatomic, retain) NSString* _tableId;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
 
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
-
-- (void) saveGame;
-
-- (void) _resetBoard;
 
 @end
