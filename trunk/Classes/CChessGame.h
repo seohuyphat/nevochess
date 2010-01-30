@@ -63,6 +63,7 @@ enum {
     
     NSMutableArray *_pieceBox;
     
+    NSString* _aiName;
     int _aiType;
     Referee  *_referee;
     AIEngine *_aiEngine;
@@ -86,7 +87,9 @@ enum {
 - (int) get_sdPlayer;
 - (void)resetCChessPieces;
 - (void)reset_game;
+- (NSString*) getAIName;
 
+@property (nonatomic, retain) NSString* _aiName;
 @property (nonatomic,readonly) RectGrid *_grid;
 @property (nonatomic,readonly) int game_result;
 

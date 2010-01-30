@@ -27,8 +27,10 @@
 
 @interface NetworkBoardViewController (PrivateMethods)
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
+- (void) handleNetworkEvent_I_TABLE:(NSString*)event;
 - (void) handleNetworkEvent_I_MOVES:(NSString*)event;
 - (void) handleNetworkEvent_MOVE:(NSString*)event;
+- (void) handleNetworkEvent_E_END:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -48,15 +50,12 @@
 
 @implementation NetworkBoardViewController
 
-@synthesize _tableId;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         _username = nil;
         _password = nil;
-        _tableId  = nil;
 
         _connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;
@@ -107,13 +106,6 @@
 - (IBAction)resetPressed:(id)sender
 {
     [_connection send_LIST];
-    
-    /*
-    TableListViewController *listController = [[TableListViewController alloc] initWithList:@"SomeList"];
-    listController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    listController.delegate = self;
-    [self presentModalViewController:listController animated:YES];
-     */
 }
 
 - (IBAction)movePrevPressed:(id)sender
@@ -263,12 +255,18 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
-- (void) handeTableJoin:(NSString *)tableId color:(NSString*)joinColor
+- (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor
 {
-    NSLog(@"%s: ENTER. table = [%@]", __FUNCTION__, tableId);
     [self dismissModalViewControllerAnimated:YES];
-    self._tableId = tableId;
-    [_connection send_JOIN:tableId color:joinColor];
+    if ([self._tableId isEqualToString:table.tableId]) {
+        NSLog(@"%s: Same table [%@]. Ignore request.", __FUNCTION__, table.tableId);
+        return;
+    } else if (self._tableId) {
+        [_connection send_LEAVE:self._tableId]; // Leave the old table.
+        self._tableId = nil; 
+        [self resetBoard];
+    }
+    [_connection send_JOIN:table.tableId color:joinColor];
 }
 
 - (void) handleNetworkEvent:(ConnectionEventEnum)code event:(NSString*)event
@@ -293,11 +291,13 @@
                 listController.delegate = self;
                 [self presentModalViewController:listController animated:YES];
             } else if ([op isEqualToString:@"I_TABLE"]) {
-                NSLog(@"%s: Got I_TABLE: [%@]", __FUNCTION__, content);
+                [self handleNetworkEvent_I_TABLE:content];
             } else if ([op isEqualToString:@"I_MOVES"]) {
                 [self handleNetworkEvent_I_MOVES:content];
             } else if ([op isEqualToString:@"MOVE"]) {
                 [self handleNetworkEvent_MOVE:content];
+            } else if ([op isEqualToString:@"E_END"]) {
+                [self handleNetworkEvent_E_END:content];
             }
 
             [newEvent release];
@@ -454,6 +454,29 @@
     [alert release];
 }
 
+- (void) handleNetworkEvent_I_TABLE:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    TableInfo* table = [TableInfo new];
+    table.tableId = [components objectAtIndex:0];
+    table.redId = [components objectAtIndex:6];
+    table.redRating = [components objectAtIndex:7];
+    table.blackId = [components objectAtIndex:8];
+    table.blackRating = [components objectAtIndex:9];
+
+    if (self._tableId && ![self._tableId isEqualToString:table.tableId]) {
+        [self resetBoard];
+    }
+    self._tableId = table.tableId; 
+
+    NSString* redInfo = ([table.redId length] == 0 ? @"*"
+                         : [NSString stringWithFormat:@"%@ (%@)", table.redId, table.redRating]);
+    NSString* blackInfo = ([table.blackId length] == 0 ? @"*"
+                           : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
+    [self setRedLabel:redInfo];
+    [self setBlackLabel:blackInfo];
+}
+
 - (void) handleNetworkEvent_I_MOVES:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
@@ -484,8 +507,13 @@
 - (void) handleNetworkEvent_MOVE:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
     NSString* moveStr = [components objectAtIndex:2];
-        
+
+    if ( ! [self._tableId isEqualToString:tableId] ) {
+        NSLog(@"%s: Move:[%@] from table:[%@] ignored.", __FUNCTION__, moveStr, tableId);
+        return;
+    }
     int row1 = [moveStr characterAtIndex:1] - '0';
     int col1 = [moveStr characterAtIndex:0] - '0';
     int row2 = [moveStr characterAtIndex:3] - '0';
@@ -501,6 +529,15 @@
     
     NSNumber *moveInfo = [NSNumber numberWithInteger:move];
     [self _handleNewMove:moveInfo];
+}
+
+- (void) handleNetworkEvent_E_END:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* gameResult = [components objectAtIndex:1];
+    
+    NSLog(@"%s: Table:[%@] - Game Over: [%@].", __FUNCTION__, tableId, gameResult);
 }
 
 - (NSString*) _generateGuestUserName

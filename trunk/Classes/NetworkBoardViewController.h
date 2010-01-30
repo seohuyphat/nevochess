@@ -27,11 +27,8 @@
 {
     NSString*          _username;
     NSString*          _password;
-    NSString*          _tableId;
     NetworkConnection* _connection;
 }
-
-@property (nonatomic, retain) NSString* _tableId;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;

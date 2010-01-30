@@ -69,6 +69,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 @interface BoardViewController (PrivateMethods)
 
+- (id)   _initSoundSystem;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer:(int)color;
 - (void) _setHighlightCells:(BOOL)bHighlight;
@@ -92,7 +93,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @synthesize black_label;
 @synthesize red_time;
 @synthesize black_time;
+@synthesize red_seat;
+@synthesize black_seat;
 @synthesize _timer;
+@synthesize _tableId;
 
 //
 // The designated initializer.
@@ -116,6 +120,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         _nthMove = -1;
         _inReview = NO;
         _latestMove = INVALID_MOVE;
+
+        _tableId = nil;
     }
     
     return self;
@@ -149,6 +155,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [self.view bringSubviewToFront:black_label];
     [self.view bringSubviewToFront:red_time];
     [self.view bringSubviewToFront:black_time];
+    [self.view bringSubviewToFront:red_seat];
+    [self.view bringSubviewToFront:black_seat];
     _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
     _redTime = _blackTime = _initialTime * 60;
     [red_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
@@ -168,13 +176,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 	// Release any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload
-{
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
-}
-
-
 - (void)dealloc
 {
     [nav_toolbar release];
@@ -183,6 +184,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [red_time release];
     [black_time release];
     [activity release];
+    [red_seat release];
+    [black_seat release];
     [_timer release];
     [_audioHelper release];
     [_game release];
@@ -213,20 +216,14 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     NSLog(@"%s: ENTER.", __FUNCTION__);
 }
 
-- (id) _initSoundSystem
+- (void) setRedLabel:(NSString*)label
 {
-    AudioHelper* audioHelper = [[AudioHelper alloc] init];
+    red_label.text = label;
+}
 
-    if ( audioHelper != nil ) {
-        NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
-                              @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
-                              @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
-                              nil];
-        for (NSString *sound in soundList) {
-            [audioHelper load_wav_sound:sound];
-        }
-    }
-    return audioHelper;
+- (void) setBlackLabel:(NSString*)label
+{
+    black_label.text = label;
 }
 
 
@@ -238,6 +235,22 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 #pragma mark -
 #pragma mark Private methods
+
+- (id) _initSoundSystem
+{
+    AudioHelper* audioHelper = [[AudioHelper alloc] init];
+    
+    if ( audioHelper != nil ) {
+        NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
+                              @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
+                              @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
+                              nil];
+        for (NSString *sound in soundList) {
+            [audioHelper load_wav_sound:sound];
+        }
+    }
+    return audioHelper;
+}
 
 - (void) _updateTimer:(int)color
 {
@@ -394,5 +407,21 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
+- (void) resetBoard
+{
+    [self _setHighlightCells:NO];
+    _selectedPiece = nil;
+    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    _redTime = _blackTime = _initialTime * 60;
+    memset(_hl_moves, 0x0, sizeof(_hl_moves));
+    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
+    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
+    
+    [_game reset_game];
+    [_moves removeAllObjects];
+    _nthMove = -1;
+    _inReview = NO;
+    _latestMove = INVALID_MOVE;
+}
 
 @end

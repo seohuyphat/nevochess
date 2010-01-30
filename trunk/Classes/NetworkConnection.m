@@ -109,6 +109,13 @@
     [self _flushOutgoingData];
 }
 
+- (void) send_LEAVE:(NSString*)tableId
+{    
+    NSString* outStr = [NSString stringWithFormat:@"op=LEAVE&pid=%@&tid=%@\n", _username, tableId];
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
+    [self _flushOutgoingData];
+}
+
 - (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr
 {
     NSString* outStr = [NSString stringWithFormat:@"op=MOVE&pid=%@&tid=%@&move=%@\n", _username, tableId, moveStr];

@@ -55,6 +55,7 @@
 
 @implementation CChessGame
 
+@synthesize _aiName;
 @synthesize _grid;
 @synthesize game_result;
 
@@ -122,6 +123,7 @@
     [_grid removeAllCells];
     [_grid release];
     [_pieceBox release];
+    [_aiName release];
     [_referee release];
     [_aiEngine release];
     [super dealloc];
@@ -136,7 +138,7 @@
         CGSize size = board.bounds.size;
         board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
         XiangQiGrid *grid = [[XiangQiGrid alloc] initWithRows: 10 columns: 9 
-                                                  frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 25,
+                                                  frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 35,
                                                                     size.width-4,size.height-4)];
         _grid = (RectGrid*)grid;
         //grid.backgroundColor = GetCGPatternNamed(@"board.png");
@@ -176,8 +178,8 @@
         [_referee initGame];
         
         // Determine the type of AI.
-        NSString *aiSelection = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
-        _aiType = [self _convertStringToAIType:aiSelection];
+        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
+        _aiType = [self _convertStringToAIType:_aiName];
 
         switch (_aiType) {
             case kNevoChess_AI_xqwlight:
@@ -283,6 +285,11 @@
     [_referee initGame];
     [_aiEngine initGame];
     game_result = kXiangQi_InPlay;
+}
+
+- (NSString*) getAIName
+{
+    return _aiName;
 }
 
 - (void)resetCChessPieces
