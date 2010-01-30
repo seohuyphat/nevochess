@@ -24,9 +24,6 @@
 #import "Piece.h"
 #import "ChessBoardView.h"
 
-//static BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
-//static BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    Private methods
@@ -62,6 +59,8 @@
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
+        [self setBlackLabel:[_game getAIName]]; 
+        
         // Restore pending game, if any.
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
         if ( sPendingGame != nil && [sPendingGame length]) {
@@ -106,7 +105,7 @@
         // only after or before AI induce begins
         // NOTE: We "reset" the Board's data *here* inside the AI Thread to
         //       avoid clearing data while the AI is thinking of a Move.
-        [self _resetBoard];
+        [self resetBoard];
     }else{
         // FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
@@ -132,19 +131,12 @@
 }
 
 //
-// Called when the view is about to made visible. Default does nothing
-//
-- (void)viewWillAppear:(BOOL)animated
-{
-}
-
-//
 // Handle the "OK" button in the END-GAME and RESUME-GAME alert dialogs. 
 //
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
     if ( alertView.tag == POC_ALERT_END_GAME ) {
-        [self _resetBoard];
+        [self resetBoard];
     }
     else if (    alertView.tag == POC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
@@ -361,24 +353,6 @@
 
     _selectedPiece = nil;  // Reset selected state.
 }
-
-- (void) _resetBoard
-{
-    [self _setHighlightCells:NO];
-    _selectedPiece = nil;
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
-    _redTime = _blackTime = _initialTime * 60;
-    memset(_hl_moves, 0x0, sizeof(_hl_moves));
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
-
-    [_game reset_game];
-    [_moves removeAllObjects];
-    _nthMove = -1;
-    _inReview = NO;
-    _latestMove = INVALID_MOVE;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //

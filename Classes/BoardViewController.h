@@ -40,6 +40,8 @@ enum AlertViewEnum
     IBOutlet UILabel     *black_label;
     IBOutlet UITextField *red_time;
     IBOutlet UITextField *black_time;
+    IBOutlet UIButton    *red_seat;
+    IBOutlet UIButton    *black_seat;
     IBOutlet UIActivityIndicatorView *activity;
     
     NSTimer *_timer;
@@ -63,6 +65,9 @@ enum AlertViewEnum
     int             _nthMove;     // pivot for the Move Review
     BOOL            _inReview;
     int             _latestMove;  // Latest Move waiting to be UI-updated.
+
+    // ---------
+    NSString*       _tableId;
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
@@ -70,20 +75,23 @@ enum AlertViewEnum
 @property (nonatomic, retain) IBOutlet UILabel *black_label;
 @property (nonatomic, retain) IBOutlet UITextField *red_time;
 @property (nonatomic, retain) IBOutlet UITextField *black_time;
+@property (nonatomic, retain) IBOutlet UIButton *red_seat;
+@property (nonatomic, retain) IBOutlet UIButton *black_seat;
 
 @property (nonatomic, retain) NSTimer* _timer;
+@property (nonatomic, retain) NSString* _tableId;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
-
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
 
+- (void) setRedLabel:(NSString*)label;
+- (void) setBlackLabel:(NSString*)label;
+
 - (void) saveGame;
-
 - (void) rescheduleTimer;
-
-- (id)   _initSoundSystem;
+- (void) resetBoard;
 
 @end
 

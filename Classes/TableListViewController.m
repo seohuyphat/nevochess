@@ -36,10 +36,9 @@
 - (void) _parseTablesStr:(NSString *)tablesStr
 {
     NSLog(@"%s: ENTER. [%@]", __FUNCTION__, tablesStr);
-
+    [_tables removeAllObjects];
     NSArray* entries = [tablesStr componentsSeparatedByString:@"\n"];
     for (NSString *entry in entries) {
-        //NSLog(@"+++++++ [%@]", entry);
         TableInfo* newTable = [TableInfo new];
         NSArray* components = [entry componentsSeparatedByString:@";"];
         newTable.tableId = [components objectAtIndex:0];
@@ -138,7 +137,7 @@
     NSString* joinColor = @"None"; // Default: an observer.
     if ([table.redId length] == 0) { joinColor = @"Red"; }
     else if ([table.blackId length] == 0) { joinColor = @"Black"; }
-    [delegate handeTableJoin:table.tableId color:joinColor];
+    [delegate handeTableJoin:table color:joinColor];
 }
 
 

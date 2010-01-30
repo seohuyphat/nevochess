@@ -38,7 +38,7 @@
 
 // --------------------------------------
 @protocol TableListDelegate <NSObject>
-- (void) handeTableJoin:(NSString *)tableId color:(NSString*)joinColor;
+- (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor;
 @end
 
 // --------------------------------------
