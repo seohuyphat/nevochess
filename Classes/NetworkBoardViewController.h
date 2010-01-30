@@ -30,10 +30,9 @@
     NetworkConnection* _connection;
 }
 
+@property (nonatomic, retain) NSString* _username;
+
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
-
-- (IBAction)movePrevPressed:(id)sender;
-- (IBAction)moveNextPressed:(id)sender;
 
 @end

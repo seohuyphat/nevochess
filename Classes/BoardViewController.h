@@ -68,6 +68,8 @@ enum AlertViewEnum
 
     // ---------
     NSString*       _tableId;
+    ColorEnum       _myColor;     // The color (role) of the LOCAL player.
+    BOOL            _blackAtTopSide;
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
@@ -92,6 +94,13 @@ enum AlertViewEnum
 - (void) saveGame;
 - (void) rescheduleTimer;
 - (void) resetBoard;
+- (void) setMyColor:(ColorEnum)color;
+- (BOOL) isMyTurnNext;
+- (void) setHighlightCells:(BOOL)bHighlight;
+- (void) showHighlightOfMove:(int)move;
+- (void) handleNewMove:(NSNumber *)pMove;
+- (void) handleEndGameInUI;
+- (void) reverseBoardView;
 
 @end
 

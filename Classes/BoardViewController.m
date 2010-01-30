@@ -72,10 +72,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (id)   _initSoundSystem;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer:(int)color;
-- (void) _setHighlightCells:(BOOL)bHighlight;
-- (void) _showHighlightOfMove:(int)move;
-- (void) _handleNewMove:(NSNumber *)pMove;
-- (void) _handleEndGameInUI;
 
 @end
 
@@ -122,6 +118,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         _latestMove = INVALID_MOVE;
 
         _tableId = nil;
+        _myColor = NC_COLOR_UNKNOWN;
+        _blackAtTopSide = YES;
     }
     
     return self;
@@ -208,12 +206,72 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (IBAction)movePrevPressed:(id)sender
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (_nthMove < 1) {  // No Move made yet?
+        return;
+    }
+    
+    _inReview = YES;  // Enter the Move-Review mode immediately!
+    
+    MoveAtom *pMove = [_moves objectAtIndex:--_nthMove];
+    int move = [(NSNumber*)pMove.move intValue];
+    int sqSrc = SRC(move);
+    int sqDst = DST(move);
+    [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
+    
+    // For Move-Review, just reverse the move order (sqDst->sqSrc)
+    // Since it's only a review, no need to make actual move in
+    // the underlying game logic.
+    //
+    [_game x_movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
+    if (pMove.capturedPiece) {
+        [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    }
+    
+    int prevMove = INVALID_MOVE;
+    if (_nthMove > 0) {  // No more Move?
+        int prevIndex = _nthMove - 1;
+        pMove = [_moves objectAtIndex:prevIndex];
+        prevMove = [(NSNumber*)pMove.move intValue];
+    }
+    [self showHighlightOfMove:prevMove];
 }
 
 - (IBAction)moveNextPressed:(id)sender
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    BOOL bNext = NO; // One "Next" click was serviced.
+    // This variable is introduced to enforce the rule:
+    // "Only one Move is replayed PER click".
+    //
+    int nMoves = [_moves count];
+    if (_nthMove >= 0 && _nthMove < nMoves) {
+        MoveAtom *pMove = [_moves objectAtIndex:_nthMove++];
+        int move = [(NSNumber*)pMove.move intValue];
+        int sqDst = DST(move);
+        int row2 = ROW(sqDst);
+        int col2 = COLUMN(sqDst);
+        [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
+        Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
+        if (capture) {
+            [capture removeFromSuperlayer];
+        }
+        [_game x_movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
+        [self showHighlightOfMove:move];
+        bNext = YES;
+    }
+    
+    if (_nthMove == nMoves)  // Are we reaching the latest Move end?
+    {
+        if ( _latestMove == INVALID_MOVE ) {
+            _inReview = NO;
+        }
+        else if ( ! bNext ) {
+            _inReview = NO;
+            // Perform the latest Move if not yet done so.
+            NSNumber *moveInfo = [NSNumber numberWithInteger:_latestMove];
+            _latestMove = INVALID_MOVE;
+            [self handleNewMove:moveInfo];
+        }
+    }
 }
 
 - (void) setRedLabel:(NSString*)label
@@ -267,7 +325,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void) _setHighlightCells:(BOOL)bHighlight
+- (void) setHighlightCells:(BOOL)bHighlight
 {
     // Set (or Clear) highlighted cells.
     for(int i = 0; i < _hl_nMoves; ++i) {
@@ -285,12 +343,12 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void) _showHighlightOfMove:(int)move
+- (void) showHighlightOfMove:(int)move
 {
     if (_hl_lastMove != INVALID_MOVE) {
         _hl_nMoves = 1;
         _hl_moves[0] = _hl_lastMove;
-        [self _setHighlightCells:NO];
+        [self setHighlightCells:NO];
         _hl_lastMove = INVALID_MOVE;
     }
     
@@ -301,7 +359,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void) _handleNewMove:(NSNumber *)moveInfo
+- (void) handleNewMove:(NSNumber *)moveInfo
 {
     int  move     = [moveInfo integerValue];
     BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
@@ -334,12 +392,12 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [_audioHelper play_wav_sound:sound];
     
     [_game x_movePiece:piece toRow:row2 toCol:col2];
-    [self _showHighlightOfMove:move];
+    [self showHighlightOfMove:move];
 
     // Check End-Game status.
     int nGameResult = [_game checkGameStatus:isAI];
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
-        [self _handleEndGameInUI];
+        [self handleEndGameInUI];
     }
     
     // Add this new Move to the Move-History.
@@ -352,40 +410,17 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _nthMove = [_moves count];
 }
 
-- (void) _handleEndGameInUI
+- (void) handleEndGameInUI
 {
     NSString *sound = nil;
     NSString *msg   = nil;
-
-    switch ( _game.game_result ) {
-        case kXiangQi_YouWin:
-            sound = @"WIN";
-            msg = NSLocalizedString(@"You win,congratulations!", @"");
-            break;
-        case kXiangQi_ComputerWin:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"Computer wins. Don't give up, please try again!", @"");
-            break;
-        case kXiangqi_YouLose:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"You lose. You may try again!", @"");
-            break;
-        case kXiangQi_Draw:
-            sound = @"DRAW";
-            msg = NSLocalizedString(@"Sorry,we are in draw!", @"");
-            break;
-        case kXiangQi_OverMoves:
-            sound = @"ILLEGAL";
-            msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
-            break;
-        default:
-            break;  // Do nothing
-    }
+    
+    sound = @"WIN";
+    msg = NSLocalizedString(@"Game Over", @"");
     
     if ( !sound ) return;
-
     [_audioHelper play_wav_sound:sound];
-
+    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
                                                     message:msg
                                                    delegate:self 
@@ -409,9 +444,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) resetBoard
 {
-    [self _setHighlightCells:NO];
+    [self setHighlightCells:NO];
     _selectedPiece = nil;
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    [self showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
     _redTime = _blackTime = _initialTime * 60;
     memset(_hl_moves, 0x0, sizeof(_hl_moves));
     red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
@@ -422,6 +457,29 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _nthMove = -1;
     _inReview = NO;
     _latestMove = INVALID_MOVE;
+}
+
+- (void) setMyColor:(ColorEnum)color
+{
+    _myColor = color;
+}
+
+- (BOOL) isMyTurnNext
+{
+    const ColorEnum nextColor = ([_game get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED); 
+    return (nextColor == _myColor);
+}
+
+- (void) reverseBoardView
+{
+    [_game reverseView];
+    CGRect redRect = red_label.frame;
+    red_label.frame = black_label.frame;
+    black_label.frame = redRect;
+    redRect = red_time.frame;
+    red_time.frame = black_time.frame;
+    black_time.frame = redRect;
+    _blackAtTopSide = !_blackAtTopSide;
 }
 
 @end

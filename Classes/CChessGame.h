@@ -19,6 +19,7 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <QuartzCore/QuartzCore.h>
+#import "Enums.h"
 #import "Game.h"
 #import "AIEngine.h"
 #import "Referee.h"
@@ -88,6 +89,7 @@ enum {
 - (void)resetCChessPieces;
 - (void)reset_game;
 - (NSString*) getAIName;
+- (void)reverseView;
 
 @property (nonatomic, retain) NSString* _aiName;
 @property (nonatomic,readonly) RectGrid *_grid;
