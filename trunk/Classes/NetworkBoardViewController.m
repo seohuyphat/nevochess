@@ -27,18 +27,15 @@
 
 @interface NetworkBoardViewController (PrivateMethods)
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
-- (void) handleNetworkEvent_I_TABLE:(NSString*)event;
-- (void) handleNetworkEvent_I_MOVES:(NSString*)event;
-- (void) handleNetworkEvent_MOVE:(NSString*)event;
-- (void) handleNetworkEvent_E_END:(NSString*)event;
+- (void) _handleNetworkEvent_I_TABLE:(NSString*)event;
+- (void) _handleNetworkEvent_I_MOVES:(NSString*)event;
+- (void) _handleNetworkEvent_MOVE:(NSString*)event;
+- (void) _handleNetworkEvent_E_END:(NSString*)event;
+- (void) _handleNetworkEvent_RESET:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
 
-- (void) _setHighlightCells:(BOOL)bHighlight;
-- (void) _showHighlightOfMove:(int)move;
-- (void) _handleNewMove:(NSNumber *)pMove;
-- (void) _handleEndGameInUI;
 @end
 
 
@@ -49,6 +46,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 @implementation NetworkBoardViewController
+
+@synthesize _username;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -108,81 +107,11 @@
     [_connection send_LIST];
 }
 
-- (IBAction)movePrevPressed:(id)sender
-{
-    if (_nthMove < 1) {  // No Move made yet?
-        return;
-    }
-    
-    _inReview = YES;  // Enter the Move-Review mode immediately!
-    
-    MoveAtom *pMove = [_moves objectAtIndex:--_nthMove];
-    int move = [(NSNumber*)pMove.move intValue];
-    int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
-    
-    // For Move-Review, just reverse the move order (sqDst->sqSrc)
-    // Since it's only a review, no need to make actual move in
-    // the underlying game logic.
-    //
-    [_game x_movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
-    if (pMove.capturedPiece) {
-        [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    }
-    
-    int prevMove = INVALID_MOVE;
-    if (_nthMove > 0) {  // No more Move?
-        int prevIndex = _nthMove - 1;
-        pMove = [_moves objectAtIndex:prevIndex];
-        prevMove = [(NSNumber*)pMove.move intValue];
-    }
-    [self _showHighlightOfMove:prevMove];
-}
-
-- (IBAction)moveNextPressed:(id)sender
-{
-    BOOL bNext = NO; // One "Next" click was serviced.
-    // This variable is introduced to enforce the rule:
-    // "Only one Move is replayed PER click".
-    //
-    int nMoves = [_moves count];
-    if (_nthMove >= 0 && _nthMove < nMoves) {
-        MoveAtom *pMove = [_moves objectAtIndex:_nthMove++];
-        int move = [(NSNumber*)pMove.move intValue];
-        int sqDst = DST(move);
-        int row2 = ROW(sqDst);
-        int col2 = COLUMN(sqDst);
-        [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
-        Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
-        if (capture) {
-            [capture removeFromSuperlayer];
-        }
-        [_game x_movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
-        [self _showHighlightOfMove:move];
-        bNext = YES;
-    }
-    
-    if (_nthMove == nMoves)  // Are we reaching the latest Move end?
-    {
-        if ( _latestMove == INVALID_MOVE ) {
-            _inReview = NO;
-        }
-        else if ( ! bNext ) {
-            _inReview = NO;
-            // Perform the latest Move if not yet done so.
-            NSNumber *moveInfo = [NSNumber numberWithInteger:_latestMove];
-            _latestMove = INVALID_MOVE;
-            [self _handleNewMove:moveInfo];
-        }
-    }
-}
-
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if ( [[event allTouches] count] != 1 // Valid for single touch only
         ||  _inReview    // Do nothing if we are in the middle of Move-Review.
-        || [_game get_sdPlayer] ) // Ignore any touch when it is robot's turn.
+        || ![self isMyTurnNext] ) // Ignore when it is not my turn.
     { 
         return;
     }
@@ -198,10 +127,10 @@
         holder = (GridCell*)piece.holder;
         if(!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
             int sqSrc = TOSQUARE(holder._row, holder._column);
-            [self _setHighlightCells:NO]; // Clear old highlight.
+            [self setHighlightCells:NO]; // Clear old highlight.
             
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
-            [self _setHighlightCells:YES];
+            [self setHighlightCells:YES];
             _selectedPiece = piece;
             [_audioHelper play_wav_sound:@"CLICK"];
             return;
@@ -213,7 +142,7 @@
     
     // Make a Move from the last selected cell to the current selected cell.
     if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
-        [self _setHighlightCells:NO]; // Clear highlighted.
+        [self setHighlightCells:NO]; // Clear highlighted.
         
         int sqDst = TOSQUARE(holder._row, holder._column);
         GridCell *cell = (GridCell*)_selectedPiece.holder;
@@ -224,7 +153,7 @@
             [_game humanMove:cell._row fromCol:cell._column toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
             
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            [self _handleNewMove:moveInfo];
+            [self handleNewMove:moveInfo];
             
             // Send over the network.
             NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", cell._column, cell._row, COLUMN(sqDst), ROW(sqDst)];
@@ -236,11 +165,14 @@
             //}
         }
     } else {
-        [self _setHighlightCells:NO];  // Clear highlighted.
+        [self setHighlightCells:NO];  // Clear highlighted.
     }
     
     _selectedPiece = nil;  // Reset selected state.
 }
+
+#pragma mark -
+#pragma mark Delegate callback functions
 
 - (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd
 {
@@ -269,6 +201,9 @@
     [_connection send_JOIN:table.tableId color:joinColor];
 }
 
+#pragma mark -
+#pragma mark Network-event handers
+
 - (void) handleNetworkEvent:(ConnectionEventEnum)code event:(NSString*)event
 {
     switch(code)
@@ -291,13 +226,15 @@
                 listController.delegate = self;
                 [self presentModalViewController:listController animated:YES];
             } else if ([op isEqualToString:@"I_TABLE"]) {
-                [self handleNetworkEvent_I_TABLE:content];
+                [self _handleNetworkEvent_I_TABLE:content];
             } else if ([op isEqualToString:@"I_MOVES"]) {
-                [self handleNetworkEvent_I_MOVES:content];
+                [self _handleNetworkEvent_I_MOVES:content];
             } else if ([op isEqualToString:@"MOVE"]) {
-                [self handleNetworkEvent_MOVE:content];
+                [self _handleNetworkEvent_MOVE:content];
             } else if ([op isEqualToString:@"E_END"]) {
-                [self handleNetworkEvent_E_END:content];
+                [self _handleNetworkEvent_E_END:content];
+            } else if ([op isEqualToString:@"RESET"]) {
+                [self _handleNetworkEvent_RESET:content];
             }
 
             [newEvent release];
@@ -325,136 +262,7 @@
     return entries;
 }
 
-- (void) _setHighlightCells:(BOOL)bHighlight
-{
-    // Set (or Clear) highlighted cells.
-    for(int i = 0; i < _hl_nMoves; ++i) {
-        int sqDst = DST(_hl_moves[i]);
-        int row = ROW(sqDst);
-        int col = COLUMN(sqDst);
-        if ( ! bHighlight ) {
-            _hl_moves[i] = 0;
-        }
-        ((XiangQiSquare*)[_game._grid cellAtRow:row column:col])._highlighted = bHighlight;
-    }
-    
-    if ( ! bHighlight ) {
-        _hl_nMoves = 0;
-    }
-}
-
-- (void) _showHighlightOfMove:(int)move
-{
-    if (_hl_lastMove != INVALID_MOVE) {
-        _hl_nMoves = 1;
-        _hl_moves[0] = _hl_lastMove;
-        [self _setHighlightCells:NO];
-        _hl_lastMove = INVALID_MOVE;
-    }
-    
-    if (move != INVALID_MOVE) {
-        int sqDst = DST(move);
-        ((XiangQiSquare*)[_game._grid cellAtRow:ROW(sqDst) column:COLUMN(sqDst)])._highlighted = YES;
-        _hl_lastMove = move;
-    }
-}
-
-- (void) _handleNewMove:(NSNumber *)moveInfo
-{
-    int  move     = [moveInfo integerValue];
-    BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
-    
-    // Delay update the UI if in Preview mode.
-    if ( _inReview ) {
-        NSAssert1(_latestMove == INVALID_MOVE,
-                  @"The latest Move should not be set [%d]", _latestMove);
-        _latestMove = move;  // NOTE: Save the Move to be processed later.
-        return;
-    }
-    
-    int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    int row1 = ROW(sqSrc);
-    int col1 = COLUMN(sqSrc);
-    int row2 = ROW(sqDst);
-    int col2 = COLUMN(sqDst);
-    
-    NSString *sound = @"MOVE";
-    
-    Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
-    Piece *piece = [_game x_getPieceAtRow:row1 col:col1];
-    
-    if (capture != nil) {
-        [capture removeFromSuperlayer];
-        sound = (isAI ? @"CAPTURE2" : @"CAPTURE");
-    }
-    
-    [_audioHelper play_wav_sound:sound];
-    
-    [_game x_movePiece:piece toRow:row2 toCol:col2];
-    [self _showHighlightOfMove:move];
-    
-    // Check End-Game status.
-    int nGameResult = [_game checkGameStatus:isAI];
-    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
-        [self _handleEndGameInUI];
-    }
-    
-    // Add this new Move to the Move-History.
-    MoveAtom *pMove = [[MoveAtom alloc] init];
-    pMove.srcPiece = piece;
-    pMove.capturedPiece = capture;
-    pMove.move = [NSNumber numberWithInteger:move];
-    [_moves addObject:pMove];
-    [pMove release];
-    _nthMove = [_moves count];
-}
-
-- (void) _handleEndGameInUI
-{
-    NSString *sound = nil;
-    NSString *msg   = nil;
-    
-    switch ( _game.game_result ) {
-        case kXiangQi_YouWin:
-            sound = @"WIN";
-            msg = NSLocalizedString(@"You win,congratulations!", @"");
-            break;
-        case kXiangQi_ComputerWin:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"Computer wins. Don't give up, please try again!", @"");
-            break;
-        case kXiangqi_YouLose:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"You lose. You may try again!", @"");
-            break;
-        case kXiangQi_Draw:
-            sound = @"DRAW";
-            msg = NSLocalizedString(@"Sorry,we are in draw!", @"");
-            break;
-        case kXiangQi_OverMoves:
-            sound = @"ILLEGAL";
-            msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
-            break;
-        default:
-            break;  // Do nothing
-    }
-    
-    if ( !sound ) return;
-    
-    [_audioHelper play_wav_sound:sound];
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
-                                                    message:msg
-                                                   delegate:self 
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"OK", nil];
-    alert.tag = POC_ALERT_END_GAME;
-    [alert show];
-    [alert release];
-}
-
-- (void) handleNetworkEvent_I_TABLE:(NSString*)event
+- (void) _handleNetworkEvent_I_TABLE:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
     TableInfo* table = [TableInfo new];
@@ -467,8 +275,18 @@
     if (self._tableId && ![self._tableId isEqualToString:table.tableId]) {
         [self resetBoard];
     }
-    self._tableId = table.tableId; 
+    self._tableId = table.tableId;
 
+    ColorEnum myColor = NC_COLOR_NONE; // Default: an observer.
+    if      ([_username isEqualToString:table.redId])   { myColor = NC_COLOR_RED;   }
+    else if ([_username isEqualToString:table.blackId]) { myColor = NC_COLOR_BLACK; }
+    [self setMyColor:myColor];
+
+    // Reverse the View if necessary.
+    if (myColor == NC_COLOR_BLACK && _blackAtTopSide) {
+        [self reverseBoardView];
+    }
+    
     NSString* redInfo = ([table.redId length] == 0 ? @"*"
                          : [NSString stringWithFormat:@"%@ (%@)", table.redId, table.redRating]);
     NSString* blackInfo = ([table.blackId length] == 0 ? @"*"
@@ -477,7 +295,7 @@
     [self setBlackLabel:blackInfo];
 }
 
-- (void) handleNetworkEvent_I_MOVES:(NSString*)event
+- (void) _handleNetworkEvent_I_MOVES:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
     NSString* tableId = [components objectAtIndex:0];
@@ -500,11 +318,11 @@
                    toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-        [self _handleNewMove:moveInfo];
+        [self handleNewMove:moveInfo];
     }
 }
 
-- (void) handleNetworkEvent_MOVE:(NSString*)event
+- (void) _handleNetworkEvent_MOVE:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
     NSString* tableId = [components objectAtIndex:0];
@@ -528,17 +346,30 @@
                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     
     NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-    [self _handleNewMove:moveInfo];
+    [self handleNewMove:moveInfo];
 }
 
-- (void) handleNetworkEvent_E_END:(NSString*)event
+- (void) _handleNetworkEvent_E_END:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
     NSString* tableId = [components objectAtIndex:0];
     NSString* gameResult = [components objectAtIndex:1];
     
     NSLog(@"%s: Table:[%@] - Game Over: [%@].", __FUNCTION__, tableId, gameResult);
+    [self handleEndGameInUI];
 }
+
+- (void) _handleNetworkEvent_RESET:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    
+    NSLog(@"%s: Table:[%@] - Game Reset.", __FUNCTION__, tableId);
+    [self resetBoard];
+}
+
+#pragma mark -
+#pragma mark Other helper functions
 
 - (NSString*) _generateGuestUserName
 {

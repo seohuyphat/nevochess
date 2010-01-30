@@ -31,9 +31,6 @@
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
 
-- (IBAction)movePrevPressed:(id)sender;
-- (IBAction)moveNextPressed:(id)sender;
-
 - (void) saveGame;
 
 @end

@@ -18,9 +18,7 @@
  ***************************************************************************/
 
 
-
 #import "CChessGame.h"
-#import "Enums.h"
 #import "Grid.h"
 #import "Piece.h"
 #import "QuartzUtils.h"
@@ -290,6 +288,21 @@
 - (NSString*) getAIName
 {
     return _aiName;
+}
+
+- (void) reverseView
+{
+    for (Piece* piece in _pieceBox) {
+        if(piece.superlayer != nil) { // not captured?
+            XiangQiSquare *holder = (XiangQiSquare*)piece.holder;
+            
+            unsigned row = 9 - holder._row;
+            unsigned column = 8 - holder._column;
+            NSLog(@"%s: Convert [%d%d -> %d%d].", __FUNCTION__, holder._row, holder._column, row, column);
+            
+            [self x_movePiece:piece toRow:row toCol:column];
+        }
+    }
 }
 
 - (void)resetCChessPieces
