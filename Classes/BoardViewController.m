@@ -119,7 +119,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
         _tableId = nil;
         _myColor = NC_COLOR_UNKNOWN;
-        _blackAtTopSide = YES;
     }
     
     return self;
@@ -335,7 +334,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         if ( ! bHighlight ) {
             _hl_moves[i] = 0;
         }
-        ((XiangQiSquare*)[_game._grid cellAtRow:row column:col])._highlighted = bHighlight;
+        [_game x_getCellAtRow:row col:col]._highlighted = bHighlight;
     }
 
     if ( ! bHighlight ) {
@@ -354,7 +353,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     
     if (move != INVALID_MOVE) {
         int sqDst = DST(move);
-        ((XiangQiSquare*)[_game._grid cellAtRow:ROW(sqDst) column:COLUMN(sqDst)])._highlighted = YES;
+        [_game x_getCellAtRow:ROW(sqDst) col:COLUMN(sqDst)]._highlighted = YES;
         _hl_lastMove = move;
     }
 }
@@ -479,7 +478,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     redRect = red_time.frame;
     red_time.frame = black_time.frame;
     black_time.frame = redRect;
-    _blackAtTopSide = !_blackAtTopSide;
 }
 
 @end
