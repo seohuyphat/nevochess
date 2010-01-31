@@ -87,6 +87,8 @@ enum AlertViewEnum
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
 
+- (void) onLocalMoveMade:(int)move;
+
 - (void) goBackToHomeMenu;
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;

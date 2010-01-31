@@ -47,6 +47,7 @@
         newTable.blackId = [components objectAtIndex:8];
         newTable.blackRating = [components objectAtIndex:9];
         [_tables addObject:newTable];
+        [newTable release];
     }
 }
 
