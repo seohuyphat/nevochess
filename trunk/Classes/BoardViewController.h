@@ -69,7 +69,6 @@ enum AlertViewEnum
     // ---------
     NSString*       _tableId;
     ColorEnum       _myColor;     // The color (role) of the LOCAL player.
-    BOOL            _blackAtTopSide;
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;

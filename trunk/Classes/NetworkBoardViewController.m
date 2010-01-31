@@ -126,7 +126,15 @@
         // Generate moves for the selected piece.
         holder = (GridCell*)piece.holder;
         if(!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
-            int sqSrc = TOSQUARE(holder._row, holder._column);
+            //*******************
+            int row = holder._row;
+            int col = holder._column;
+            if (!_game.blackAtTopSide) {
+                row = 9 - row;
+                col = 8 - col;
+            }
+            //*******************
+            int sqSrc = TOSQUARE(row, col);
             [self setHighlightCells:NO]; // Clear old highlight.
             
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
@@ -144,19 +152,31 @@
     if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
         [self setHighlightCells:NO]; // Clear highlighted.
         
-        int sqDst = TOSQUARE(holder._row, holder._column);
         GridCell *cell = (GridCell*)_selectedPiece.holder;
-        int sqSrc = TOSQUARE(cell._row, cell._column);
+        //*******************
+        int row1 = cell._row;
+        int col1 = cell._column;
+        int row2 = holder._row;
+        int col2 = holder._column;
+        if (!_game.blackAtTopSide) {
+            row1 = 9 - row1;
+            col1 = 8 - col1;
+            row2 = 9 - row2;
+            col2 = 8 - col2;
+        }
+        //*******************
+        int sqSrc = TOSQUARE(row1, col1);
+        int sqDst = TOSQUARE(row2, col2);
         int move = MOVE(sqSrc, sqDst);
         if([_game isLegalMove:move])
         {
-            [_game humanMove:cell._row fromCol:cell._column toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+            [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
             
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
             [self handleNewMove:moveInfo];
             
             // Send over the network.
-            NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", cell._column, cell._row, COLUMN(sqDst), ROW(sqDst)];
+            NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", col1, row1, col2, row2];
             [_connection send_MOVE:_tableId move:moveStr];
             
             // AI's turn.
@@ -283,7 +303,9 @@
     [self setMyColor:myColor];
 
     // Reverse the View if necessary.
-    if (myColor == NC_COLOR_BLACK && _blackAtTopSide) {
+    if (   (myColor == NC_COLOR_BLACK && _game.blackAtTopSide)
+        || (!_game.blackAtTopSide) )
+    {
         [self reverseBoardView];
     }
     
