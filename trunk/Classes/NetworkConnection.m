@@ -102,6 +102,13 @@
     [self _flushOutgoingData];
 }
 
+- (void) send_NEW:(NSString*)itimes
+{
+    NSString* outStr = [NSString stringWithFormat:@"op=NEW&pid=%@&itimes=%@\n", _username, itimes];
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
+    [self _flushOutgoingData];
+}
+
 - (void) send_JOIN:(NSString*)tableId color:(NSString*)joinColor
 {    
     NSString* outStr = [NSString stringWithFormat:@"op=JOIN&pid=%@&tid=%@&color=%@\n", _username, tableId, joinColor];

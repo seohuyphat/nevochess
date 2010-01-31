@@ -38,18 +38,28 @@
 
 // --------------------------------------
 @protocol TableListDelegate <NSObject>
+- (void) handeBackFromList;
+- (void) handeNewFromList;
+- (void) handeRefreshFromList;
 - (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor;
 @end
 
 // --------------------------------------
-@interface TableListViewController : UITableViewController
+@interface TableListViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
+    IBOutlet UITableView* listView;
+
     NSMutableArray* _tables;
     id <TableListDelegate> delegate;
 }
 
+@property (nonatomic, retain) IBOutlet UITableView* listView;
 @property (nonatomic, retain) id <TableListDelegate> delegate;
+- (IBAction) backButtonPressed:(id)sender;
+- (IBAction) newButtonPressed:(id)sender;
+- (IBAction) refreshButtonPressed:(id)sender;
 
 - (id)initWithList:(NSString *)tablesStr;
+- (void)reinitWithList:(NSString *)tablesStr;
 
 @end

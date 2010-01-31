@@ -26,12 +26,17 @@
 
 
 @interface NetworkBoardViewController (PrivateMethods)
+- (void) _dismissListTableView;
+
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
+- (void) _handleNetworkEvent_LIST:(NSString*)event;
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event;
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event;
 - (void) _handleNetworkEvent_MOVE:(NSString*)event;
 - (void) _handleNetworkEvent_E_END:(NSString*)event;
 - (void) _handleNetworkEvent_RESET:(NSString*)event;
+- (void) _handleNetworkEvent_E_JOIN:(NSString*)event;
+- (void) _handleNetworkEvent_LEAVE:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -49,6 +54,9 @@
 
 @synthesize _username;
 @synthesize _password;
+@synthesize _redId;
+@synthesize _blackId;
+@synthesize _tableListController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -60,6 +68,11 @@
         _connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;
         [_connection connect];
+        
+        self._redId = nil;
+        self._blackId = nil;
+        _isGameOver = NO;
+        self._tableListController = nil;
     }
     
     return self;
@@ -86,10 +99,12 @@
 
 - (void)dealloc
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     self._username = nil;
     self._password = nil;
     [_connection release];
+    self._redId = nil;
+    self._blackId = nil;
+    self._tableListController = nil;
     [super dealloc];
 }
 
@@ -124,6 +139,13 @@
     [_connection send_MOVE:_tableId move:moveStr];
 }
 
+- (BOOL) isGameReady
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    return (   !_isGameOver
+            && _redId != nil && _blackId != nil );
+}
+
 #pragma mark -
 #pragma mark Delegate callback functions
 
@@ -143,9 +165,35 @@
     }
 }
 
+- (void) handeBackFromList
+{
+    [self _dismissListTableView];
+}
+
+- (void) handeNewFromList
+{
+    [self _dismissListTableView];
+
+    if (self._tableId) {
+        [_connection send_LEAVE:self._tableId]; // Leave the old table.
+        self._tableId = nil; 
+        [self resetBoard];
+    }
+    [_connection send_NEW:@"900/180/20"];
+}
+
+- (void) handeRefreshFromList
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    // DO NOT dismiss the existing List-of-Tables view!
+
+    [_connection send_LIST];
+}
+
 - (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self _dismissListTableView];
+
     if ([self._tableId isEqualToString:table.tableId]) {
         NSLog(@"%s: Same table [%@]. Ignore request.", __FUNCTION__, table.tableId);
         return;
@@ -155,6 +203,12 @@
         [self resetBoard];
     }
     [_connection send_JOIN:table.tableId color:joinColor];
+}
+
+- (void) _dismissListTableView
+{
+    [self dismissModalViewControllerAnimated:YES];
+    self._tableListController = nil;
 }
 
 #pragma mark -
@@ -177,10 +231,7 @@
             NSString* content = [newEvent objectForKey:@"content"];
 
             if ([op isEqualToString:@"LIST"]) {
-                TableListViewController *listController = [[TableListViewController alloc] initWithList:content];
-                listController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-                listController.delegate = self;
-                [self presentModalViewController:listController animated:YES];
+                [self _handleNetworkEvent_LIST:content];
             } else if ([op isEqualToString:@"I_TABLE"]) {
                 [self _handleNetworkEvent_I_TABLE:content];
             } else if ([op isEqualToString:@"I_MOVES"]) {
@@ -191,6 +242,10 @@
                 [self _handleNetworkEvent_E_END:content];
             } else if ([op isEqualToString:@"RESET"]) {
                 [self _handleNetworkEvent_RESET:content];
+            } else if ([op isEqualToString:@"E_JOIN"]) {
+                [self _handleNetworkEvent_E_JOIN:content];
+            } else if ([op isEqualToString:@"LEAVE"]) {
+                [self _handleNetworkEvent_LEAVE:content];
             }
 
             [newEvent release];
@@ -216,6 +271,20 @@
     }
     
     return entries;
+}
+
+- (void) _handleNetworkEvent_LIST:(NSString*)event
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (_tableListController == nil) {
+        self._tableListController = [[TableListViewController alloc] initWithList:event];
+        _tableListController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        _tableListController.delegate = self;
+        [self presentModalViewController:_tableListController animated:YES];
+    } else {
+        [_tableListController reinitWithList:event];
+    }
+
 }
 
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event
@@ -251,6 +320,9 @@
                            : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
     [self setRedLabel:redInfo];
     [self setBlackLabel:blackInfo];
+    self._redId = ([table.redId length] == 0 ? nil : table.redId);
+    self._blackId = ([table.blackId length] == 0 ? nil : table.blackId);
+    _isGameOver = NO;
     [table release];
 }
 
@@ -315,6 +387,10 @@
     NSString* gameResult = [components objectAtIndex:1];
     
     NSLog(@"%s: Table:[%@] - Game Over: [%@].", __FUNCTION__, tableId, gameResult);
+
+    if ( [self._tableId isEqualToString:tableId] ) {
+        _isGameOver = YES;
+    }
     [self handleEndGameInUI];
 }
 
@@ -325,6 +401,59 @@
     
     NSLog(@"%s: Table:[%@] - Game Reset.", __FUNCTION__, tableId);
     [self resetBoard];
+    _isGameOver = NO;
+}
+
+- (void) _handleNetworkEvent_E_JOIN:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* pid = [components objectAtIndex:1];
+    NSString* rating = [components objectAtIndex:2];
+    NSString* color = [components objectAtIndex:3];
+
+    NSString* playerInfo = ([pid length] == 0 ? @"*"
+                            : [NSString stringWithFormat:@"%@ (%@)", pid, rating]);
+
+    if ( ! [self._tableId isEqualToString:tableId] ) {
+        NSLog(@"%s: E_JOIN:[%@ as %@] from table:[%@] ignored.", __FUNCTION__, playerInfo, color, tableId);
+        return;
+    }
+    if ([color isEqualToString:@"Red"]) {
+        self._redId = pid;
+        [self setRedLabel:playerInfo];
+    } else if ([color isEqualToString:@"Black"]) {
+        self._blackId = pid;
+        [self setBlackLabel:playerInfo];
+    } else if ([color isEqualToString:@"None"]) {
+        NSLog(@"%s: Player: [%@] joined as an observer.", __FUNCTION__, playerInfo);
+        if ([pid isEqualToString:self._redId]) {
+            self._redId = nil;
+            [self setRedLabel:@"*"];
+        } else if ([pid isEqualToString:self._blackId]) {
+            self._blackId = nil;
+            [self setBlackLabel:@"*"];
+        }
+    }
+}
+
+- (void) _handleNetworkEvent_LEAVE:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* pid = [components objectAtIndex:1];
+
+    if ( ! [self._tableId isEqualToString:tableId] ) {
+        NSLog(@"%s: E_LEAVE:[%@] from table:[%@] ignored.", __FUNCTION__, pid, tableId);
+        return;
+    }
+    if ([pid isEqualToString:self._redId]) {
+        self._redId = nil;
+        [self setRedLabel:@"*"];
+    } else if ([pid isEqualToString:self._blackId]) {
+        self._blackId = nil;
+        [self setBlackLabel:@"*"];
+    }
 }
 
 #pragma mark -
