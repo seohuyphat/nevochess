@@ -196,15 +196,18 @@
 
 - (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd
 {
-    if (button != nil)
+    [self dismissModalViewControllerAnimated:YES];
+    if (button == nil) // "Cancel" button clicked?
     {
+        [self goBackToHomeMenu];
+    }
+    else {
         NSLog(@"%s: Username = [%@:%@]", __FUNCTION__, name, passwd);
         _username = ([name length] == 0 ? [self _generateGuestUserName] : name);
         _password = passwd;
         [_connection setLoginInfo:_username password:_password];
         [_connection send_LOGIN];
     }
-    [self dismissModalViewControllerAnimated:YES];
 }
 
 - (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor
@@ -263,7 +266,7 @@
         case NC_CONN_EVENT_END:
         {
             NSLog(@"%s: Got NC_CONN_EVENT_END.", __FUNCTION__);
-            [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
+            [self goBackToHomeMenu];
             break;
         }
     }
