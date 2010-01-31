@@ -73,7 +73,7 @@ static GameDataManager *gameDataManager;
     NSFileManager *fileManager = [NSFileManager defaultManager];
     // If the expected store doesn't exist, copy the default store.
     if (![fileManager fileExistsAtPath:storePath]) {
-        NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:@"CoreDataBooks" ofType:@"sqlite"];
+        NSString *defaultStorePath = [[NSBundle mainBundle] pathForResource:@"game" ofType:@"sqlite"];
         if (defaultStorePath) {
             [fileManager copyItemAtPath:defaultStorePath toPath:storePath error:NULL];
         }
@@ -138,14 +138,14 @@ static GameDataManager *gameDataManager;
                         error:(NSError**)error
 {
     NSEntityDescription *entityDescription = [NSEntityDescription
-                                              entityForName:name inManagedObjectContext:managedObjectContext];
+                                              entityForName:name inManagedObjectContext:[self managedObjectContext]];
     NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
     [request setEntity:entityDescription];
     
     [request setPredicate:predicate];
     [request setSortDescriptors:[NSArray arrayWithObject:sort]];
     
-    NSArray *result = [managedObjectContext executeFetchRequest:request error:error];
+    NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:error];
     return result;
 }
 
@@ -155,7 +155,7 @@ static GameDataManager *gameDataManager;
 //
 - (NSManagedObject*)prepareAndAddEntityForName:(NSString*)name
 {
-    return [NSEntityDescription insertNewObjectForEntityForName:name inManagedObjectContext:managedObjectContext];
+    return [NSEntityDescription insertNewObjectForEntityForName:name inManagedObjectContext:[self managedObjectContext]];
 }
 
 #pragma mark return game data manager handle 
