@@ -27,8 +27,11 @@
 
 }
 
-@property(nonatomic,retain) id _move;
-@property(nonatomic,retain) id _srcPiece;
-@property(nonatomic,retain) id _capturedPiece;
+@property(nonatomic,retain) id move;
+@property(nonatomic,retain) id srcPiece;
+@property(nonatomic,retain) id capturedPiece;
+
+// we need an unique id to identify all moves of game's one turn (playing session)
+@property(nonatomic,retain) NSString *sid;
 
 @end

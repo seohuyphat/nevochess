@@ -45,7 +45,8 @@ static GameDataManager *gameDataManager;
 #pragma mark Core Data
 //
 // Returns the path to the application's documents directory.
-///
+// We need to write to Application Document dir since that's the only place allowing us to write into
+//
 - (NSString *)applicationDocumentsDirectory {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
@@ -80,7 +81,8 @@ static GameDataManager *gameDataManager;
     
     NSURL *storeUrl = [NSURL fileURLWithPath:storePath];
 	
-    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];	
+    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, 
+                             [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];	
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
     
     NSError *error;
@@ -124,6 +126,36 @@ static GameDataManager *gameDataManager;
     // this will load model from main bundle
     managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
     return managedObjectModel;
+}
+
+//
+// load array of fetched results for specific entity
+// return nil or NSArray object, and optionally return error info.
+//
+- (NSArray*)loadEntityForName:(NSString*)name 
+              searchPredicate:(NSPredicate*)predicate 
+                         sort:(NSSortDescriptor*)sort 
+                        error:(NSError**)error
+{
+    NSEntityDescription *entityDescription = [NSEntityDescription
+                                              entityForName:name inManagedObjectContext:managedObjectContext];
+    NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+    [request setEntity:entityDescription];
+    
+    [request setPredicate:predicate];
+    [request setSortDescriptors:[NSArray arrayWithObject:sort]];
+    
+    NSArray *result = [managedObjectContext executeFetchRequest:request error:error];
+    return result;
+}
+
+//
+// prepare and add a new entity object into underlying managed object model;
+// any change toward the returned object would be automatically reflected into the object store
+//
+- (NSManagedObject*)prepareAndAddEntityForName:(NSString*)name
+{
+    return [NSEntityDescription insertNewObjectForEntityForName:name inManagedObjectContext:managedObjectContext];
 }
 
 #pragma mark return game data manager handle 

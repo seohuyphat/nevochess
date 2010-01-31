@@ -17,28 +17,17 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import <Foundation/Foundation.h>
-#import "DataManager.h"
+#import <CoreData/CoreData.h>
 
-@class NSManagedObjectModel;
-@class NSManagedObjectContext;
-@class NSPersistentStoreCoordinator;
+//
+// This is CoreData entity to represent a record of playing session/turn
+//
 
-@interface GameDataManager : DataManager {
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;	    
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@interface PlayRecord : NSManagedObject {
+
 }
 
-@property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-
-- (NSArray*)loadEntityForName:(NSString*)name 
-              searchPredicate:(NSPredicate*)predicate 
-                         sort:(NSSortDescriptor*)sort 
-                        error:(NSError**)error;
-
-- (NSManagedObject*)prepareAndAddEntityForName:(NSString*)name;
+@property(nonatomic,retain) NSData *date;
+@property(nonatomic,retain) NSString *sid;
 
 @end
