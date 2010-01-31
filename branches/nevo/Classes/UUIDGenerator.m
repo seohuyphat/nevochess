@@ -17,28 +17,17 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import <Foundation/Foundation.h>
-#import "DataManager.h"
+#import "UUIDGenerator.h"
 
-@class NSManagedObjectModel;
-@class NSManagedObjectContext;
-@class NSPersistentStoreCoordinator;
 
-@interface GameDataManager : DataManager {
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;	    
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@implementation UUIDGenerator
+
++ (NSString*)GetUUID
+{
+    CFUUIDRef theUUID = CFUUIDCreate(NULL);
+    CFStringRef string = CFUUIDCreateString(NULL, theUUID);
+    CFRelease(theUUID);
+    return [(NSString *)string autorelease];
 }
-
-@property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-
-- (NSArray*)loadEntityForName:(NSString*)name 
-              searchPredicate:(NSPredicate*)predicate 
-                         sort:(NSSortDescriptor*)sort 
-                        error:(NSError**)error;
-
-- (NSManagedObject*)prepareAndAddEntityForName:(NSString*)name;
 
 @end

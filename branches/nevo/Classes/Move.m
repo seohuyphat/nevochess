@@ -22,8 +22,9 @@
 
 @implementation Move
 
-@dynamic _move;
-@dynamic _srcPiece;
-@dynamic _capturedPiece;
+@dynamic move;
+@dynamic srcPiece;
+@dynamic capturedPiece;
+@dynamic sid;
 
 @end

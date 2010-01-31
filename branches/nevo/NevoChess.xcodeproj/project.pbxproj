@@ -66,6 +66,8 @@
 		AFB08A14106A663E00038488 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFB08A12106A663E00038488 /* Localizable.strings */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DE3A5C1111033D12006D3CD3 /* DataManager.m */; };
+		DE95DA7411153512007CE223 /* UUIDGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = DE95DA7311153512007CE223 /* UUIDGenerator.m */; };
+		DE95DA7D111537D2007CE223 /* PlayRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = DE95DA7C111537D2007CE223 /* PlayRecord.m */; };
 		DE964FCD1082511E00980CF6 /* GenericSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */; };
 		DE964FCE1082511E00980CF6 /* OptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCC1082511E00980CF6 /* OptionsView.xib */; };
 		DEE1A160110C91F700171BE1 /* GameDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DEE1A15F110C91F700171BE1 /* GameDataManager.m */; };
@@ -166,6 +168,10 @@
 		AFF89D0F106FEF2B00E2136D /* Enums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enums.h; sourceTree = "<group>"; };
 		DE3A5C1011033D12006D3CD3 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
 		DE3A5C1111033D12006D3CD3 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
+		DE95DA7211153512007CE223 /* UUIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUIDGenerator.h; sourceTree = "<group>"; };
+		DE95DA7311153512007CE223 /* UUIDGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUIDGenerator.m; sourceTree = "<group>"; };
+		DE95DA7B111537D2007CE223 /* PlayRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayRecord.h; sourceTree = "<group>"; };
+		DE95DA7C111537D2007CE223 /* PlayRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayRecord.m; sourceTree = "<group>"; };
 		DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericSettingViewController.xib; sourceTree = "<group>"; };
 		DE964FCC1082511E00980CF6 /* OptionsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionsView.xib; sourceTree = "<group>"; };
 		DEE1A15E110C91F700171BE1 /* GameDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameDataManager.h; sourceTree = "<group>"; };
@@ -198,8 +204,9 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				DE95DA71111534F6007CE223 /* Utils */,
 				DE3A5C0F11033C82006D3CD3 /* Managers */,
-				DE3A5C0E11033C4D006D3CD3 /* Models */,
+				DE3A5C0E11033C4D006D3CD3 /* DataEntities */,
 				AF07E8A8107A302B00FE19B7 /* Referee */,
 				AF75F8D91065B6CD002A371B /* AI */,
 				4BBB5ECA1032FAFD00243E55 /* xiangqi */,
@@ -376,13 +383,15 @@
 			path = images;
 			sourceTree = "<group>";
 		};
-		DE3A5C0E11033C4D006D3CD3 /* Models */ = {
+		DE3A5C0E11033C4D006D3CD3 /* DataEntities */ = {
 			isa = PBXGroup;
 			children = (
 				DEE62D36111486300078EAC5 /* Move.h */,
 				DEE62D37111486300078EAC5 /* Move.m */,
+				DE95DA7B111537D2007CE223 /* PlayRecord.h */,
+				DE95DA7C111537D2007CE223 /* PlayRecord.m */,
 			);
-			name = Models;
+			name = DataEntities;
 			sourceTree = "<group>";
 		};
 		DE3A5C0F11033C82006D3CD3 /* Managers */ = {
@@ -394,6 +403,15 @@
 				DEE1A15F110C91F700171BE1 /* GameDataManager.m */,
 			);
 			name = Managers;
+			sourceTree = "<group>";
+		};
+		DE95DA71111534F6007CE223 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				DE95DA7211153512007CE223 /* UUIDGenerator.h */,
+				DE95DA7311153512007CE223 /* UUIDGenerator.m */,
+			);
+			name = Utils;
 			sourceTree = "<group>";
 		};
 		DEE62D341114856F0078EAC5 /* models */ = {
@@ -540,6 +558,8 @@
 				DEE1A160110C91F700171BE1 /* GameDataManager.m in Sources */,
 				DEE62D38111486300078EAC5 /* Move.m in Sources */,
 				DEE62D3E111488AE0078EAC5 /* gamedata.xcdatamodel in Sources */,
+				DE95DA7411153512007CE223 /* UUIDGenerator.m in Sources */,
+				DE95DA7D111537D2007CE223 /* PlayRecord.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

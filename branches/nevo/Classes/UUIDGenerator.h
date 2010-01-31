@@ -18,27 +18,13 @@
  ***************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import "DataManager.h"
 
-@class NSManagedObjectModel;
-@class NSManagedObjectContext;
-@class NSPersistentStoreCoordinator;
+//
+// UUIDGenerator is used to generate universally unique id
+//
 
-@interface GameDataManager : DataManager {
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;	    
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@interface UUIDGenerator : NSObject {
+
 }
-
-@property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-
-- (NSArray*)loadEntityForName:(NSString*)name 
-              searchPredicate:(NSPredicate*)predicate 
-                         sort:(NSSortDescriptor*)sort 
-                        error:(NSError**)error;
-
-- (NSManagedObject*)prepareAndAddEntityForName:(NSString*)name;
-
++ (NSString*)GetUUID;
 @end
