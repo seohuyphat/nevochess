@@ -19,18 +19,20 @@
 
 
 #import "BoardViewController.h"
+#import "LoginViewController.h"
+#import "TableListViewController.h"
+#import "NetworkConnection.h"
 
-@interface ChessBoardViewController : BoardViewController
+@interface NetworkBoardViewController : BoardViewController <LoginDelegate, TableListDelegate, NetworkHandler>
 {
-    
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+    NSString*          _username;
+    NSString*          _password;
+    NetworkConnection* _connection;
 }
+
+@property (nonatomic, retain) NSString* _username;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
-
-- (void) saveGame;
 
 @end

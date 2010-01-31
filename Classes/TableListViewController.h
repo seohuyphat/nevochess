@@ -17,20 +17,39 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+#import <UIKit/UIKit.h>
 
-#import "BoardViewController.h"
-
-@interface ChessBoardViewController : BoardViewController
+@interface TableInfo : NSObject
 {
-    
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+    NSString* tableId;
+    NSString* redId;
+    NSString* redRating;
+    NSString* blackId;
+    NSString* blackRating;
 }
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+@property (nonatomic, retain) NSString* tableId;
+@property (nonatomic, retain) NSString* redId;
+@property (nonatomic, retain) NSString* redRating;
+@property (nonatomic, retain) NSString* blackId;
+@property (nonatomic, retain) NSString* blackRating;
 
-- (void) saveGame;
+@end
+
+// --------------------------------------
+@protocol TableListDelegate <NSObject>
+- (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor;
+@end
+
+// --------------------------------------
+@interface TableListViewController : UITableViewController
+{
+    NSMutableArray* _tables;
+    id <TableListDelegate> delegate;
+}
+
+@property (nonatomic, retain) id <TableListDelegate> delegate;
+
+- (id)initWithList:(NSString *)tablesStr;
 
 @end

@@ -33,6 +33,7 @@
 @property(nonatomic,retain) IBOutlet UIImageView *bg_view;
 
 - (IBAction)newGamePressed:(id)sender;
+- (IBAction)networkGamePressed:(id)sender;
 - (IBAction)aboutPressed:(id)sender;
 - (IBAction)settingPressed:(id)sender;
 

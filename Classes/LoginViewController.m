@@ -17,20 +17,53 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+#import "LoginViewController.h"
 
-#import "BoardViewController.h"
 
-@interface ChessBoardViewController : BoardViewController
-{
-    
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+@implementation LoginViewController
+
+@synthesize delegate;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
 }
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [_username becomeFirstResponder]; // to have the first keyboard focus
+}
 
-- (void) saveGame;
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (IBAction)loginButtonPressed:(id)sender
+{
+    NSLog(@"%s: ENTER. [%@]", __FUNCTION__, _username.text);
+    [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
+}
+
+- (IBAction)cancelButtonPressed:(id)sender
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [delegate handleLoginRequest:nil username:nil password:nil];
+}
 
 @end

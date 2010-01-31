@@ -17,20 +17,59 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+#import <Foundation/Foundation.h>
 
-#import "BoardViewController.h"
-
-@interface ChessBoardViewController : BoardViewController
+typedef enum
 {
+    NC_CONN_STATE_NONE,
+    NC_CONN_STATE_CONNECTING,
+    NC_CONN_STATE_CONNECTED
+} ConnectionStateEnum;
+
+typedef enum
+{
+    NC_CONN_EVENT_OPEN,
+    NC_CONN_EVENT_DATA,
+    NC_CONN_EVENT_END
+} ConnectionEventEnum;
+
+@protocol NetworkHandler <NSObject>
+- (void) handleNetworkEvent:(ConnectionEventEnum)code event:(NSString*)event;
+@end
+
+@interface NetworkConnection : NSObject
+{
+    ConnectionStateEnum _connectionState;
+    NSString*           _username;
+    NSString*           _password;
+
+    NSMutableData*      _outData;
+    NSMutableData*      _inData;
+    unsigned int        _outByteIndex;
+    unsigned int        _inByteIndex;
     
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+    NSInputStream*      _inStream;
+    NSOutputStream*     _outStream;
+    bool                _outAvailable;
+    
+    id <NetworkHandler> delegate;
 }
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+@property (nonatomic, retain) id <NetworkHandler> delegate;
+@property (nonatomic, retain) NSString* _username;
+@property (nonatomic, retain) NSString* _password;
+@property(readonly) ConnectionStateEnum state;
 
-- (void) saveGame;
+- (id) init;
+- (void) connect;
+- (void) disconnect;
+- (void) setLoginInfo:(NSString *)username password:(NSString*)passwd;
+
+- (void) send_LOGIN;
+- (void) send_LOGOUT;
+- (void) send_LIST;
+- (void) send_JOIN:(NSString*)tableId color:(NSString*)joinColor;
+- (void) send_LEAVE:(NSString*)tableId;
+- (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr;
 
 @end
