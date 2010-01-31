@@ -31,8 +31,11 @@
 }
 
 @property (nonatomic, retain) NSString* _username;
+@property (nonatomic, retain) NSString* _password;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
+
+- (void) onLocalMoveMade:(int)move;
 
 @end

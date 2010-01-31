@@ -32,6 +32,7 @@
 
 @interface ChessBoardViewController (PrivateMethods)
 
+- (void) _AIMove;
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 
@@ -104,7 +105,7 @@
         //       avoid clearing data while the AI is thinking of a Move.
         [self resetBoard];
     }else{
-        // FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
+        // FIXME: in case of this function is invoked before "_AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
         CFRunLoopStop(_robotLoop);
         [self goBackToHomeMenu];
@@ -163,12 +164,6 @@
 	// Release any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload
-{
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
-}
-
 - (void)dealloc
 {
     [_robotPort release];
@@ -205,8 +200,10 @@
     [alert release];
 }
 
-#pragma mark AI move 
-- (void)AIMove
+//
+// Handle AI's move.
+//
+- (void)_AIMove
 {
     int captured = 0;
     int move = [_game getRobotMove:&captured];
@@ -220,65 +217,12 @@
                            withObject:moveInfo waitUntilDone:NO];
 }
 
-#pragma mark Touch event handling
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void) onLocalMoveMade:(int)move
 {
-    if ( [[event allTouches] count] != 1 // Valid for single touch only
-      ||  _inReview    // Do nothing if we are in the middle of Move-Review.
-      || ![self isMyTurnNext] ) // Ignore when it is not my turn.
-    { 
-        return;
+    // AI's turn.
+    if ( _game.game_result == kXiangQi_InPlay ) {
+        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
-
-    ChessBoardView *view = (ChessBoardView*) self.view;
-    GridCell *holder = nil;
-    
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint p = [touch locationInView:self.view];
-    Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
-    if(piece) {
-        // Generate moves for the selected piece.
-        holder = (GridCell*)piece.holder;
-        if(!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
-            int sqSrc = TOSQUARE(holder._row, holder._column);
-            [self setHighlightCells:NO]; // Clear old highlight.
-
-            _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
-            [self setHighlightCells:YES];
-            _selectedPiece = piece;
-            [_audioHelper play_wav_sound:@"CLICK"];
-            return;
-        }
-        
-    } else {
-        holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsBitHolder offset:NULL];
-    }
-
-    // Make a Move from the last selected cell to the current selected cell.
-    if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
-        [self setHighlightCells:NO]; // Clear highlighted.
-
-        int sqDst = TOSQUARE(holder._row, holder._column);
-        GridCell *cell = (GridCell*)_selectedPiece.holder;
-        int sqSrc = TOSQUARE(cell._row, cell._column);
-        int move = MOVE(sqSrc, sqDst);
-        if([_game isLegalMove:move])
-        {
-            [_game humanMove:cell._row fromCol:cell._column toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
-            NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            [self handleNewMove:moveInfo];
-
-            // AI's turn.
-            if ( _game.game_result == kXiangQi_InPlay ) {
-                [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
-            }
-        }
-    } else {
-        [self setHighlightCells:NO];  // Clear highlighted.
-    }
-
-    _selectedPiece = nil;  // Reset selected state.
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -387,7 +331,7 @@
 
     // If it is AI's turn after the game is loaded, then inform the AI.
     if ( bAIturn && _game.game_result == kXiangQi_InPlay ) {
-        [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }
 

@@ -273,6 +273,87 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if ( [[event allTouches] count] != 1 // Valid for single touch only
+        ||  _inReview    // Do nothing if we are in the middle of Move-Review.
+        || ![self isMyTurnNext] ) // Ignore when it is not my turn.
+    { 
+        return;
+    }
+
+    ChessBoardView *view = (ChessBoardView*) self.view;
+    GridCell *holder = nil;
+    
+    UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    CGPoint p = [touch locationInView:self.view];
+    Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+    if(piece) {
+        // Generate moves for the selected piece.
+        holder = (GridCell*)piece.holder;
+        if(!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
+            //*******************
+            int row = holder._row;
+            int col = holder._column;
+            if (!_game.blackAtTopSide) {
+                row = 9 - row;
+                col = 8 - col;
+            }
+            //*******************
+            int sqSrc = TOSQUARE(row, col);
+            [self setHighlightCells:NO]; // Clear old highlight.
+            
+            _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
+            [self setHighlightCells:YES];
+            _selectedPiece = piece;
+            [_audioHelper play_wav_sound:@"CLICK"];
+            return;
+        }
+    } else {
+        holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsBitHolder offset:NULL];
+    }
+    
+    // Make a Move from the last selected cell to the current selected cell.
+    if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
+        [self setHighlightCells:NO]; // Clear highlighted.
+
+        GridCell *cell = (GridCell*)_selectedPiece.holder;
+        //*******************
+        int row1 = cell._row;
+        int col1 = cell._column;
+        int row2 = holder._row;
+        int col2 = holder._column;
+        if (!_game.blackAtTopSide) {
+            row1 = 9 - row1;
+            col1 = 8 - col1;
+            row2 = 9 - row2;
+            col2 = 8 - col2;
+        }
+        //*******************
+        int sqSrc = TOSQUARE(row1, col1);
+        int sqDst = TOSQUARE(row2, col2);
+        int move = MOVE(sqSrc, sqDst);
+        if([_game isLegalMove:move])
+        {
+            [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
+            
+            NSNumber *moveInfo = [NSNumber numberWithInteger:move];
+            [self handleNewMove:moveInfo];
+
+            [self onLocalMoveMade:move];
+        }
+    } else {
+        [self setHighlightCells:NO];  // Clear highlighted.
+    }
+
+    _selectedPiece = nil;  // Reset selected state.
+}
+
+- (void) onLocalMoveMade:(int)move
+{
+    NSLog(@"%s: ENTER. move = [%d -> %d]", __FUNCTION__, SRC(move), DST(move));
+}
+
 - (void) goBackToHomeMenu
 {
     [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
