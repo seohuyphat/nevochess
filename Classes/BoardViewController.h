@@ -43,18 +43,18 @@ enum AlertViewEnum
     IBOutlet UIButton    *red_seat;
     IBOutlet UIButton    *black_seat;
     IBOutlet UIActivityIndicatorView *activity;
-    
+
     NSTimer *_timer;
 
     AudioHelper *_audioHelper;
-    
+
     // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
     int    _hl_moves[MAX_GEN_MOVES];
     int    _hl_nMoves;
     int    _hl_lastMove;      // The last Move that was highlighted.
 
     Piece *_selectedPiece;
-    
+
     CChessGame *_game;
 
     int _initialTime;  // The initial time (in seconds)
@@ -98,6 +98,7 @@ enum AlertViewEnum
 - (void) resetBoard;
 - (void) setMyColor:(ColorEnum)color;
 - (BOOL) isMyTurnNext;
+- (BOOL) isGameReady;
 - (void) setHighlightCells:(BOOL)bHighlight;
 - (void) showHighlightOfMove:(int)move;
 - (void) handleNewMove:(NSNumber *)pMove;

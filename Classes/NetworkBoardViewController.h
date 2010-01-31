@@ -28,10 +28,20 @@
     NSString*          _username;
     NSString*          _password;
     NetworkConnection* _connection;
+
+    NSString*          _redId; // TODO: We should use the 'players' in Game class.
+    NSString*          _blackId;
+
+    BOOL               _isGameOver;
+
+    TableListViewController* _tableListController;
 }
 
 @property (nonatomic, retain) NSString* _username;
 @property (nonatomic, retain) NSString* _password;
+@property (nonatomic, retain) NSString* _redId;
+@property (nonatomic, retain) NSString* _blackId;
+@property (nonatomic, retain) TableListViewController* _tableListController;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;

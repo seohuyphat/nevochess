@@ -277,7 +277,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     if ( [[event allTouches] count] != 1 // Valid for single touch only
         ||  _inReview    // Do nothing if we are in the middle of Move-Review.
-        || ![self isMyTurnNext] ) // Ignore when it is not my turn.
+        || ![self isMyTurnNext] // Ignore when it is not my turn.
+        || ![self isGameReady] )
     { 
         return;
     }
@@ -553,6 +554,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     const ColorEnum nextColor = ([_game get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED); 
     return (nextColor == _myColor);
+}
+
+- (BOOL) isGameReady
+{
+    return YES;
 }
 
 - (void) reverseBoardView

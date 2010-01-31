@@ -68,6 +68,7 @@ typedef enum
 - (void) send_LOGIN;
 - (void) send_LOGOUT;
 - (void) send_LIST;
+- (void) send_NEW:(NSString*)itimes;
 - (void) send_JOIN:(NSString*)tableId color:(NSString*)joinColor;
 - (void) send_LEAVE:(NSString*)tableId;
 - (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr;

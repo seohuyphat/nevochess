@@ -31,6 +31,7 @@
 //------------------------------------------------
 @implementation TableListViewController
 
+@synthesize listView;
 @synthesize delegate;
 
 - (void) _parseTablesStr:(NSString *)tablesStr
@@ -53,27 +54,32 @@
 
 - (id)initWithList:(NSString *)tablesStr
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    if (self = [super initWithStyle:UITableViewStylePlain]) {
+    if (self = [self initWithNibName:@"TableListView" bundle:nil]) {
         _tables = [[NSMutableArray alloc] init];
         [self _parseTablesStr:tablesStr];
     }
-    
     return self;
+}
+
+- (void)reinitWithList:(NSString *)tablesStr
+{
+    [self _parseTablesStr:tablesStr];
+    [self.listView reloadData];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    CGRect titleRect = CGRectMake(0, 0, 300, 40);
-    UILabel *tableTitle = [[UILabel alloc] initWithFrame:titleRect];
+
+    // Create a table's heading.
+    CGRect titleRect = CGRectMake(0, 0, 300, 30);
+    UILabel* tableTitle = [[UILabel alloc] initWithFrame:titleRect];
     tableTitle.textColor = [UIColor blueColor];
-    tableTitle.backgroundColor = [self.tableView backgroundColor];
+    tableTitle.backgroundColor = [self.listView backgroundColor];
     tableTitle.opaque = YES;
     tableTitle.font = [UIFont boldSystemFontOfSize:18];
     tableTitle.text = NSLocalizedString(@"List of Tables", @"");
-    self.tableView.tableHeaderView = tableTitle;
-    [self.tableView reloadData];
+    self.listView.tableHeaderView = tableTitle;
+    [self.listView reloadData];
     [tableTitle release];
 }
 
@@ -89,6 +95,21 @@
 	// e.g. self.myOutlet = nil;
 }
 
+#pragma mark Button methods
+- (IBAction) backButtonPressed:(id)sender
+{
+    [delegate handeBackFromList];
+}
+
+- (IBAction) newButtonPressed:(id)sender
+{
+    [delegate handeNewFromList];
+}
+
+- (IBAction) refreshButtonPressed:(id)sender
+{
+    [delegate handeRefreshFromList];
+}
 
 #pragma mark Table view methods
 
@@ -143,7 +164,9 @@
 
 
 - (void)dealloc {
+    self.listView = nil;
     [_tables release];
+    [delegate release];
     [super dealloc];
 }
 
