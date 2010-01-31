@@ -273,6 +273,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
+- (void) goBackToHomeMenu
+{
+    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
+}
+
 - (void) setRedLabel:(NSString*)label
 {
     red_label.text = label;

@@ -107,7 +107,7 @@
         // FIXME: in case of this function is invoked before "AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
         CFRunLoopStop(_robotLoop);
-        [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
+        [self goBackToHomeMenu];
     }
 }
 
