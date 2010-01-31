@@ -18,10 +18,7 @@
  ***************************************************************************/
 
 
-
 #import "CChessGame.h"
-#import "Enums.h"
-#import "Grid.h"
 #import "Piece.h"
 #import "QuartzUtils.h"
 #import "AI_HaQiKiD.h"
@@ -40,6 +37,7 @@
 @interface CChessGame ()
 
 - (int) _convertStringToAIType:(NSString *)aiSelection;
+- (void)_setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 
 @end
 
@@ -55,8 +53,10 @@
 
 @implementation CChessGame
 
+@synthesize _aiName;
 @synthesize _grid;
 @synthesize game_result;
+@synthesize blackAtTopSide=_blackAtTopSide;
 
 - (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo
 {
@@ -86,6 +86,15 @@
 
 - (void)x_movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    [self _setPiece:piece toRow:row toCol:col];
+}
+
+- (void)_setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
+{
     XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow: row column: col]); 
     CGRect frame = s.frame;
     CGPoint position;
@@ -102,6 +111,10 @@
 
 - (Piece*)x_getPieceAtRow:(int)row col:(int)col
 {
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
     XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow: row column: col]); 
     CGRect frame = s.frame;
     CGPoint position;
@@ -114,7 +127,16 @@
     }
     
     return nil;
-    
+}
+
+- (XiangQiSquare*)x_getCellAtRow:(int)row col:(int)col
+{
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow:row column:col]);
+    return s;
 }
 
 - (void)dealloc
@@ -122,6 +144,7 @@
     [_grid removeAllCells];
     [_grid release];
     [_pieceBox release];
+    [_aiName release];
     [_referee release];
     [_aiEngine release];
     [super dealloc];
@@ -136,7 +159,7 @@
         CGSize size = board.bounds.size;
         board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
         XiangQiGrid *grid = [[XiangQiGrid alloc] initWithRows: 10 columns: 9 
-                                                  frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 25,
+                                                  frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 35,
                                                                     size.width-4,size.height-4)];
         _grid = (RectGrid*)grid;
         //grid.backgroundColor = GetCGPatternNamed(@"board.png");
@@ -168,7 +191,8 @@
         
         ((XiangQiSquare*)[grid cellAtRow: 1 column: 4]).cross = YES;
         ((XiangQiSquare*)[grid cellAtRow: 8 column: 4]).cross = YES;
-        
+
+        _blackAtTopSide = YES;
         game_result = kXiangQi_InPlay;
         
         // Create a Referee to manage the Game.
@@ -176,8 +200,8 @@
         [_referee initGame];
         
         // Determine the type of AI.
-        NSString *aiSelection = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
-        _aiType = [self _convertStringToAIType:aiSelection];
+        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
+        _aiType = [self _convertStringToAIType:_aiName];
 
         switch (_aiType) {
             case kNevoChess_AI_xqwlight:
@@ -279,10 +303,38 @@
 
 - (void)reset_game
 {
+    BOOL saved_blackAtTopSide = _blackAtTopSide;
+    _blackAtTopSide = YES;
     [self resetCChessPieces];
+    if (!saved_blackAtTopSide) {
+        [self reverseView];
+    }
+    _blackAtTopSide = saved_blackAtTopSide;
+    
     [_referee initGame];
     [_aiEngine initGame];
     game_result = kXiangQi_InPlay;
+}
+
+- (NSString*) getAIName
+{
+    return _aiName;
+}
+
+- (void) reverseView
+{
+    for (Piece* piece in _pieceBox) {
+        if(piece.superlayer != nil) { // not captured?
+            XiangQiSquare *holder = (XiangQiSquare*)piece.holder;
+            
+            unsigned row = 9 - holder._row;
+            unsigned column = 8 - holder._column;
+            NSLog(@"%s: Convert [%d%d -> %d%d].", __FUNCTION__, holder._row, holder._column, row, column);
+            
+            [self _setPiece:piece toRow:row toCol:column];
+        }
+    }
+    _blackAtTopSide = !_blackAtTopSide;
 }
 
 - (void)resetCChessPieces
@@ -332,8 +384,7 @@
     [self x_movePiece:[_pieceBox objectAtIndex:28] toRow:6 toCol:2];
     [self x_movePiece:[_pieceBox objectAtIndex:29] toRow:6 toCol:4];
     [self x_movePiece:[_pieceBox objectAtIndex:30] toRow:6 toCol:6];
-    [self x_movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];    
-
+    [self x_movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];
 }
 
 - (void)setupCChessPieces

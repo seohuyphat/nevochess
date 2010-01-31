@@ -17,20 +17,25 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+#import <UIKit/UIKit.h>
 
-#import "BoardViewController.h"
+@protocol LoginDelegate <NSObject>
+// button == nil on cancel
+- (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd;
+@end
 
-@interface ChessBoardViewController : BoardViewController
+
+@interface LoginViewController : UIViewController
 {
+    IBOutlet UITextField *_username;
+    IBOutlet UITextField *_password;
     
-    NSThread*     robot;
-    NSPort*      _robotPort; // the port is used to instruct the robot to do works
-    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+    id <LoginDelegate> delegate;
 }
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+@property (nonatomic, retain) id <LoginDelegate> delegate;
 
-- (void) saveGame;
+- (IBAction)loginButtonPressed:(id)sender;
+- (IBAction)cancelButtonPressed:(id)sender;
 
 @end

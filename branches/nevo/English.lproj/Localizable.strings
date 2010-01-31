@@ -12,7 +12,7 @@
 "RESET" = "RESET";
 
 /* These HOME keys need a single space in the front to separate an icon. */
-"Home_Play" = " Play";
+"Home_Play" = " Practice";
 "Home_Settings" = " Settings";
 "Home_About" = " About";
 

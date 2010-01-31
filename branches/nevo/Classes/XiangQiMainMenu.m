@@ -19,6 +19,7 @@
 
 #import "XiangQiMainMenu.h"
 #import "ChessBoardViewController.h"
+#import "NetworkBoardViewController.h"
 #import "NevoChessAppDelegate.h"
 #import "AboutViewController.h"
 #import "OptionsViewController.h"
@@ -83,6 +84,13 @@
 - (IBAction)newGamePressed:(id)sender
 {
     ChessBoardViewController *chessboard = [[ChessBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
+    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:chessboard animated:YES];
+    [chessboard release];
+}
+
+- (IBAction)networkGamePressed:(id)sender
+{
+    NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
     [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }

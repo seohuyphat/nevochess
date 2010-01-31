@@ -34,5 +34,31 @@
 #define POC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
 #define POC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
 
+///////////////////////////////////////////////////////////////////////////////
+//
+//    Common Enums
+//
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Color for both Piece and Role.
+ */
+typedef enum
+{
+    NC_COLOR_UNKNOWN = -1,
+        // This type indicates the absense of color or role.
+        // For example, it is used to indicate the player is not even
+        // at the table.
+
+    NC_COLOR_RED,   // RED color.
+    NC_COLOR_BLACK, // BLACK color.
+
+    NC_COLOR_NONE
+        // NOTE: This type actually does not make sense for 'Piece',
+        //       only for "Player". It is used to indicate the role of a player
+        //       who is currently only observing the game, not playing.
+
+} ColorEnum;
+
 
 ////////////////////// END OF FILE ////////////////////////////////////////////

@@ -19,6 +19,8 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <QuartzCore/QuartzCore.h>
+#import "Enums.h"
+#import "Grid.h"
 #import "Game.h"
 #import "AIEngine.h"
 #import "Referee.h"
@@ -59,10 +61,11 @@ enum {
 
 @interface CChessGame : Game
 {
-    RectGrid *_grid;
-    
-    NSMutableArray *_pieceBox;
-    
+    RectGrid*       _grid;
+    NSMutableArray* _pieceBox;
+    BOOL            _blackAtTopSide;
+
+    NSString* _aiName;
     int _aiType;
     Referee  *_referee;
     AIEngine *_aiEngine;
@@ -74,6 +77,7 @@ enum {
 - (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo;
 - (void)x_movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*)x_getPieceAtRow:(int)row col:(int)col;
+- (XiangQiSquare*)x_getCellAtRow:(int)row col:(int)col;
 
 - (int)  getRobotMove:(int*)captured;
 - (int) humanMove:(int)row1 fromCol:(int)col1
@@ -86,8 +90,12 @@ enum {
 - (int) get_sdPlayer;
 - (void)resetCChessPieces;
 - (void)reset_game;
+- (NSString*) getAIName;
+- (void)reverseView;
 
-@property (nonatomic,readonly) RectGrid *_grid;
-@property (nonatomic,readonly) int game_result;
+@property (nonatomic, retain) NSString* _aiName;
+@property (nonatomic, readonly) RectGrid *_grid;
+@property (nonatomic, readonly) BOOL blackAtTopSide;
+@property (nonatomic, readonly) int game_result;
 
 @end
