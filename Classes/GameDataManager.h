@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 #import "DataManager.h"
 
 @class NSManagedObjectModel;
@@ -35,6 +36,11 @@
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
 - (NSArray*)loadEntityForName:(NSString*)name 
+              searchPredicate:(NSPredicate*)predicate 
+                         sort:(NSSortDescriptor*)sort 
+                        error:(NSError**)error;
+
+- (BOOL)hasEntityForName:(NSString*)name 
               searchPredicate:(NSPredicate*)predicate 
                          sort:(NSSortDescriptor*)sort 
                         error:(NSError**)error;
