@@ -20,7 +20,6 @@
 //
 // Part of the code in this file is from file "CoreDataBooksAppDelegates.m" in iPhone sample "CoreDataBooks"
 //
-#import "CoreData/CoreData.h"
 
 #import "GameDataManager.h"
 
@@ -142,11 +141,31 @@ static GameDataManager *gameDataManager;
     NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
     [request setEntity:entityDescription];
     
-    [request setPredicate:predicate];
-    [request setSortDescriptors:[NSArray arrayWithObject:sort]];
+    if (predicate) [request setPredicate:predicate];
+    if (sort) [request setSortDescriptors:[NSArray arrayWithObject:sort]];
     
     NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:error];
     return result;
+}
+
+//
+// poll the managedObjectContext to see if it contains the specific objects
+//
+- (BOOL)hasEntityForName:(NSString*)name 
+         searchPredicate:(NSPredicate*)predicate 
+                    sort:(NSSortDescriptor*)sort 
+                   error:(NSError**)error
+{
+    NSEntityDescription *entityDescription = [NSEntityDescription
+                                              entityForName:name inManagedObjectContext:[self managedObjectContext]];
+    NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+    [request setEntity:entityDescription];
+    
+    if (predicate) [request setPredicate:predicate];
+    if (sort) [request setSortDescriptors:[NSArray arrayWithObject:sort]];
+    
+    NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:error];
+    return ([result count] > 0 ? YES : NO);
 }
 
 //

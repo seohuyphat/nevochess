@@ -23,6 +23,9 @@
 #import "Grid.h"
 #import "Piece.h"
 #import "ChessBoardView.h"
+#import "GameDataManager.h"
+#import "PlayRecord.h"
+#import "UUIDGenerator.h"
 
 BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
 BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
@@ -72,6 +75,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (id)   _initSoundSystem;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer:(int)color;
+
+// core data
+- (void) _initGameDataSession;
 
 @end
 
@@ -157,12 +163,13 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
     _redTime = _blackTime = _initialTime * 60;
     [red_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
+    //red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
 
     [black_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
+    //black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
 
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
+    [self resetBoard];
 }
 
 - (void)didReceiveMemoryWarning
@@ -187,7 +194,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [_audioHelper release];
     [_game release];
     [_moves release];
-
+    [_sid release];
+    
     [super dealloc];
 }
 
@@ -433,6 +441,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) saveGame
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    [[[GameDataManager getDataManager] managedObjectContext] save:nil];
 }
 
 - (void) rescheduleTimer
@@ -456,6 +465,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _nthMove = -1;
     _inReview = NO;
     _latestMove = INVALID_MOVE;
+    
+    [self _initGameDataSession];
 }
 
 - (void) setMyColor:(ColorEnum)color
@@ -478,6 +489,17 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     redRect = red_time.frame;
     red_time.frame = black_time.frame;
     black_time.frame = redRect;
+}
+
+#pragma mark Core Data Methods
+- (void) _initGameDataSession
+{
+    [_sid release];
+    _sid = [[UUIDGenerator GetUUID] retain];
+    NSLog(@"initialize game data session %@", _sid);
+    PlayRecord *record = (PlayRecord*)[[GameDataManager getDataManager] prepareAndAddEntityForName:@"PlayRecord"];
+    record.sid = _sid;
+    record.date = [NSDate date];
 }
 
 @end

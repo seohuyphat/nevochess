@@ -23,6 +23,9 @@
 #import "Grid.h"
 #import "Piece.h"
 #import "ChessBoardView.h"
+#import "GameDataManager.h"
+#import "Move.h"
+#import "PlayRecord.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -33,7 +36,9 @@
 @interface ChessBoardViewController (PrivateMethods)
 
 - (void) _displayResumeGameAlert;
-- (void) _loadPendingGame:(NSString *)sPendingGame;
+- (NSArray*) _loadLocalGameSessions;
+- (void) _loadPendingGame;
+- (BOOL) _hasPendingGame;
 
 @end
 
@@ -59,8 +64,7 @@
         [self setBlackLabel:[_game getAIName]];
         
         // Restore pending game, if any.
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
+        if ([self _hasPendingGame]) {
             [self _displayResumeGameAlert];
         }
     }
@@ -138,10 +142,7 @@
     else if (    alertView.tag == POC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
     {
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
-            [self _loadPendingGame:sPendingGame];
-        }
+        [self _loadPendingGame];
     }
     else if (    alertView.tag == POC_ALERT_RESET_GAME
              && buttonIndex != [alertView cancelButtonIndex] )
@@ -347,32 +348,65 @@
     [alert release];
 }
 
+#pragma mark  CoreData methods
 - (void) saveGame
 {
-    NSMutableString *sMoves = [NSMutableString new];
-
+    NSLog(@"Save current game session %@", _sid);
     if ( _game.game_result == kXiangQi_InPlay ) {
         for (MoveAtom *pMove in _moves) {
-            NSNumber *move = pMove.move;
-            if ([sMoves length]) [sMoves appendString:@","];
-            [sMoves appendFormat:@"%d",[move integerValue]];
+            Move *move = [[GameDataManager getDataManager] prepareAndAddEntityForName:@"Move"];
+            move.sid = _sid;
+            move.move = pMove.move;
         }
     }
-
-    [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
-    [sMoves release];
+    [super saveGame];
 }
 
-- (void) _loadPendingGame:(NSString *)sPendingGame
+- (BOOL) _hasPendingGame
 {
-    NSArray *moves = [sPendingGame componentsSeparatedByString:@","];
+    // in order to load the pending game, we must load the last game session first
+    NSArray *sessions = [self _loadLocalGameSessions];
+    if (sessions == nil || [sessions count] == 0) {
+        NSLog(@"No pending game");
+        return NO;
+    }
+    
+    //the first one would be the current session
+    PlayRecord *last = [sessions objectAtIndex:2];
+    NSLog(@"the last session is %@", last.sid);
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
+    BOOL hasPendingGame = [[GameDataManager getDataManager] hasEntityForName:@"Move"
+                                                             searchPredicate:predicate
+                                                                        sort:nil
+                                                                       error:nil];
+    return hasPendingGame;
+}
+
+- (void) _loadPendingGame
+{
+    // in order to load the pending game, we must load the last game session first
+    NSArray *sessions = [self _loadLocalGameSessions];
+    if (sessions == nil || [sessions count] == 0) {
+        NSLog(@"No pending game to load");
+        return;
+    }
+    
+    NSError *error;
+    PlayRecord *last = [sessions objectAtIndex:2];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
+    NSArray *moves = [[GameDataManager getDataManager] loadEntityForName:@"Move"
+                                                         searchPredicate:predicate
+                                                                    sort:nil
+                                                                   error:&error];
+    NSAssert((moves != nil), @"failed to load pending game from local history storage");
+    
     int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
     BOOL bAIturn = NO;
 
-    for (NSNumber *pMove in moves) {
-        move  = [pMove integerValue];
+    for (Move *pMove in moves) {
+        move  = [(NSNumber*)pMove.move integerValue];
         sqSrc = SRC(move);
         sqDst = DST(move);
 
@@ -389,6 +423,22 @@
     if ( bAIturn && _game.game_result == kXiangQi_InPlay ) {
         [self performSelector:@selector(AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
+}
+
+- (NSArray*) _loadLocalGameSessions
+{
+    NSError *error;
+    NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO selector:@selector(compare:)];
+    NSArray *sessions = [[GameDataManager getDataManager] loadEntityForName:@"PlayRecord"
+                                                            searchPredicate:nil
+                                                                       sort:dateDescriptor
+                                                                      error:&error];
+    if (sessions == nil) {
+        NSLog(@"Failed to load last local game session %@ ", [error localizedDescription]);
+        return nil;
+    }
+    
+    return sessions; // autoreleased 
 }
 
 #pragma mark NSMachPort message handle 

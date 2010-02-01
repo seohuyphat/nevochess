@@ -69,6 +69,9 @@ enum AlertViewEnum
     // ---------
     NSString*       _tableId;
     ColorEnum       _myColor;     // The color (role) of the LOCAL player.
+    
+    // Core Data
+    NSString        *_sid;        // game session id;
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
