@@ -366,13 +366,15 @@
 {
     // in order to load the pending game, we must load the last game session first
     NSArray *sessions = [self _loadLocalGameSessions];
-    if (sessions == nil || [sessions count] == 0) {
+    if (sessions == nil || [sessions count] < 2) {
+        // the first one should be the current one, so we must ensure
+        // the previous one is in the array
         NSLog(@"No pending game");
         return NO;
     }
     
     //the first one would be the current session
-    PlayRecord *last = [sessions objectAtIndex:2];
+    PlayRecord *last = [sessions objectAtIndex:1];
     NSLog(@"the last session is %@", last.sid);
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
     BOOL hasPendingGame = [[GameDataManager getDataManager] hasEntityForName:@"Move"
@@ -392,7 +394,7 @@
     }
     
     NSError *error;
-    PlayRecord *last = [sessions objectAtIndex:2];
+    PlayRecord *last = [sessions objectAtIndex:1];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
     NSArray *moves = [[GameDataManager getDataManager] loadEntityForName:@"Move"
                                                          searchPredicate:predicate

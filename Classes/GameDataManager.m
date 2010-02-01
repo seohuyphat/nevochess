@@ -164,8 +164,8 @@ static GameDataManager *gameDataManager;
     if (predicate) [request setPredicate:predicate];
     if (sort) [request setSortDescriptors:[NSArray arrayWithObject:sort]];
     
-    NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:error];
-    return ([result count] > 0 ? YES : NO);
+    NSUInteger count = [[self managedObjectContext] countForFetchRequest:request error:error];
+    return (count > 0 ? YES : NO);
 }
 
 //
