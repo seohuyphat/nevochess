@@ -91,7 +91,7 @@
 - (IBAction)networkGamePressed:(id)sender
 {
     NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:chessboard animated:YES];
+    [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }
 

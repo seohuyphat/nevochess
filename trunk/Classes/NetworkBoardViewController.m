@@ -26,9 +26,14 @@
 
 
 @interface NetworkBoardViewController (PrivateMethods)
+
+- (void) _connectToNetwork;
+- (void) _showLoginView:(NSString*)errorStr;
+- (void) _dismissLoginView;
 - (void) _dismissListTableView;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
+- (void) _handleNetworkEvent_LOGIN:(NSString*)event;
 - (void) _handleNetworkEvent_LIST:(NSString*)event;
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event;
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event;
@@ -56,6 +61,8 @@
 @synthesize _password;
 @synthesize _redId;
 @synthesize _blackId;
+@synthesize _connection;
+@synthesize _loginController;
 @synthesize _tableListController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -64,15 +71,17 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self._username = nil;
         self._password = nil;
-
-        _connection = [[NetworkConnection alloc] init];
-        _connection.delegate = self;
-        [_connection connect];
-        
         self._redId = nil;
         self._blackId = nil;
         _isGameOver = NO;
+        _loginCanceled = NO;
+        _loginAuthenticated = NO;
+        _logoutPending = NO;
+        self._loginController = nil;
         self._tableListController = nil;
+
+        self._connection = nil;
+        [self _connectToNetwork];
     }
     
     return self;
@@ -84,16 +93,31 @@
     [super viewDidLoad];
 } 
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [super viewWillAppear:animated];
+    if (_loginController != nil) {
+        NSLog(@"%s: Hide the navigation-bar.", __FUNCTION__);
+        self.navigationController.navigationBarHidden = YES;
+        return;
+    }
+}
+
 - (void)viewDidAppear:(BOOL)animated 
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidAppear:animated];
-    if (_username == nil)
+    if (_username != nil) {
+        return;
+    }
+    else if (_loginController != nil) {
+        return;
+    }
+    else if (!_loginCanceled)
     {
-        LoginViewController *loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
-        loginController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        loginController.delegate = self;
-        [self presentModalViewController:loginController animated:YES];
+        NSLog(@"%s: Show the Login view...", __FUNCTION__);
+        [self _showLoginView:@""];
     }
 }
 
@@ -101,9 +125,10 @@
 {
     self._username = nil;
     self._password = nil;
-    [_connection release];
+    self._connection = nil;
     self._redId = nil;
     self._blackId = nil;
+    self._loginController = nil;
     self._tableListController = nil;
     [super dealloc];
 }
@@ -112,7 +137,19 @@
 - (IBAction)homePressed:(id)sender
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    [_connection send_LOGOUT];
+    if (_connection == nil) {
+        [self goBackToHomeMenu];
+    }
+    else if (_loginAuthenticated) {
+        _logoutPending = YES;
+        [_connection send_LOGOUT];
+    } else {
+        NSLog(@"%s: Disconnect the network connection...", __FUNCTION__);
+        [_connection disconnect];
+        self._connection = nil;
+        [self goBackToHomeMenu];
+    }
+
 
     // !!!!!!!!!!!!!!!!!!!
     // NOTE: Let the handler for the 'NSStreamEventEndEncountered' event
@@ -151,15 +188,23 @@
 
 - (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd
 {
-    [self dismissModalViewControllerAnimated:YES];
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    
     if (button == nil) // "Cancel" button clicked?
     {
-        [self goBackToHomeMenu];
+        NSLog(@"%s: Login got canceled.", __FUNCTION__);
+        _loginCanceled = YES;
+        self._loginController = nil;
     }
     else {
         NSLog(@"%s: Username = [%@:%@]", __FUNCTION__, name, passwd);
-        self._username = ([name length] == 0 ? [self _generateGuestUserName] : name);
+        if ([name length] == 0) {
+            name = [self _generateGuestUserName];
+            NSLog(@"%s: Generated a Guest username: [%@].", __FUNCTION__, name);
+        }
+        self._username = name;
         self._password = passwd;
+        [self _connectToNetwork]; // Connect if needed.
         [_connection setLoginInfo:_username password:_password];
         [_connection send_LOGIN];
     }
@@ -205,6 +250,36 @@
     [_connection send_JOIN:table.tableId color:joinColor];
 }
 
+- (void) _connectToNetwork
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (self._connection == nil) {
+        NSLog(@"%s: Connecting to network...", __FUNCTION__);
+        self._connection = [[NetworkConnection alloc] init];
+        _connection.delegate = self;
+        [_connection connect];
+    }
+}
+
+- (void) _showLoginView:(NSString*)errorStr
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (self._loginController == nil) {
+        NSLog(@"%s: Creating new Login view...", __FUNCTION__);
+        self._loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
+        _loginController.delegate = self;
+    }
+    [_loginController setErrorString:errorStr];
+    [self.navigationController pushViewController:_loginController animated:YES];
+    self.navigationController.navigationBarHidden = NO;
+}
+
+- (void) _dismissLoginView
+{
+    [self.navigationController popViewControllerAnimated:YES];
+    self._loginController = nil;
+}
+
 - (void) _dismissListTableView
 {
     [self dismissModalViewControllerAnimated:YES];
@@ -228,24 +303,37 @@
             NSLog(@"%s: A new event [%@].", __FUNCTION__, event);
             NSMutableDictionary* newEvent = [self _allocNewEvent:event];
             NSString* op = [newEvent objectForKey:@"op"];
+            int code = [[newEvent objectForKey:@"code"] integerValue];
             NSString* content = [newEvent objectForKey:@"content"];
 
-            if ([op isEqualToString:@"LIST"]) {
-                [self _handleNetworkEvent_LIST:content];
-            } else if ([op isEqualToString:@"I_TABLE"]) {
-                [self _handleNetworkEvent_I_TABLE:content];
-            } else if ([op isEqualToString:@"I_MOVES"]) {
-                [self _handleNetworkEvent_I_MOVES:content];
-            } else if ([op isEqualToString:@"MOVE"]) {
-                [self _handleNetworkEvent_MOVE:content];
-            } else if ([op isEqualToString:@"E_END"]) {
-                [self _handleNetworkEvent_E_END:content];
-            } else if ([op isEqualToString:@"RESET"]) {
-                [self _handleNetworkEvent_RESET:content];
-            } else if ([op isEqualToString:@"E_JOIN"]) {
-                [self _handleNetworkEvent_E_JOIN:content];
-            } else if ([op isEqualToString:@"LEAVE"]) {
-                [self _handleNetworkEvent_LEAVE:content];
+            if (code != 0) {  // Error
+                if ([op isEqualToString:@"LOGIN"]) {
+                    NSLog(@"%s: Login failed. Error: [%@].", __FUNCTION__, content);
+                    [self _showLoginView:content];
+                } else {
+                    NSLog(@"%s: Received an ERROR event: [%@].", __FUNCTION__, content);
+                }
+            }
+            else {
+                if ([op isEqualToString:@"LOGIN"]) {
+                    [self _handleNetworkEvent_LOGIN:content];
+                } else if ([op isEqualToString:@"LIST"]) {
+                    [self _handleNetworkEvent_LIST:content];
+                } else if ([op isEqualToString:@"I_TABLE"]) {
+                    [self _handleNetworkEvent_I_TABLE:content];
+                } else if ([op isEqualToString:@"I_MOVES"]) {
+                    [self _handleNetworkEvent_I_MOVES:content];
+                } else if ([op isEqualToString:@"MOVE"]) {
+                    [self _handleNetworkEvent_MOVE:content];
+                } else if ([op isEqualToString:@"E_END"]) {
+                    [self _handleNetworkEvent_E_END:content];
+                } else if ([op isEqualToString:@"RESET"]) {
+                    [self _handleNetworkEvent_RESET:content];
+                } else if ([op isEqualToString:@"E_JOIN"]) {
+                    [self _handleNetworkEvent_E_JOIN:content];
+                } else if ([op isEqualToString:@"LEAVE"]) {
+                    [self _handleNetworkEvent_LEAVE:content];
+                }
             }
 
             [newEvent release];
@@ -254,7 +342,10 @@
         case NC_CONN_EVENT_END:
         {
             NSLog(@"%s: Got NC_CONN_EVENT_END.", __FUNCTION__);
-            [self goBackToHomeMenu];
+            self._connection = nil;
+            if (_logoutPending) {
+                [self goBackToHomeMenu];
+            }
             break;
         }
     }
@@ -271,6 +362,16 @@
     }
     
     return entries;
+}
+
+- (void) _handleNetworkEvent_LOGIN:(NSString*)event
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    _loginAuthenticated = YES;
+    if (_loginController != nil) {
+        NSLog(@"%s: Destroy Login view...", __FUNCTION__);
+        self._loginController = nil;
+    }
 }
 
 - (void) _handleNetworkEvent_LIST:(NSString*)event

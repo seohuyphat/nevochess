@@ -19,6 +19,12 @@
 
 #import "LoginViewController.h"
 
+enum LoginButtonEnum
+{
+    BUTTON_NONE,
+    BUTTON_LOGIN,
+    BUTTON_GUEST
+};
 
 @implementation LoginViewController
 
@@ -26,15 +32,25 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        // Custom initialization
+        self.delegate = nil;
+        _clickedButton = BUTTON_NONE;
     }
     return self;
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
+    self.title = NSLocalizedString(@"Login", @"");
+    _error.text = @"";
     [_username becomeFirstResponder]; // to have the first keyboard focus
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBarHidden = NO;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -44,26 +60,51 @@
 	// Release any cached data, images, etc that aren't in use.
 }
 
+- (void)viewDidDisappear:(BOOL)animated
+{
+    NSLog(@"%s: ENTER. Clicked-button = [%d]", __FUNCTION__, _clickedButton);
+    switch (_clickedButton) {
+        case BUTTON_LOGIN:
+            [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
+            break;
+        case BUTTON_GUEST:
+            [delegate handleLoginRequest:@"guest" username:@"" password:@""];
+            break;
+        default:  // canceled?
+            [delegate handleLoginRequest:nil username:nil password:nil];
+            break;
+    }
+}
+
 - (void)viewDidUnload {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
 
 
 - (void)dealloc {
+    self.delegate = nil;
     [super dealloc];
+}
+
+- (void)setErrorString:(NSString*)errorStr
+{
+    _error.text = errorStr;
 }
 
 - (IBAction)loginButtonPressed:(id)sender
 {
     NSLog(@"%s: ENTER. [%@]", __FUNCTION__, _username.text);
-    [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
+    _clickedButton = BUTTON_LOGIN;
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (IBAction)cancelButtonPressed:(id)sender
+- (IBAction)guestButtonPressed:(id)sender
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    [delegate handleLoginRequest:nil username:nil password:nil];
+    _clickedButton = BUTTON_GUEST;
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end

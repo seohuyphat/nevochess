@@ -27,15 +27,19 @@
 
 @interface LoginViewController : UIViewController
 {
-    IBOutlet UITextField *_username;
-    IBOutlet UITextField *_password;
-    
+    IBOutlet UITextField* _username;
+    IBOutlet UITextField* _password;
+    IBOutlet UILabel*     _error;
+
     id <LoginDelegate> delegate;
+    int                _clickedButton;
 }
 
 @property (nonatomic, retain) id <LoginDelegate> delegate;
 
+- (void)setErrorString:(NSString*)errorStr;
+
 - (IBAction)loginButtonPressed:(id)sender;
-- (IBAction)cancelButtonPressed:(id)sender;
+- (IBAction)guestButtonPressed:(id)sender;
 
 @end

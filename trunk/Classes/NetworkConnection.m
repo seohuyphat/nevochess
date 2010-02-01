@@ -135,6 +135,8 @@
     const NSString *urlStr = @"games.playxiangqi.com";
     const UInt32 port = 80;
     
+    _connectionState = NC_CONN_STATE_CONNECTING;
+    
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)urlStr, port, &readStream, &writeStream);
@@ -153,6 +155,8 @@
     [_outStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_inStream open];
     [_outStream open];
+    
+    _connectionState = NC_CONN_STATE_CONNECTED;
 } 
 
 - (void) _closeIOStreams

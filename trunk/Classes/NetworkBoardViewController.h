@@ -34,6 +34,10 @@
 
     BOOL               _isGameOver;
 
+    BOOL               _loginCanceled;
+    BOOL               _loginAuthenticated;
+    BOOL               _logoutPending;
+    LoginViewController*     _loginController;
     TableListViewController* _tableListController;
 }
 
@@ -41,6 +45,8 @@
 @property (nonatomic, retain) NSString* _password;
 @property (nonatomic, retain) NSString* _redId;
 @property (nonatomic, retain) NSString* _blackId;
+@property (nonatomic, retain) NetworkConnection* _connection;
+@property (nonatomic, retain) LoginViewController* _loginController;
 @property (nonatomic, retain) TableListViewController* _tableListController;
 
 - (IBAction)homePressed:(id)sender;
