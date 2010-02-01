@@ -22,6 +22,8 @@
 @interface TableInfo : NSObject
 {
     NSString* tableId;
+    BOOL      rated;
+    NSString* itimes;   // Initial times.
     NSString* redId;
     NSString* redRating;
     NSString* blackId;
@@ -29,6 +31,8 @@
 }
 
 @property (nonatomic, retain) NSString* tableId;
+@property (nonatomic)         BOOL rated;
+@property (nonatomic, retain) NSString* itimes;
 @property (nonatomic, retain) NSString* redId;
 @property (nonatomic, retain) NSString* redRating;
 @property (nonatomic, retain) NSString* blackId;

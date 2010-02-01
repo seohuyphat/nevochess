@@ -23,6 +23,8 @@
 @implementation TableInfo
 
 @synthesize tableId;
+@synthesize rated;
+@synthesize itimes;
 @synthesize redId, redRating;
 @synthesize blackId, blackRating;
 
@@ -43,6 +45,8 @@
         TableInfo* newTable = [TableInfo new];
         NSArray* components = [entry componentsSeparatedByString:@";"];
         newTable.tableId = [components objectAtIndex:0];
+        newTable.rated = [[components objectAtIndex:2] isEqualToString:@"0"];
+        newTable.itimes = [components objectAtIndex:3];
         newTable.redId = [components objectAtIndex:6];
         newTable.redRating = [components objectAtIndex:7];
         newTable.blackId = [components objectAtIndex:8];
@@ -136,8 +140,9 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
         cell.textLabel.font = [UIFont systemFontOfSize:12];
+        cell.detailTextLabel.font = [UIFont systemFontOfSize:10];
     }
     
     // Set up the cell...
@@ -147,6 +152,7 @@
     NSString* blackInfo = ([table.blackId length] == 0 ? @"*"
                          : [NSString stringWithFormat:@"%@(%@)", table.blackId, table.blackRating]); 
     cell.textLabel.text = [NSString stringWithFormat:@"#%@: %@ vs. %@", table.tableId, redInfo, blackInfo];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%@  %@", table.rated ? @"Rated" : @"Nonrated", table.itimes];
     cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
 	
     return cell;
