@@ -440,8 +440,12 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) saveGame
 {
+    NSError *error;
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    [[[GameDataManager getDataManager] managedObjectContext] save:nil];
+    BOOL ret = [[[GameDataManager getDataManager] managedObjectContext] save:&error];
+    if (!ret) {
+        NSLog(@"failed to save current game data %@", [error localizedDescription]);
+    }
 }
 
 - (void) rescheduleTimer
