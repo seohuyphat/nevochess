@@ -19,11 +19,28 @@
 
 #import <UIKit/UIKit.h>
 
+@interface TimeInfo : NSObject
+{
+    int  gameTime;  // Game-time (in seconds).
+    int  moveTime;  // Move-time (in seconds).
+    int  freeTime;  // Free-time (in seconds).
+}
+
+@property (nonatomic) int gameTime;
+@property (nonatomic) int moveTime;
+@property (nonatomic) int freeTime;
+
++ (id)allocTimeFromString:(NSString *)timeContent;
+
+@end
+
 @interface TableInfo : NSObject
 {
     NSString* tableId;
     BOOL      rated;
     NSString* itimes;   // Initial times.
+    NSString* redTimes;
+    NSString* blackTimes;
     NSString* redId;
     NSString* redRating;
     NSString* blackId;
@@ -33,16 +50,19 @@
 @property (nonatomic, retain) NSString* tableId;
 @property (nonatomic)         BOOL rated;
 @property (nonatomic, retain) NSString* itimes;
+@property (nonatomic, retain) NSString* redTimes;
+@property (nonatomic, retain) NSString* blackTimes;
 @property (nonatomic, retain) NSString* redId;
 @property (nonatomic, retain) NSString* redRating;
 @property (nonatomic, retain) NSString* blackId;
 @property (nonatomic, retain) NSString* blackRating;
 
++ (id)allocTableFromString:(NSString *)tableContent;
+
 @end
 
 // --------------------------------------
 @protocol TableListDelegate <NSObject>
-- (void) handeBackFromList;
 - (void) handeNewFromList;
 - (void) handeRefreshFromList;
 - (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor;

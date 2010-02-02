@@ -20,13 +20,50 @@
 #import "TableListViewController.h"
 
 //------------------------------------------------
+@implementation TimeInfo
+
+@synthesize gameTime, moveTime, freeTime;
+
++ (id)allocTimeFromString:(NSString *)timeContent
+{
+    TimeInfo* newTime = [TimeInfo new];
+    NSArray* components = [timeContent componentsSeparatedByString:@"/"];
+
+    newTime.gameTime = [[components objectAtIndex:0] intValue];
+    newTime.moveTime = [[components objectAtIndex:1] intValue];
+    newTime.freeTime = [[components objectAtIndex:2] intValue];
+
+    return newTime;
+}
+
+@end
+
+//------------------------------------------------
 @implementation TableInfo
 
 @synthesize tableId;
 @synthesize rated;
-@synthesize itimes;
+@synthesize itimes, redTimes, blackTimes;
 @synthesize redId, redRating;
 @synthesize blackId, blackRating;
+
++ (id)allocTableFromString:(NSString *)tableContent
+{
+    TableInfo* newTable = [TableInfo new];
+    NSArray* components = [tableContent componentsSeparatedByString:@";"];
+
+    newTable.tableId = [components objectAtIndex:0];
+    newTable.rated = [[components objectAtIndex:2] isEqualToString:@"0"];
+    newTable.itimes = [components objectAtIndex:3];
+    newTable.redTimes = [components objectAtIndex:4];
+    newTable.blackTimes = [components objectAtIndex:5];
+    newTable.redId = [components objectAtIndex:6];
+    newTable.redRating = [components objectAtIndex:7];
+    newTable.blackId = [components objectAtIndex:8];
+    newTable.blackRating = [components objectAtIndex:9];
+
+    return newTable;
+}
 
 @end
 
@@ -112,8 +149,7 @@
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
-    
+    //NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -167,19 +203,10 @@
 
 - (void) _parseTablesStr:(NSString *)tablesStr
 {
-    NSLog(@"%s: ENTER. [%@]", __FUNCTION__, tablesStr);
     [_tables removeAllObjects];
     NSArray* entries = [tablesStr componentsSeparatedByString:@"\n"];
     for (NSString *entry in entries) {
-        TableInfo* newTable = [TableInfo new];
-        NSArray* components = [entry componentsSeparatedByString:@";"];
-        newTable.tableId = [components objectAtIndex:0];
-        newTable.rated = [[components objectAtIndex:2] isEqualToString:@"0"];
-        newTable.itimes = [components objectAtIndex:3];
-        newTable.redId = [components objectAtIndex:6];
-        newTable.redRating = [components objectAtIndex:7];
-        newTable.blackId = [components objectAtIndex:8];
-        newTable.blackRating = [components objectAtIndex:9];
+        TableInfo* newTable = [TableInfo allocTableFromString:entry];
         [_tables addObject:newTable];
         [newTable release];
     }

@@ -92,6 +92,8 @@ enum AlertViewEnum
 - (void) goBackToHomeMenu;
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;
+- (void) setRedTime:(NSString*)times;
+- (void) setBlackTime:(NSString*)times;
 
 - (void) saveGame;
 - (void) rescheduleTimer;
