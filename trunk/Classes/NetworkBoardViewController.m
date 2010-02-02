@@ -19,6 +19,15 @@
 
 #import "NetworkBoardViewController.h"
 
+enum ActionIndexEnum
+{
+    // NOTE: Do not change the contants' value!
+    ACTION_INDEX_CLOSE_TABLE = 0,
+    ACTION_INDEX_RESIGN      = 1,
+    ACTION_INDEX_DRAW        = 2,
+    ACTION_INDEX_CANCEL      = 3
+};
+
 @interface NetworkBoardViewController (PrivateMethods)
 
 - (void) _connectToNetwork;
@@ -151,6 +160,44 @@
         return;
     }
     [_connection send_LIST];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSLog(@"%s: ENTER. buttonIndex = [%d].", __FUNCTION__, buttonIndex);
+    if (self._tableId == nil) {
+        NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
+        return;
+    }
+
+    switch (buttonIndex)
+    {
+        case ACTION_INDEX_CLOSE_TABLE:
+            NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
+            [_connection send_LEAVE:self._tableId];
+            self._tableId = nil; 
+            [self displayEmptyBoard];
+            break;
+        case ACTION_INDEX_RESIGN:
+            [_connection send_RESIGN:self._tableId];
+            break;
+        case ACTION_INDEX_DRAW:
+            [_connection send_DRAW:self._tableId];
+            break;
+        default:
+            break; // Do nothing.
+    };
+}
+
+- (IBAction)actionPressed:(id)sender
+{
+    UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:@"Table Actions" delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                               destructiveButtonTitle:@"Close Table"
+                                                    otherButtonTitles:@"Resign", @"Draw", nil];
+    actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
+    [actionSheet showInView:self.view];
+    [actionSheet release];
 }
 
 - (void) onLocalMoveMade:(int)move

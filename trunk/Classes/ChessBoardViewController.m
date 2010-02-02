@@ -57,6 +57,7 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
         [self setMyColor:NC_COLOR_RED];
+        [self setRedLabel:@"You"];
         [self setBlackLabel:[_game getAIName]];
         
         // Restore pending game, if any.
