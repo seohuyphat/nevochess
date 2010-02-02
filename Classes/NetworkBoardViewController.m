@@ -24,11 +24,11 @@
 - (void) _connectToNetwork;
 - (void) _showLoginView:(NSString*)errorStr;
 - (void) _showListTableView:(NSString*)event;
-//- (void) _dismissLoginView;
+- (void) _dismissLoginView;
 - (void) _dismissListTableView;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
-- (void) _handleNetworkEvent_LOGIN:(NSString*)event;
+- (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event;
 - (void) _handleNetworkEvent_LIST:(NSString*)event;
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event;
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event;
@@ -100,13 +100,8 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidAppear:animated];
-    if (_username != nil) {
-        return;
-    }
-    else if (_loginController != nil) {
-        return;
-    }
-    else if (!_loginCanceled)
+
+    if (!_loginAuthenticated && !_loginCanceled)
     {
         NSLog(@"%s: Show the Login view...", __FUNCTION__);
         [self _showLoginView:@""];
@@ -151,6 +146,10 @@
 
 - (IBAction)resetPressed:(id)sender
 {
+    if (!_loginAuthenticated) {
+        [self _showLoginView:@""];
+        return;
+    }
     [_connection send_LIST];
 }
 
@@ -181,30 +180,26 @@
 - (void) handleLoginRequest:(NSString *)button username:(NSString*)name password:(NSString*)passwd
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    
+
     if (button == nil) // "Cancel" button clicked?
     {
         NSLog(@"%s: Login got canceled.", __FUNCTION__);
         _loginCanceled = YES;
-        self._loginController = nil;
+        [self _dismissLoginView];
+        return;
     }
-    else {
-        NSLog(@"%s: Username = [%@:%@]", __FUNCTION__, name, passwd);
-        if ([name length] == 0) {
-            name = [self _generateGuestUserName];
-            NSLog(@"%s: Generated a Guest username: [%@].", __FUNCTION__, name);
-        }
-        self._username = name;
-        self._password = passwd;
-        [self _connectToNetwork]; // Connect if needed.
-        [_connection setLoginInfo:_username password:_password];
-        [_connection send_LOGIN];
-    }
-}
 
-- (void) handeBackFromList
-{
-    [self _dismissListTableView];
+    NSLog(@"%s: Username = [%@:%@]", __FUNCTION__, name, passwd);
+    if ([button isEqualToString:@"guest"])
+    {
+        name = [self _generateGuestUserName];
+        NSLog(@"%s: Generated a Guest username: [%@].", __FUNCTION__, name);
+    }
+    self._username = name;
+    self._password = passwd;
+    [self _connectToNetwork]; // Connect if needed.
+    [_connection setLoginInfo:_username password:_password];
+    [_connection send_LOGIN];
 }
 
 - (void) handeNewFromList
@@ -262,8 +257,12 @@
         _loginController.delegate = self;
     }
     [_loginController setErrorString:errorStr];
-    [self.navigationController pushViewController:_loginController animated:YES];
-    self.navigationController.navigationBarHidden = NO;
+
+    UIViewController* topController = [self.navigationController topViewController];
+    if (topController != _loginController) {
+        [self.navigationController pushViewController:_loginController animated:YES];
+        self.navigationController.navigationBarHidden = NO;
+    }
 }
 
 - (void) _showListTableView:(NSString*)event
@@ -277,23 +276,28 @@
         [_tableListController reinitWithList:event];
     }
 
-    UIViewController *topController = [self.navigationController topViewController];
+    UIViewController* topController = [self.navigationController topViewController];
     if (topController != _tableListController) {
         [self.navigationController pushViewController:_tableListController animated:YES];
         self.navigationController.navigationBarHidden = NO;
     }
 }
 
-//- (void) _dismissLoginView
-//{
-//    [self.navigationController popViewControllerAnimated:YES];
-//    self._loginController = nil;
-//}
+- (void) _dismissLoginView
+{
+    if (_loginController != nil) {
+        [self.navigationController popToViewController:self animated:YES];
+        NSLog(@"%s: Destroy Login view...", __FUNCTION__);
+        self._loginController = nil;
+    }
+}
 
 - (void) _dismissListTableView
 {
-    [self.navigationController popViewControllerAnimated:YES];
-    self._tableListController = nil;
+    if (_tableListController != nil) {
+        [self.navigationController popToViewController:self animated:YES];
+        self._tableListController = nil;
+    }
 }
 
 #pragma mark -
@@ -316,18 +320,14 @@
             int code = [[newEvent objectForKey:@"code"] integerValue];
             NSString* content = [newEvent objectForKey:@"content"];
 
-            if (code != 0) {  // Error
-                if ([op isEqualToString:@"LOGIN"]) {
-                    NSLog(@"%s: Login failed. Error: [%@].", __FUNCTION__, content);
-                    [self _showLoginView:content];
-                } else {
-                    NSLog(@"%s: Received an ERROR event: [%@].", __FUNCTION__, content);
-                }
+            if ([op isEqualToString:@"LOGIN"]) {
+                [self _handleNetworkEvent_LOGIN:code withContent:content];
+            }
+            else if (code != 0) {  // Error
+                NSLog(@"%s: Received an ERROR event: [%@].", __FUNCTION__, content);
             }
             else {
-                if ([op isEqualToString:@"LOGIN"]) {
-                    [self _handleNetworkEvent_LOGIN:content];
-                } else if ([op isEqualToString:@"LIST"]) {
+                if ([op isEqualToString:@"LIST"]) {
                     [self _handleNetworkEvent_LIST:content];
                 } else if ([op isEqualToString:@"I_TABLE"]) {
                     [self _handleNetworkEvent_I_TABLE:content];
@@ -374,14 +374,16 @@
     return entries;
 }
 
-- (void) _handleNetworkEvent_LOGIN:(NSString*)event
+- (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    _loginAuthenticated = YES;
-    if (_loginController != nil) {
-        NSLog(@"%s: Destroy Login view...", __FUNCTION__);
-        self._loginController = nil;
+    if (code != 0) {  // Error
+        NSLog(@"%s: Login failed. Error: [%@].", __FUNCTION__, event);
+        [self _showLoginView:event];
+        return;
     }
+    _loginAuthenticated = YES;
+    [self _dismissLoginView];
 }
 
 - (void) _handleNetworkEvent_LIST:(NSString*)event
@@ -392,13 +394,7 @@
 
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event
 {
-    NSArray* components = [event componentsSeparatedByString:@";"];
-    TableInfo* table = [TableInfo new];
-    table.tableId = [components objectAtIndex:0];
-    table.redId = [components objectAtIndex:6];
-    table.redRating = [components objectAtIndex:7];
-    table.blackId = [components objectAtIndex:8];
-    table.blackRating = [components objectAtIndex:9];
+    TableInfo* table = [TableInfo allocTableFromString:event];
 
     if (self._tableId && ![self._tableId isEqualToString:table.tableId]) {
         [self resetBoard];
@@ -423,6 +419,9 @@
                            : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
     [self setRedLabel:redInfo];
     [self setBlackLabel:blackInfo];
+    [self setRedTime:table.redTimes];
+    [self setBlackTime:table.blackTimes];
+
     self._redId = ([table.redId length] == 0 ? nil : table.redId);
     self._blackId = ([table.blackId length] == 0 ? nil : table.blackId);
     _isGameOver = NO;
@@ -442,7 +441,7 @@
         int col1 = [moveStr characterAtIndex:0] - '0';
         int row2 = [moveStr characterAtIndex:3] - '0';
         int col2 = [moveStr characterAtIndex:2] - '0';
-        NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
+        //NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
         
         int sqSrc = TOSQUARE(row1, col1);
         int sqDst = TOSQUARE(row2, col2);

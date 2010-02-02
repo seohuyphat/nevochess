@@ -23,6 +23,7 @@
 #import "Grid.h"
 #import "Piece.h"
 #import "ChessBoardView.h"
+#import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
 
 BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
 BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
@@ -370,6 +371,21 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     black_label.text = label;
 }
 
+- (void) setRedTime:(NSString*)times
+{
+    TimeInfo* timeInfo = [TimeInfo allocTimeFromString:times];
+    _redTime = timeInfo.gameTime;
+    [timeInfo release];
+    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
+}
+
+- (void) setBlackTime:(NSString*)times
+{
+    TimeInfo* timeInfo = [TimeInfo allocTimeFromString:times];
+    _blackTime = timeInfo.gameTime;
+    [timeInfo release];
+    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
