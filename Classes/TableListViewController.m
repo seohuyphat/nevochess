@@ -31,30 +31,20 @@
 @end
 
 //------------------------------------------------
+@interface TableListViewController (PrivateMethods)
+
+- (void) _parseTablesStr:(NSString *)tablesStr;
+- (void) _addNewTable;
+
+@end
+
+//------------------------------------------------
 @implementation TableListViewController
 
+@synthesize addButton;
 @synthesize listView;
 @synthesize delegate;
 
-- (void) _parseTablesStr:(NSString *)tablesStr
-{
-    NSLog(@"%s: ENTER. [%@]", __FUNCTION__, tablesStr);
-    [_tables removeAllObjects];
-    NSArray* entries = [tablesStr componentsSeparatedByString:@"\n"];
-    for (NSString *entry in entries) {
-        TableInfo* newTable = [TableInfo new];
-        NSArray* components = [entry componentsSeparatedByString:@";"];
-        newTable.tableId = [components objectAtIndex:0];
-        newTable.rated = [[components objectAtIndex:2] isEqualToString:@"0"];
-        newTable.itimes = [components objectAtIndex:3];
-        newTable.redId = [components objectAtIndex:6];
-        newTable.redRating = [components objectAtIndex:7];
-        newTable.blackId = [components objectAtIndex:8];
-        newTable.blackRating = [components objectAtIndex:9];
-        [_tables addObject:newTable];
-        [newTable release];
-    }
-}
 
 - (id)initWithList:(NSString *)tablesStr
 {
@@ -69,22 +59,21 @@
 {
     [self _parseTablesStr:tablesStr];
     [self.listView reloadData];
+    [self.listView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
+                         atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 
-    // Create a table's heading.
-    CGRect titleRect = CGRectMake(0, 0, 300, 30);
-    UILabel* tableTitle = [[UILabel alloc] initWithFrame:titleRect];
-    tableTitle.textColor = [UIColor blueColor];
-    tableTitle.backgroundColor = [self.listView backgroundColor];
-    tableTitle.opaque = YES;
-    tableTitle.font = [UIFont boldSystemFontOfSize:18];
-    tableTitle.text = NSLocalizedString(@"List of Tables", @"");
-    self.listView.tableHeaderView = tableTitle;
-    [self.listView reloadData];
-    [tableTitle release];
+    self.title = NSLocalizedString(@"Tables", @"");
+
+    // Create the Add button.
+    self.addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                              target:self action:@selector(_addNewTable)];
+    //addButton.enabled = NO;
+    self.navigationItem.rightBarButtonItem = addButton;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -100,15 +89,6 @@
 }
 
 #pragma mark Button methods
-- (IBAction) backButtonPressed:(id)sender
-{
-    [delegate handeBackFromList];
-}
-
-- (IBAction) newButtonPressed:(id)sender
-{
-    [delegate handeNewFromList];
-}
 
 - (IBAction) refreshButtonPressed:(id)sender
 {
@@ -117,10 +97,10 @@
 
 #pragma mark Table view methods
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     return 1;
 }
-
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -130,11 +110,9 @@
 
 
 // Customize the appearance of table view cells.
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    ////////////
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
-    ////////////
     
     static NSString *CellIdentifier = @"Cell";
     
@@ -158,7 +136,8 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
     TableInfo* table = [_tables objectAtIndex:indexPath.row];
 
@@ -168,14 +147,48 @@
     [delegate handeTableJoin:table color:joinColor];
 }
 
-
-- (void)dealloc {
+- (void)dealloc
+{
+    self.addButton = nil;
     self.listView = nil;
     [_tables release];
     [delegate release];
     [super dealloc];
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+//    Implementation of Private methods
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#pragma mark -
+#pragma mark Private methods
+
+- (void) _parseTablesStr:(NSString *)tablesStr
+{
+    NSLog(@"%s: ENTER. [%@]", __FUNCTION__, tablesStr);
+    [_tables removeAllObjects];
+    NSArray* entries = [tablesStr componentsSeparatedByString:@"\n"];
+    for (NSString *entry in entries) {
+        TableInfo* newTable = [TableInfo new];
+        NSArray* components = [entry componentsSeparatedByString:@";"];
+        newTable.tableId = [components objectAtIndex:0];
+        newTable.rated = [[components objectAtIndex:2] isEqualToString:@"0"];
+        newTable.itimes = [components objectAtIndex:3];
+        newTable.redId = [components objectAtIndex:6];
+        newTable.redRating = [components objectAtIndex:7];
+        newTable.blackId = [components objectAtIndex:8];
+        newTable.blackRating = [components objectAtIndex:9];
+        [_tables addObject:newTable];
+        [newTable release];
+    }
+}
+
+- (void) _addNewTable
+{
+    [delegate handeNewFromList];
+}
 
 @end
 

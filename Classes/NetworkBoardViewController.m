@@ -18,18 +18,13 @@
  ***************************************************************************/
 
 #import "NetworkBoardViewController.h"
-#import "Enums.h"
-#import "NevoChessAppDelegate.h"
-#import "Grid.h"
-#import "Piece.h"
-#import "ChessBoardView.h"
-
 
 @interface NetworkBoardViewController (PrivateMethods)
 
 - (void) _connectToNetwork;
 - (void) _showLoginView:(NSString*)errorStr;
-- (void) _dismissLoginView;
+- (void) _showListTableView:(NSString*)event;
+//- (void) _dismissLoginView;
 - (void) _dismissListTableView;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
@@ -47,7 +42,6 @@
 - (int) _generateRandomNumber:(unsigned int)max_value;
 
 @end
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -97,11 +91,9 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewWillAppear:animated];
-    if (_loginController != nil) {
-        NSLog(@"%s: Hide the navigation-bar.", __FUNCTION__);
-        self.navigationController.navigationBarHidden = YES;
-        return;
-    }
+
+    NSLog(@"%s: Hide the navigation-bar.", __FUNCTION__);
+    self.navigationController.navigationBarHidden = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated 
@@ -274,15 +266,33 @@
     self.navigationController.navigationBarHidden = NO;
 }
 
-- (void) _dismissLoginView
+- (void) _showListTableView:(NSString*)event
 {
-    [self.navigationController popViewControllerAnimated:YES];
-    self._loginController = nil;
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (_tableListController == nil) {
+        NSLog(@"%s: Creating new Table-List view...", __FUNCTION__);
+        self._tableListController = [[TableListViewController alloc] initWithList:event];
+        _tableListController.delegate = self;
+    } else {
+        [_tableListController reinitWithList:event];
+    }
+
+    UIViewController *topController = [self.navigationController topViewController];
+    if (topController != _tableListController) {
+        [self.navigationController pushViewController:_tableListController animated:YES];
+        self.navigationController.navigationBarHidden = NO;
+    }
 }
+
+//- (void) _dismissLoginView
+//{
+//    [self.navigationController popViewControllerAnimated:YES];
+//    self._loginController = nil;
+//}
 
 - (void) _dismissListTableView
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:YES];
     self._tableListController = nil;
 }
 
@@ -377,15 +387,7 @@
 - (void) _handleNetworkEvent_LIST:(NSString*)event
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    if (_tableListController == nil) {
-        self._tableListController = [[TableListViewController alloc] initWithList:event];
-        _tableListController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        _tableListController.delegate = self;
-        [self presentModalViewController:_tableListController animated:YES];
-    } else {
-        [_tableListController reinitWithList:event];
-    }
-
+    [self _showListTableView:event];
 }
 
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event

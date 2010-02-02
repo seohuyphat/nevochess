@@ -51,16 +51,17 @@
 // --------------------------------------
 @interface TableListViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
+    UIBarButtonItem*      addButton;
     IBOutlet UITableView* listView;
 
     NSMutableArray* _tables;
     id <TableListDelegate> delegate;
 }
 
+@property (nonatomic, retain) IBOutlet UIBarButtonItem* addButton;
 @property (nonatomic, retain) IBOutlet UITableView* listView;
 @property (nonatomic, retain) id <TableListDelegate> delegate;
-- (IBAction) backButtonPressed:(id)sender;
-- (IBAction) newButtonPressed:(id)sender;
+
 - (IBAction) refreshButtonPressed:(id)sender;
 
 - (id)initWithList:(NSString *)tablesStr;
