@@ -23,7 +23,7 @@
 #import "TableListViewController.h"
 #import "NetworkConnection.h"
 
-@interface NetworkBoardViewController : BoardViewController <LoginDelegate, TableListDelegate, NetworkHandler>
+@interface NetworkBoardViewController : BoardViewController <LoginDelegate, TableListDelegate, NetworkHandler, UIActionSheetDelegate>
 {
     NSString*          _username;
     NSString*          _password;

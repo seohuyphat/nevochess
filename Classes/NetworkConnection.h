@@ -72,5 +72,7 @@ typedef enum
 - (void) send_JOIN:(NSString*)tableId color:(NSString*)joinColor;
 - (void) send_LEAVE:(NSString*)tableId;
 - (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr;
+- (void) send_RESIGN:(NSString*)tableId;
+- (void) send_DRAW:(NSString*)tableId;
 
 @end

@@ -130,6 +130,20 @@
     [self _flushOutgoingData];
 }
 
+- (void) send_RESIGN:(NSString*)tableId
+{    
+    NSString* outStr = [NSString stringWithFormat:@"op=RESIGN&pid=%@&tid=%@\n", _username, tableId];
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
+    [self _flushOutgoingData];
+}
+
+- (void) send_DRAW:(NSString*)tableId
+{    
+    NSString* outStr = [NSString stringWithFormat:@"op=DRAW&pid=%@&tid=%@\n", _username, tableId];
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
+    [self _flushOutgoingData];
+}
+
 - (void) _openIOStreams
 {
     const NSString *urlStr = @"games.playxiangqi.com";

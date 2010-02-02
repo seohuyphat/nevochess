@@ -86,6 +86,7 @@ enum AlertViewEnum
 - (IBAction)resetPressed:(id)sender;
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
+- (IBAction)actionPressed:(id)sender;
 
 - (void) onLocalMoveMade:(int)move;
 
@@ -98,6 +99,7 @@ enum AlertViewEnum
 - (void) saveGame;
 - (void) rescheduleTimer;
 - (void) resetBoard;
+- (void) displayEmptyBoard;
 - (void) setMyColor:(ColorEnum)color;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;

@@ -163,6 +163,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [black_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
     black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
 
+    red_label.text = @"";
+    black_label.text = @"";
+
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
@@ -272,6 +275,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
             [self handleNewMove:moveInfo];
         }
     }
+}
+
+- (IBAction)actionPressed:(id)sender
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -559,6 +567,17 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _nthMove = -1;
     _inReview = NO;
     _latestMove = INVALID_MOVE;
+}
+
+- (void) displayEmptyBoard
+{
+    [self resetBoard];
+    [self setRedLabel:@""];
+    [self setBlackLabel:@""];
+    if (!_game.blackAtTopSide )
+    {
+        [self reverseBoardView];
+    }
 }
 
 - (void) setMyColor:(ColorEnum)color
