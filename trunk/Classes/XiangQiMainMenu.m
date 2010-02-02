@@ -20,7 +20,6 @@
 #import "XiangQiMainMenu.h"
 #import "ChessBoardViewController.h"
 #import "NetworkBoardViewController.h"
-#import "NevoChessAppDelegate.h"
 #import "AboutViewController.h"
 #import "OptionsViewController.h"
 
@@ -31,16 +30,6 @@
 @synthesize about;
 @synthesize bg_view;
 
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
-
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
@@ -50,15 +39,6 @@
     [about setTitle:NSLocalizedString(@"Home_About", @"") forState:UIControlStateNormal];
     [setting setTitle:NSLocalizedString(@"Home_Settings", @"") forState:UIControlStateNormal];
 }
-
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -84,7 +64,7 @@
 - (IBAction)newGamePressed:(id)sender
 {
     ChessBoardViewController *chessboard = [[ChessBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:chessboard animated:YES];
+    [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }
 
@@ -98,14 +78,14 @@
 - (IBAction)aboutPressed:(id)sender
 {
     AboutViewController *aboutController = [[AboutViewController alloc] initWithNibName:@"AboutViewController" bundle:nil];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:aboutController animated:YES];
+    [self.navigationController pushViewController:aboutController animated:YES];
     [aboutController release];      
 }
 
 - (IBAction)settingPressed:(id)sender
 {
     OptionsViewController *optionController = [[OptionsViewController alloc] initWithNibName:@"OptionsView" bundle:nil];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:optionController animated:YES];
+    [self.navigationController pushViewController:optionController animated:YES];
     [optionController release];
     
 }
