@@ -122,7 +122,13 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
-
+    
+    // Remove the Actions button.
+    NSArray *items = nav_toolbar.items;    
+    NSMutableArray *newItems = [NSMutableArray arrayWithArray:items];
+    [newItems removeLastObject];
+    nav_toolbar.items = newItems;
+    
     // Robot
     _robotPort = [[NSMachPort port] retain]; //retain here otherwise it will be autoreleased
     [_robotPort setDelegate:self];

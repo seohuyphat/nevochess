@@ -24,6 +24,16 @@
 
 @synthesize gameTime, moveTime, freeTime;
 
+- (id)initWithTime:(TimeInfo*)other
+{
+    if (self = [self init]) {
+        gameTime = other.gameTime;
+        moveTime = other.moveTime;
+        freeTime = other.freeTime;
+    }
+    return self;
+}
+
 + (id)allocTimeFromString:(NSString *)timeContent
 {
     TimeInfo* newTime = [TimeInfo new];
