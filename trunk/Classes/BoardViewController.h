@@ -21,6 +21,7 @@
 #import <UIKit/UIKit.h>
 #import "CChessGame.h"
 #import "AudioHelper.h"
+#import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
 
 BOOL layerIsBit( CALayer* layer );
 BOOL layerIsBitHolder( CALayer* layer );
@@ -38,8 +39,10 @@ enum AlertViewEnum
     IBOutlet UIToolbar   *nav_toolbar;
     IBOutlet UILabel     *red_label;
     IBOutlet UILabel     *black_label;
-    IBOutlet UITextField *red_time;
-    IBOutlet UITextField *black_time;
+    IBOutlet UILabel     *red_time;
+    IBOutlet UILabel     *red_move_time;
+    IBOutlet UILabel     *black_time;
+    IBOutlet UILabel     *black_move_time;
     IBOutlet UIButton    *red_seat;
     IBOutlet UIButton    *black_seat;
     IBOutlet UIActivityIndicatorView *activity;
@@ -57,10 +60,6 @@ enum AlertViewEnum
 
     CChessGame *_game;
 
-    int _initialTime;  // The initial time (in seconds)
-    int _redTime;      // RED   time (in seconds)
-    int _blackTime;    // BLACK time (in seconds)
-    
     NSMutableArray *_moves;       // MOVE history
     int             _nthMove;     // pivot for the Move Review
     BOOL            _inReview;
@@ -68,19 +67,27 @@ enum AlertViewEnum
 
     // ---------
     NSString*       _tableId;
+    TimeInfo*       _initialTime;
+    TimeInfo*       _redTime;
+    TimeInfo*       _blackTime;
     ColorEnum       _myColor;     // The color (role) of the LOCAL player.
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
 @property (nonatomic, retain) IBOutlet UILabel *red_label;
 @property (nonatomic, retain) IBOutlet UILabel *black_label;
-@property (nonatomic, retain) IBOutlet UITextField *red_time;
-@property (nonatomic, retain) IBOutlet UITextField *black_time;
+@property (nonatomic, retain) IBOutlet UILabel *red_time;
+@property (nonatomic, retain) IBOutlet UILabel *red_move_time;
+@property (nonatomic, retain) IBOutlet UILabel *black_time;
+@property (nonatomic, retain) IBOutlet UILabel *black_move_time;
 @property (nonatomic, retain) IBOutlet UIButton *red_seat;
 @property (nonatomic, retain) IBOutlet UIButton *black_seat;
 
 @property (nonatomic, retain) NSTimer* _timer;
 @property (nonatomic, retain) NSString* _tableId;
+@property (nonatomic, retain) TimeInfo* _initialTime;
+@property (nonatomic, retain) TimeInfo* _redTime;
+@property (nonatomic, retain) TimeInfo* _blackTime;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
@@ -93,6 +100,7 @@ enum AlertViewEnum
 - (void) goBackToHomeMenu;
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;
+- (void) setInitialTime:(NSString*)times;
 - (void) setRedTime:(NSString*)times;
 - (void) setBlackTime:(NSString*)times;
 

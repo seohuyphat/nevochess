@@ -30,6 +30,7 @@
 @property (nonatomic) int moveTime;
 @property (nonatomic) int freeTime;
 
+- (id)initWithTime:(TimeInfo*)other;
 + (id)allocTimeFromString:(NSString *)timeContent;
 
 @end

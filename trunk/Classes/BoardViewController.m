@@ -23,7 +23,6 @@
 #import "Grid.h"
 #import "Piece.h"
 #import "ChessBoardView.h"
-#import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
 
 BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
 BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
@@ -88,12 +87,40 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @synthesize nav_toolbar;
 @synthesize red_label;
 @synthesize black_label;
-@synthesize red_time;
-@synthesize black_time;
+@synthesize red_time, red_move_time;
+@synthesize black_time, black_move_time;
 @synthesize red_seat;
 @synthesize black_seat;
 @synthesize _timer;
 @synthesize _tableId;
+@synthesize _initialTime, _redTime, _blackTime;
+
+// -------- TEMP functions (to be reviewed and moved later ------------
+- (NSString*) _allocStringFrom:(int)seconds
+{
+    return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
+}
+
+/**
+ * Reset the MOVE time to the initial value.
+ * If the GAME time is already zero, then reset the FREE time as well.
+ */
+- (void) resetMoveTime:(int)color
+{
+    if ( color == NC_COLOR_RED ) {
+        _redTime.moveTime = _initialTime.moveTime;
+        if (_redTime.gameTime == 0) {
+            _redTime.moveTime = _initialTime.freeTime;
+        }
+    }
+    else {
+        _blackTime.moveTime = _initialTime.moveTime;
+        if (_blackTime.gameTime == 0) {
+            _blackTime.moveTime = _initialTime.freeTime;
+        }
+    }
+}
+// --------------------
 
 //
 // The designated initializer.
@@ -118,7 +145,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         _inReview = NO;
         _latestMove = INVALID_MOVE;
 
-        _tableId = nil;
+        self._tableId = nil;
         _myColor = NC_COLOR_UNKNOWN;
     }
     
@@ -152,16 +179,24 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [self.view bringSubviewToFront:red_label];
     [self.view bringSubviewToFront:black_label];
     [self.view bringSubviewToFront:red_time];
+    [self.view bringSubviewToFront:red_move_time];
     [self.view bringSubviewToFront:black_time];
+    [self.view bringSubviewToFront:black_move_time];
     [self.view bringSubviewToFront:red_seat];
     [self.view bringSubviewToFront:black_seat];
-    _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
-    _redTime = _blackTime = _initialTime * 60;
+    // TODO: _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
+    self._initialTime = [TimeInfo allocTimeFromString:@"900/180/20"];
+    self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
+    self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
     [red_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
+    [red_move_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
+    red_time.text = [self _allocStringFrom:_redTime.gameTime];
+    red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
 
     [black_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
+    [black_move_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
+    black_time.text = [self _allocStringFrom:_blackTime.gameTime];
+    black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
     red_label.text = @"";
     black_label.text = @"";
@@ -183,7 +218,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [red_label release];
     [black_label release];
     [red_time release];
+    [red_move_time release];
     [black_time release];
+    [black_move_time release];
     [activity release];
     [red_seat release];
     [black_seat release];
@@ -191,6 +228,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [_audioHelper release];
     [_game release];
     [_moves release];
+    [_tableId release];
+    [_initialTime release];
+    [_redTime release];
+    [_blackTime release];
 
     [super dealloc];
 }
@@ -379,20 +420,23 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     black_label.text = label;
 }
 
+- (void) setInitialTime:(NSString*)times
+{
+    self._initialTime = [TimeInfo allocTimeFromString:times];
+}
+
 - (void) setRedTime:(NSString*)times
 {
-    TimeInfo* timeInfo = [TimeInfo allocTimeFromString:times];
-    _redTime = timeInfo.gameTime;
-    [timeInfo release];
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
+    self._redTime = [TimeInfo allocTimeFromString:times];
+    red_time.text = [self _allocStringFrom:_redTime.gameTime];
+    red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
 }
 
 - (void) setBlackTime:(NSString*)times
 {
-    TimeInfo* timeInfo = [TimeInfo allocTimeFromString:times];
-    _blackTime = timeInfo.gameTime;
-    [timeInfo release];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
+    self._blackTime = [TimeInfo allocTimeFromString:times];
+    black_time.text = [self _allocStringFrom:_blackTime.gameTime];
+    black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -423,15 +467,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) _updateTimer:(int)color
 {
     if ( color == 1 ) {
-        --_blackTime;
-        int min = _blackTime / 60;
-        int sec = _blackTime % 60;
-        black_time.text = [NSString stringWithFormat:@"%d:%02d", min, sec];
+        black_time.text = [self _allocStringFrom:_blackTime.gameTime--];
+        black_move_time.text = [self _allocStringFrom:_blackTime.moveTime--];
     } else {
-        --_redTime;
-        int min = _redTime / 60;
-        int sec = _redTime % 60;
-        red_time.text = [NSString stringWithFormat:@"%d:%02d", min, sec];
+        red_time.text = [self _allocStringFrom:_redTime.gameTime--];
+        red_move_time.text = [self _allocStringFrom:_redTime.moveTime--];
     }
 }
 
@@ -474,6 +514,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     int  move     = [moveInfo integerValue];
     BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
 
+    [self resetMoveTime:(isAI ? NC_COLOR_BLACK : NC_COLOR_RED)];
+    
     // Delay update the UI if in Preview mode.
     if ( _inReview ) {
         NSAssert1(_latestMove == INVALID_MOVE,
@@ -557,11 +599,14 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [self setHighlightCells:NO];
     _selectedPiece = nil;
     [self showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
-    _redTime = _blackTime = _initialTime * 60;
+    self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
+    self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
     memset(_hl_moves, 0x0, sizeof(_hl_moves));
-    red_time.text = [NSString stringWithFormat:@"%d:%02d", (_redTime / 60), (_redTime % 60)];
-    black_time.text = [NSString stringWithFormat:@"%d:%02d", (_blackTime / 60), (_blackTime % 60)];
-    
+    red_time.text = [self _allocStringFrom:_redTime.gameTime];
+    red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
+    black_time.text = [self _allocStringFrom:_blackTime.gameTime];
+    black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
+
     [_game reset_game];
     [_moves removeAllObjects];
     _nthMove = -1;
@@ -605,6 +650,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     redRect = red_time.frame;
     red_time.frame = black_time.frame;
     black_time.frame = redRect;
+    redRect = red_move_time.frame;
+    red_move_time.frame = black_move_time.frame;
+    black_move_time.frame = redRect;
 }
 
 @end

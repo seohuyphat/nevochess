@@ -46,6 +46,7 @@ enum ActionIndexEnum
 - (void) _handleNetworkEvent_RESET:(NSString*)event;
 - (void) _handleNetworkEvent_E_JOIN:(NSString*)event;
 - (void) _handleNetworkEvent_LEAVE:(NSString*)event;
+- (void) _handleNetworkEvent_UPDATE:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -94,6 +95,17 @@ enum ActionIndexEnum
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
+
+    // Replace the image of "addButton" with Search image.
+    NSArray* items = nav_toolbar.items;
+    UIBarButtonItem* addButton = (UIBarButtonItem*) [items objectAtIndex:1];
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:items];
+    UIBarButtonItem* newButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch 
+                                                                               target:addButton.target action:addButton.action];
+    newButton.style = UIBarButtonItemStyleBordered;
+    [newItems replaceObjectAtIndex:1 withObject:newButton];
+    [newButton release];
+    nav_toolbar.items = newItems;
 } 
 
 - (void)viewWillAppear:(BOOL)animated
@@ -390,6 +402,8 @@ enum ActionIndexEnum
                     [self _handleNetworkEvent_E_JOIN:content];
                 } else if ([op isEqualToString:@"LEAVE"]) {
                     [self _handleNetworkEvent_LEAVE:content];
+                } else if ([op isEqualToString:@"UPDATE"]) {
+                    [self _handleNetworkEvent_UPDATE:content];
                 }
             }
 
@@ -466,6 +480,7 @@ enum ActionIndexEnum
                            : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
     [self setRedLabel:redInfo];
     [self setBlackLabel:blackInfo];
+    [self setInitialTime:table.itimes];
     [self setRedTime:table.redTimes];
     [self setBlackTime:table.blackTimes];
 
@@ -603,6 +618,23 @@ enum ActionIndexEnum
         self._blackId = nil;
         [self setBlackLabel:@"*"];
     }
+}
+
+- (void) _handleNetworkEvent_UPDATE:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* pid = [components objectAtIndex:1];
+    NSString* itimes = [components objectAtIndex:3];
+
+    if ( ! [self._tableId isEqualToString:tableId] ) {
+        NSLog(@"%s: [%@] UPDATE time [%@] at table:[%@] ignored.", __FUNCTION__, pid, itimes, tableId);
+        return;
+    }
+
+    [self setInitialTime:itimes];
+    [self setRedTime:itimes];
+    [self setBlackTime:itimes];
 }
 
 #pragma mark -
