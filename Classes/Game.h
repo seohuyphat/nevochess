@@ -63,10 +63,6 @@
     Player *_currentPlayer, *_winner;
 }
 
-/** Returns the human-readable name of this game.
-    (By default it just returns the class name with the "Game" suffix removed.) */
-+ (NSString*) displayName;
-
 @property (nonatomic, retain) NSMutableArray *_players;
 @property (nonatomic, assign) Player *_currentPlayer;
 @property (nonatomic, assign) Player *_winner;

@@ -70,16 +70,16 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
 {
     if ([state isEqualToString:@"play"]) {
-        closeIndex = 0;
-        resignIndex = 1;
-        drawIndex = 2;
-        cancelIndex = 3;
+        closeIndex = -1;
+        resignIndex = 0;
+        drawIndex = 1;
+        cancelIndex = 2;
         self = [super initWithTitle:nil delegate:delegate
                   cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:@"Close Table"
-                  otherButtonTitles:@"Resign", @"Draw", nil];
+             destructiveButtonTitle:@"Resign"
+                  otherButtonTitles:@"Draw", nil];
     }
-    else if ([state isEqualToString:@"view"]) {
+    else if ([state isEqualToString:@"view"] || [state isEqualToString:@"ready"]) {
         closeIndex = 0;
         resignIndex = -1;
         drawIndex = -1;
@@ -617,23 +617,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) handleEndGameInUI
 {
-    NSString *sound = nil;
-    NSString *msg   = nil;
-    
-    sound = @"WIN";
-    msg = NSLocalizedString(@"Game Over", @"");
-    
-    if ( !sound ) return;
-    [_audioHelper play_wav_sound:sound];
-    
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
-                                                    message:msg
-                                                   delegate:self 
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"OK", nil];
-    alert.tag = POC_ALERT_END_GAME;
-    [alert show];
-    [alert release];
+    NSLog(@"%s: ENTER.", __FUNCTION__);
 }
 
 - (void) saveGame
@@ -676,11 +660,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     {
         [self reverseBoardView];
     }
-}
-
-- (void) setMyColor:(ColorEnum)color
-{
-    _myColor = color;
 }
 
 - (BOOL) isMyTurnNext

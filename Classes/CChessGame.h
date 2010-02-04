@@ -17,8 +17,6 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import <CoreGraphics/CoreGraphics.h>
-#import <QuartzCore/QuartzCore.h>
 #import "Enums.h"
 #import "Grid.h"
 #import "Game.h"
@@ -56,7 +54,6 @@ enum {
 };
 
 
-@class RectGrid;
 @class Piece;
 
 @interface CChessGame : Game
@@ -79,7 +76,7 @@ enum {
 - (Piece*)x_getPieceAtRow:(int)row col:(int)col;
 - (XiangQiSquare*)x_getCellAtRow:(int)row col:(int)col;
 
-- (int)  getRobotMove:(int*)captured;
+- (int) getRobotMove:(int*)captured;
 - (int) humanMove:(int)row1 fromCol:(int)col1
              toRow:(int)row2   toCol:(int)col2;
 
@@ -88,6 +85,7 @@ enum {
 - (BOOL)isLegalMove:(int)mv;
 - (int)checkGameStatus:(BOOL)isAI;
 - (int) get_sdPlayer;
+- (int) get_nMoveNum;
 - (void)resetCChessPieces;
 - (void)reset_game;
 - (NSString*) getAIName;

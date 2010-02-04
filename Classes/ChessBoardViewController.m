@@ -56,7 +56,7 @@
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
-        [self setMyColor:NC_COLOR_RED];
+        _myColor = NC_COLOR_RED;
         [self setRedLabel:@"You"];
         [self setBlackLabel:[_game getAIName]];
         
