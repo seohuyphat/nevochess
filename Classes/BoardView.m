@@ -48,13 +48,17 @@
  
  */
 
+/***************************************************************************
+ *                                                                         *
+ * Customized by the PlayXiangqi team to work as a Xiangqi Board.          *
+ *                                                                         *
+ ***************************************************************************/
 
 #import "BoardView.h"
 #import "Bit.h"
 #import "BitHolder.h"
-#import "Game.h"
 #import "QuartzUtils.h"
-
+#import "NevoChessAppDelegate.h"
 
 @implementation BoardView
 
@@ -70,9 +74,11 @@
     [super dealloc];
 }
 
-- (void) startGameNamed: (NSString*)gameClassName
+- (void) awakeFromNib
 {
-    NSLog(@"Start Board game");
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    ((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController.navigationBarHidden = YES;
+
     if( _gameboard ) {
         [_gameboard removeFromSuperlayer];
         _gameboard = nil;
@@ -80,24 +86,23 @@
     _gameboard = [[CALayer alloc] init];
     _gameboard.frame = [self gameBoardFrame];
     self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-    //_gameboard.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
     [self.layer addSublayer: _gameboard];
     
-    Class gameClass = NSClassFromString(gameClassName);
-    _game = [[gameClass alloc] initWithBoard: _gameboard];
+    _game = [[CChessGame alloc] initWithBoard: _gameboard];
+    int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
+    [_game setSearchDepth:nDifficulty];
 }
-
 
 - (CGRect) gameBoardFrame
 {
     CGRect bounds = self.layer.bounds;
-#if 0
+/*
     bounds.origin.x += 2;
     bounds.origin.y += 2;
     bounds.size.width -= 4;
     bounds.size.height -= 24;
     self.layer.bounds = bounds;
-#endif
+*/
     return bounds;
 }
 

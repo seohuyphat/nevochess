@@ -22,7 +22,7 @@
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
 #import "Piece.h"
-#import "ChessBoardView.h"
+#import "BoardView.h"
 
 BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
 BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
@@ -191,7 +191,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         _hl_lastMove = INVALID_MOVE;
         _selectedPiece = nil;
 
-        _game = (CChessGame*)((ChessBoardView*)self.view).game;
+        _game = ((BoardView*)self.view).game;
         [_game retain];
         _moves = [[NSMutableArray alloc] initWithCapacity: POC_MAX_MOVES_PER_GAME];
         _nthMove = -1;
@@ -386,7 +386,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         return;
     }
 
-    ChessBoardView *view = (ChessBoardView*) self.view;
+    BoardView *view = (BoardView*) self.view;
     GridCell *holder = nil;
     
     UITouch *touch = [[touches allObjects] objectAtIndex:0];
