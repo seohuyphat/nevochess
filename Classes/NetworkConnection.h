@@ -30,7 +30,8 @@ typedef enum
 {
     NC_CONN_EVENT_OPEN,
     NC_CONN_EVENT_DATA,
-    NC_CONN_EVENT_END
+    NC_CONN_EVENT_END,
+    NC_CONN_EVENT_ERROR
 } ConnectionEventEnum;
 
 @protocol NetworkHandler <NSObject>

@@ -60,6 +60,59 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 @end
 
+///////////////////////////////////////////////////////////////////////////////
+//
+//    BoardActionSheet
+//
+//////////////////////////////////////////////////////////////////////////////
+@implementation BoardActionSheet
+
+- (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
+{
+    if ([state isEqualToString:@"play"]) {
+        closeIndex = 0;
+        resignIndex = 1;
+        drawIndex = 2;
+        cancelIndex = 3;
+        self = [super initWithTitle:nil delegate:delegate
+                  cancelButtonTitle:@"Cancel"
+             destructiveButtonTitle:@"Close Table"
+                  otherButtonTitles:@"Resign", @"Draw", nil];
+    }
+    else if ([state isEqualToString:@"view"]) {
+        closeIndex = 0;
+        resignIndex = -1;
+        drawIndex = -1;
+        cancelIndex = 1;
+        self = [super initWithTitle:nil delegate:delegate
+                  cancelButtonTitle:@"Cancel"
+             destructiveButtonTitle:@"Close Table"
+                  otherButtonTitles:nil];
+    }
+    else {
+        closeIndex = -1;
+        resignIndex = -1;
+        drawIndex = -1;
+        cancelIndex = 0;
+        self = [super initWithTitle:nil delegate:delegate
+                  cancelButtonTitle:@"Cancel"
+             destructiveButtonTitle:nil
+                  otherButtonTitles:nil];
+    }
+
+    self.actionSheetStyle = UIActionSheetStyleAutomatic;
+    return self;
+}
+
+- (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == closeIndex) { return ACTION_INDEX_CLOSE; }
+    if (buttonIndex == resignIndex) { return ACTION_INDEX_RESIGN; }
+    if (buttonIndex == drawIndex) { return ACTION_INDEX_DRAW; }
+    return ACTION_INDEX_CANCEL;
+}
+
+@end
 
 ///////////////////////////////////////////////////////////////////////////////
 //
