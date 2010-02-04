@@ -33,6 +33,28 @@ enum AlertViewEnum
     POC_ALERT_RESET_GAME
 };
 
+// TODO: Temporary place here! ---------------------------------------
+
+enum ActionIndexEnum
+{
+    ACTION_INDEX_CLOSE,
+    ACTION_INDEX_RESIGN,
+    ACTION_INDEX_DRAW,
+    ACTION_INDEX_CANCEL
+};
+
+@interface BoardActionSheet : UIActionSheet
+{
+    int closeIndex;  // Close the current table.
+    int resignIndex;
+    int drawIndex;
+    int cancelIndex;
+}
+- (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate;
+- (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex;
+@end
+
+// -------------------------------------------------------
 @interface BoardViewController : UIViewController
 {
     

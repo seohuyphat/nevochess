@@ -19,15 +19,6 @@
 
 #import "NetworkBoardViewController.h"
 
-enum ActionIndexEnum
-{
-    // NOTE: Do not change the contants' value!
-    ACTION_INDEX_CLOSE_TABLE = 0,
-    ACTION_INDEX_RESIGN      = 1,
-    ACTION_INDEX_DRAW        = 2,
-    ACTION_INDEX_CANCEL      = 3
-};
-
 @interface NetworkBoardViewController (PrivateMethods)
 
 - (void) _connectToNetwork;
@@ -182,9 +173,12 @@ enum ActionIndexEnum
         return;
     }
 
-    switch (buttonIndex)
+    BoardActionSheet* boardActionSheet = (BoardActionSheet*)actionSheet;
+    NSInteger buttonValue = [boardActionSheet valueOfClickedButtonAtIndex:buttonIndex];
+    
+    switch (buttonValue)
     {
-        case ACTION_INDEX_CLOSE_TABLE:
+        case ACTION_INDEX_CLOSE:
             NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
             [_connection send_LEAVE:self._tableId];
             self._tableId = nil; 
@@ -203,11 +197,17 @@ enum ActionIndexEnum
 
 - (IBAction)actionPressed:(id)sender
 {
-    UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:@"Table Actions" delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:@"Close Table"
-                                                    otherButtonTitles:@"Resign", @"Draw", nil];
-    actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
+    NSString* state = nil;
+    if (!_tableId) {
+        state = @"";
+    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
+               && !_isGameOver ) {
+        state = @"play";
+    } else {
+        state = @"view";
+    }
+    
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
     [actionSheet showInView:self.view];
     [actionSheet release];
 }
@@ -417,6 +417,13 @@ enum ActionIndexEnum
             if (_logoutPending) {
                 [self goBackToHomeMenu];
             }
+            break;
+        }
+        case NC_CONN_EVENT_ERROR:
+        {
+            NSLog(@"%s: Got NC_CONN_EVENT_ERROR.", __FUNCTION__);
+            [_connection disconnect];
+            self._connection = nil;
             break;
         }
     }

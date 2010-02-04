@@ -249,7 +249,7 @@
         case NSStreamEventErrorOccurred:
         {
             NSLog(@"%s: Got NSStreamEventErrorOccurred.", __FUNCTION__);
-            // TODO: Inform errors!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            [delegate handleNetworkEvent:NC_CONN_EVENT_ERROR event:nil];
             break;
         }
     }
