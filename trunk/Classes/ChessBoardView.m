@@ -43,7 +43,6 @@ static NSString* sCurrentGameName = @"CChessGame";
     //set search depth 
     int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
     [((CChessGame*)_game) setSearchDepth:nDifficulty];
-    //self.title = [(id)[game class] displayName];
 }
 
 

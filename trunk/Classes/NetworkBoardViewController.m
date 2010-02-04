@@ -168,7 +168,7 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSLog(@"%s: ENTER. buttonIndex = [%d].", __FUNCTION__, buttonIndex);
-    if (self._tableId == nil) {
+    if (!_tableId) {
         NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
         return;
     }
@@ -180,15 +180,15 @@
     {
         case ACTION_INDEX_CLOSE:
             NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
-            [_connection send_LEAVE:self._tableId];
+            [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
             [self displayEmptyBoard];
             break;
         case ACTION_INDEX_RESIGN:
-            [_connection send_RESIGN:self._tableId];
+            [_connection send_RESIGN:_tableId];
             break;
         case ACTION_INDEX_DRAW:
-            [_connection send_DRAW:self._tableId];
+            [_connection send_DRAW:_tableId];
             break;
         default:
             break; // Do nothing.
@@ -202,7 +202,7 @@
         state = @"";
     } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
                && !_isGameOver ) {
-        state = @"play";
+        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
     } else {
         state = @"view";
     }
@@ -228,9 +228,7 @@
 
 - (BOOL) isGameReady
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    return (   !_isGameOver
-            && _redId != nil && _blackId != nil );
+    return ( !_isGameOver && _redId && _blackId );
 }
 
 #pragma mark -
@@ -265,8 +263,8 @@
 {
     [self _dismissListTableView];
 
-    if (self._tableId) {
-        [_connection send_LEAVE:self._tableId]; // Leave the old table.
+    if (_tableId) {
+        [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
         [self resetBoard];
     }
@@ -285,11 +283,11 @@
 {
     [self _dismissListTableView];
 
-    if ([self._tableId isEqualToString:table.tableId]) {
+    if ([_tableId isEqualToString:table.tableId]) {
         NSLog(@"%s: Same table [%@]. Ignore request.", __FUNCTION__, table.tableId);
         return;
-    } else if (self._tableId) {
-        [_connection send_LEAVE:self._tableId]; // Leave the old table.
+    } else if (_tableId) {
+        [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
         [self resetBoard];
     }
@@ -464,7 +462,7 @@
 {
     TableInfo* table = [TableInfo allocTableFromString:event];
 
-    if (self._tableId && ![self._tableId isEqualToString:table.tableId]) {
+    if (_tableId && ![_tableId isEqualToString:table.tableId]) {
         [self resetBoard];
     }
     self._tableId = table.tableId;
@@ -472,7 +470,7 @@
     ColorEnum myColor = NC_COLOR_NONE; // Default: an observer.
     if      ([_username isEqualToString:table.redId])   { myColor = NC_COLOR_RED;   }
     else if ([_username isEqualToString:table.blackId]) { myColor = NC_COLOR_BLACK; }
-    [self setMyColor:myColor];
+    _myColor = myColor;
 
     // Reverse the View if necessary.
     if (   (myColor == NC_COLOR_BLACK && _game.blackAtTopSide)
@@ -530,7 +528,7 @@
     NSString* tableId = [components objectAtIndex:0];
     NSString* moveStr = [components objectAtIndex:2];
 
-    if ( ! [self._tableId isEqualToString:tableId] ) {
+    if ( ! [_tableId isEqualToString:tableId] ) {
         NSLog(@"%s: Move:[%@] from table:[%@] ignored.", __FUNCTION__, moveStr, tableId);
         return;
     }
@@ -559,10 +557,20 @@
     
     NSLog(@"%s: Table:[%@] - Game Over: [%@].", __FUNCTION__, tableId, gameResult);
 
-    if ( [self._tableId isEqualToString:tableId] ) {
+    if ( [_tableId isEqualToString:tableId] ) {
         _isGameOver = YES;
     }
-    [self handleEndGameInUI];
+    
+    [_audioHelper play_wav_sound:@"WIN"];
+    NSString* msg = NSLocalizedString(@"Game Over", @"");
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
+                                                    message:msg
+                                                   delegate:self 
+                                          cancelButtonTitle:nil
+                                          otherButtonTitles:@"OK", nil];
+    alert.tag = POC_ALERT_END_GAME;
+    [alert show];
+    [alert release];
 }
 
 - (void) _handleNetworkEvent_RESET:(NSString*)event
@@ -586,7 +594,7 @@
     NSString* playerInfo = ([pid length] == 0 ? @"*"
                             : [NSString stringWithFormat:@"%@ (%@)", pid, rating]);
 
-    if ( ! [self._tableId isEqualToString:tableId] ) {
+    if ( ! [_tableId isEqualToString:tableId] ) {
         NSLog(@"%s: E_JOIN:[%@ as %@] from table:[%@] ignored.", __FUNCTION__, playerInfo, color, tableId);
         return;
     }
@@ -614,7 +622,7 @@
     NSString* tableId = [components objectAtIndex:0];
     NSString* pid = [components objectAtIndex:1];
 
-    if ( ! [self._tableId isEqualToString:tableId] ) {
+    if ( ! [_tableId isEqualToString:tableId] ) {
         NSLog(@"%s: E_LEAVE:[%@] from table:[%@] ignored.", __FUNCTION__, pid, tableId);
         return;
     }
@@ -634,7 +642,7 @@
     NSString* pid = [components objectAtIndex:1];
     NSString* itimes = [components objectAtIndex:3];
 
-    if ( ! [self._tableId isEqualToString:tableId] ) {
+    if ( ! [_tableId isEqualToString:tableId] ) {
         NSLog(@"%s: [%@] UPDATE time [%@] at table:[%@] ignored.", __FUNCTION__, pid, itimes, tableId);
         return;
     }

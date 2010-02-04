@@ -57,14 +57,6 @@
 
 @synthesize _players, _currentPlayer, _winner;
 
-+ (NSString*) displayName
-{
-    NSString* name = [self description];
-    if( [name hasSuffix: @"Game"] )
-        name = [name substringToIndex: name.length-4];
-    return name;
-}
-
 - (void)dealloc
 {
     [_players release];

@@ -1067,7 +1067,7 @@ Referee_is_mate()
 extern "C" int
 Referee_get_nMoveNum()
 {
-    return pos.nMoveNum;
+    return pos.nMoveNum - 1;
 }
 
 extern "C" int

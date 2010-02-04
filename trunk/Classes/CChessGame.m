@@ -296,10 +296,8 @@
     return nGameResult;
 }
 
-- (int) get_sdPlayer
-{
-    return [_referee get_sdPlayer];
-}
+- (int) get_sdPlayer { return [_referee get_sdPlayer]; }
+- (int) get_nMoveNum { return [_referee get_nMoveNum]; }
 
 - (void)reset_game
 {
@@ -329,7 +327,7 @@
             
             unsigned row = 9 - holder._row;
             unsigned column = 8 - holder._column;
-            NSLog(@"%s: Convert [%d%d -> %d%d].", __FUNCTION__, holder._row, holder._column, row, column);
+            //NSLog(@"%s: Convert [%d%d -> %d%d].", __FUNCTION__, holder._row, holder._column, row, column);
             
             [self _setPiece:piece toRow:row toCol:column];
         }

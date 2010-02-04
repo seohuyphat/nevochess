@@ -130,7 +130,6 @@ enum ActionIndexEnum
 - (void) rescheduleTimer;
 - (void) resetBoard;
 - (void) displayEmptyBoard;
-- (void) setMyColor:(ColorEnum)color;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
 - (void) setHighlightCells:(BOOL)bHighlight;

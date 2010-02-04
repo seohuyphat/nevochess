@@ -22,7 +22,6 @@
 
 @interface ChessBoardViewController : BoardViewController
 {
-    
     NSThread*     robot;
     NSPort*      _robotPort; // the port is used to instruct the robot to do works
     CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
