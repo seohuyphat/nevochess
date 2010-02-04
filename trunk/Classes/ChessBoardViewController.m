@@ -22,7 +22,6 @@
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
 #import "Piece.h"
-#import "ChessBoardView.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //

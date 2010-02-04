@@ -581,7 +581,7 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>BoardViewController</string>
 					<string>UIResponder</string>
-					<string>ChessBoardView</string>
+					<string>BoardView</string>
 					<string>{{833, 128}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -686,14 +686,6 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Classes/BoardViewController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ChessBoardView</string>
-					<string key="superclassName">BoardView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Classes/ChessBoardView.h</string>
 					</object>
 				</object>
 			</object>

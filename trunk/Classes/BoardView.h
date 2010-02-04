@@ -48,11 +48,18 @@
  
  */
 
+/***************************************************************************
+ *                                                                         *
+ * Customized by the PlayXiangqi team to work as a Xiangqi Board.          *
+ *                                                                         *
+ ***************************************************************************/
+
 #import <UIKit/UIKit.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <QuartzCore/QuartzCore.h>
+#import "CChessGame.h"
 
-@class Bit, Card, Grid, Game;
+@class Bit, Card, Grid;
 @protocol BitHolder;
 
 
@@ -62,7 +69,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 /** NSView that hosts a game. */
 @interface BoardView : UIView
 {
-    Game *_game;                                // Current Game
+    CChessGame *_game;                          // Current Game
     CALayer *_gameboard;                        // Game's main layer
     
     // Used during mouse-down tracking:
@@ -81,15 +88,11 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
     //NSDragOperation _viewDropOp;                // Current drag operation
 }
 
-- (void) startGameNamed: (NSString*)gameClassName;
-
 - (CALayer*) hitTestPoint: (CGPoint)locationInWindow
        LayerMatchCallback: (LayerMatchCallback)match
                    offset: (CGPoint*)outOffset;
 
-//- (IBAction) enterFullScreen: (id)sender;
-
-@property (readonly) Game *game;
+@property (readonly) CChessGame *game;
 @property (readonly) CALayer *gameboard;
 
 - (CGRect) gameBoardFrame;
