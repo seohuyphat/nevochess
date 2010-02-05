@@ -60,7 +60,7 @@
 
 - (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo
 {
-    XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow: row column: col]); 
+    GridCell *s = [_grid cellAtRow: row column: col]; 
     CGRect frame = s.frame;
     CGPoint position;
     position.x = CGRectGetMidX(frame);
@@ -95,7 +95,7 @@
 
 - (void)_setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
-    XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow: row column: col]); 
+    GridCell *s = [_grid cellAtRow: row column: col]; 
     CGRect frame = s.frame;
     CGPoint position;
     position.x = floor(CGRectGetMidX(frame))+0.5;
@@ -115,7 +115,7 @@
         row = 9 - row;
         col = 8 - col;
     }
-    XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow: row column: col]); 
+    GridCell *s = [_grid cellAtRow: row column: col]; 
     CGRect frame = s.frame;
     CGPoint position;
     position.x = floor(CGRectGetMidX(frame))+0.5;
@@ -129,13 +129,13 @@
     return nil;
 }
 
-- (XiangQiSquare*)x_getCellAtRow:(int)row col:(int)col
+- (GridCell*)x_getCellAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
         row = 9 - row;
         col = 8 - col;
     }
-    XiangQiSquare *s = ((XiangQiSquare*)[_grid cellAtRow:row column:col]);
+    GridCell *s = [_grid cellAtRow:row column:col];
     return s;
 }
 
@@ -158,39 +158,36 @@
         
         CGSize size = board.bounds.size;
         board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-        XiangQiGrid *grid = [[XiangQiGrid alloc] initWithRows: 10 columns: 9 
-                                                  frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 35,
-                                                                    size.width-4,size.height-4)];
-        _grid = (RectGrid*)grid;
-        //grid.backgroundColor = GetCGPatternNamed(@"board.png");
-        //grid.borderColor = kTranslucentLightGrayColor;
-        //grid.borderWidth = 2;
-        grid.lineColor = kRedColor;
-        grid.cellClass = [XiangQiSquare class];
-        [grid addAllCells];
-        grid.usesDiagonals = grid.allowsMoves = grid.allowsCaptures = NO;
-        [board addSublayer: grid];
+        _grid = [[Grid alloc] initWithRows: 10 columns: 9
+                                     frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 35,
+                                                       size.width-4,size.height-4)];
+        //_grid.backgroundColor = GetCGPatternNamed(@"board.png");
+        //_grid.borderColor = kTranslucentLightGrayColor;
+        //_grid.borderWidth = 2;
+        _grid.lineColor = kRedColor;
+        [_grid addAllCells];
+        [board addSublayer: _grid];
         
         _pieceBox = [[NSMutableArray alloc] initWithCapacity:32];
         [self setupCChessPieces];
         
-        ((XiangQiSquare*)[grid cellAtRow: 3 column: 0])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 6 column: 0])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 2 column: 1])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 7 column: 1])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 3 column: 2])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 6 column: 2])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 3 column: 4])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 6 column: 4])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 3 column: 6])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 6 column: 6])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 2 column: 7])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 7 column: 7])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 3 column: 8])._dotted = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 6 column: 8])._dotted = YES;
+        [_grid cellAtRow: 3 column: 0].dotted = YES;
+        [_grid cellAtRow: 6 column: 0].dotted = YES;
+        [_grid cellAtRow: 2 column: 1].dotted = YES;
+        [_grid cellAtRow: 7 column: 1].dotted = YES;
+        [_grid cellAtRow: 3 column: 2].dotted = YES;
+        [_grid cellAtRow: 6 column: 2].dotted = YES;
+        [_grid cellAtRow: 3 column: 4].dotted = YES;
+        [_grid cellAtRow: 6 column: 4].dotted = YES;
+        [_grid cellAtRow: 3 column: 6].dotted = YES;
+        [_grid cellAtRow: 6 column: 6].dotted = YES;
+        [_grid cellAtRow: 2 column: 7].dotted = YES;
+        [_grid cellAtRow: 7 column: 7].dotted = YES;
+        [_grid cellAtRow: 3 column: 8].dotted = YES;
+        [_grid cellAtRow: 6 column: 8].dotted = YES;
         
-        ((XiangQiSquare*)[grid cellAtRow: 1 column: 4]).cross = YES;
-        ((XiangQiSquare*)[grid cellAtRow: 8 column: 4]).cross = YES;
+        [_grid cellAtRow: 1 column: 4].cross = YES;
+        [_grid cellAtRow: 8 column: 4].cross = YES;
 
         _blackAtTopSide = YES;
         game_result = kXiangQi_InPlay;
@@ -323,7 +320,7 @@
 {
     for (Piece* piece in _pieceBox) {
         if(piece.superlayer != nil) { // not captured?
-            XiangQiSquare *holder = (XiangQiSquare*)piece.holder;
+            GridCell *holder = (GridCell*)piece.holder;
             
             unsigned row = 9 - holder._row;
             unsigned column = 8 - holder._column;

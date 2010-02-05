@@ -66,12 +66,7 @@
         _nRows = nRows;
         _nColumns = nColumns;
         _spacing = spacing;
-        _cellClass = [GridCell class];
         _lineColor = CGColorRetain(kRedColor);
-        //_cellColor = CGColorRetain(kWhiteColor);
-        _cellColor = nil;
-        _allowsMoves = YES;
-        _usesDiagonals = YES;
 
         self.bounds = CGRectMake(-1, -1, nColumns*spacing.width+2, nRows*spacing.height+2);
         self.position = pos;
@@ -80,12 +75,22 @@
         self.needsDisplayOnBoundsChange = YES;
         
         unsigned n = nRows*nColumns;
-        _cells = [[NSMutableArray alloc]  initWithCapacity: n];
+        _cells = [[NSMutableArray alloc] initWithCapacity:n];
         id null = [NSNull null];
-        while( n-- > 0 )
-            [_cells addObject: null];
-
+        while( n-- > 0 ) { [_cells addObject:null]; }
         [self setNeedsDisplay];
+        
+        // Create the River.
+        CGRect frame;
+        frame.origin.x = spacing.width/2;
+        frame.origin.y = 4 * spacing.height + spacing.height/2;
+        frame.size.height = spacing.height;
+        frame.size.width = spacing.width * 8;
+        _river = [[GridCell alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
+        [self addSublayer:_river];
+        _river.backgroundColor =  GetCGPatternNamed(@"board_320x480.png");
+        _river.borderColor = kRedColor;
+        _river.borderWidth = 1.0;
     }
     return self;
 }
@@ -102,12 +107,11 @@
 }
 
 - (void)dealloc {
-    CGColorRelease(_cellColor);
     CGColorRelease(_lineColor);
     [_cells release];
+    [_river release];
     [super dealloc];
 }
-
 
 - (void)setcolor:(CGColorRef *)var withNewColor:(CGColorRef)color
 {
@@ -118,15 +122,11 @@
     }
 }
 
-- (CGColorRef) cellColor                        {return _cellColor;}
-- (void) setCellColor: (CGColorRef)cellColor    {[self setcolor:&_cellColor withNewColor:cellColor];}
+- (CGColorRef) lineColor                     {return _lineColor;}
+- (void) setLineColor: (CGColorRef)lineColor {[self setcolor:&_lineColor withNewColor:lineColor];}
 
-- (CGColorRef) lineColor                        {return _lineColor;}
-- (void) setLineColor: (CGColorRef)lineColor    {[self setcolor:&_lineColor withNewColor:lineColor];}
-
-@synthesize cellClass=_cellClass, rows=_nRows, columns=_nColumns, spacing=_spacing,
-            usesDiagonals=_usesDiagonals, allowsMoves=_allowsMoves, allowsCaptures=_allowsCaptures;
-
+@synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
+@synthesize _river;
 
 #pragma mark -
 #pragma mark GEOMETRY:
@@ -147,7 +147,7 @@
 - (GridCell*) allocCellAtRow: (unsigned)row column: (unsigned)col 
                suggestedFrame: (CGRect)frame
 {
-    return [[_cellClass alloc] initWithGrid: self 
+    return [[GridCell alloc] initWithGrid: self 
                                         row: row column: col
                                       frame: frame];
 }
@@ -175,14 +175,14 @@
 
 - (void) addAllCells
 {
-    for( int row=_nRows-1; row>=0; row-- )                // makes 'upper' cells be in 'back'
+    for( int row=_nRows-1; row>=0; row-- )  // makes 'upper' cells be in 'back'
         for( int col=0; col<_nColumns; col++ ) 
             [self addCellAtRow: row column: col];
 }
 
 - (void) removeAllCells
 {
-    for( int row=_nRows-1; row>=0; row-- )                // makes 'upper' cells be in 'back'
+    for( int row=_nRows-1; row>=0; row-- )   // makes 'upper' cells be in 'back'
         for( int col=0; col<_nColumns; col++ ) 
             [self removeCellAtRow: row column: col];
 }
@@ -206,14 +206,14 @@
 #pragma mark DRAWING:
 
 
-- (void) drawCellsInContext: (CGContextRef)ctx fill: (BOOL)fill
+- (void) drawCellsInContext: (CGContextRef)ctx
 {
     // Subroutine of -drawInContext:. Draws all the cells, with or without a fill.
     for( unsigned row=0; row<_nRows; row++ )
         for( unsigned col=0; col<_nColumns; col++ ) {
             GridCell *cell = [self cellAtRow: row column: col];
             if( cell )
-                [cell drawInParentContext: ctx fill: fill];
+                [cell drawInParentContext: ctx];
         }
 }
 
@@ -222,15 +222,9 @@
 {
     // Custom CALayer drawing implementation. Delegates to the cells to draw themselves
     // in me; this is more efficient than having each cell have its own drawing.
-    if( _cellColor ) {
-        CGContextSetFillColorWithColor(ctx, _cellColor);
-        [self drawCellsInContext: ctx fill: YES];
-    }
-    if( _lineColor ) {
-        CGContextSetStrokeColorWithColor(ctx,_lineColor);
-        CGContextSetLineWidth(ctx, 1.5);
-        [self drawCellsInContext:ctx fill: NO];
-    }
+    CGContextSetStrokeColorWithColor(ctx,_lineColor);
+    CGContextSetLineWidth(ctx, 1.5);
+    [self drawCellsInContext:ctx];
 }
 
 
@@ -242,14 +236,12 @@
 
 @implementation GridCell
 
-
 @synthesize _grid, _row, _column;
-@synthesize _neighbors;
+@synthesize dotted, cross;
 
 - (void)dealloc
 {
     [_grid release];
-    [_neighbors release];
     [super dealloc];
 }
 
@@ -269,7 +261,6 @@
         self.bounds = bounds;
         self.anchorPoint = CGPointMake(0,0);
         self.borderColor = kHighlightColor;         // Used when highlighting (see -setHighlighted:)
-        _neighbors = [[NSMutableArray alloc] initWithCapacity:8];
     }
     return self;
 }
@@ -278,18 +269,6 @@
 {
     return [NSString stringWithFormat: @"%@(%u,%u)", [self class],_column,_row];
 }
-
-
-- (void) drawInParentContext: (CGContextRef)ctx fill: (BOOL)fill
-{
-    // Default implementation just fills or outlines the cell.
-    CGRect frame = self.frame;
-    if( fill )
-        CGContextFillRect(ctx,frame);
-    else
-        CGContextStrokeRect(ctx, frame);
-}
-
 
 - (void) setBit: (Bit*)bit
 {
@@ -304,147 +283,53 @@
     }
 }
 
-- (Bit*) canDragBit: (Bit*)bit
+- (void) drawInParentContext: (CGContextRef)ctx
 {
-    if( _grid.allowsMoves && bit==self._bit )
-        return [super canDragBit: bit];
-    else
-        return nil;
-}
-
-- (BOOL) canDropBit: (Bit*)bit atPoint: (CGPoint)point
-{
-    return self._bit == nil || _grid.allowsCaptures;
-}
-
-
-- (BOOL) fwdIsN 
-{
-    return self.game._currentPlayer.index == 0;
-}
-
-
-- (NSArray*) neighbors
-{
-    BOOL orthogonal = ! _grid.usesDiagonals;
-    [_neighbors removeAllObjects];
-    for( int dy=-1; dy<=1; dy++ )
-        for( int dx=-1; dx<=1; dx++ )
-            if( (dx || dy) && !(orthogonal && dx && dy) ) {
-                GridCell *cell = [_grid cellAtRow: _row+dy column: _column+dx];
-                if( cell )
-                    [_neighbors addObject: cell];
-            }
-    return [[_neighbors retain] autorelease];
-}
-
-
-// Recursive subroutine used by getGroup:.
-- (void) x_addToGroup: (NSMutableSet*)group liberties: (NSMutableSet*)liberties owner: (Player*)owner
-{
-    Bit *bit = self._bit;
-    if( bit == nil ) {
-        if( [liberties containsObject: self] )
-            return; // already traversed
-        [liberties addObject: self];
-    } else if( bit._owner==owner ) {
-        if( [group containsObject: self] )
-            return; // already traversed
-        [group addObject: self];
-        for( GridCell *c in self.neighbors )
-            [c x_addToGroup: group liberties: liberties owner: owner];
+    CGRect frame = self.frame;
+    const CGFloat midx=floor(CGRectGetMidX(frame))+0.5, 
+    midy=floor(CGRectGetMidY(frame))+0.5;
+    CGPoint p[4] = {{CGRectGetMinX(frame),midy},
+        {CGRectGetMaxX(frame),midy},
+        {midx,CGRectGetMinY(frame)},
+        {midx,CGRectGetMaxY(frame)}};
+    if( ! self.s )  p[2].y = midy;
+    if( ! self.n )  p[3].y = midy;
+    if( ! self.w )  p[0].x = midx;
+    if( ! self.e )  p[1].x = midx;
+    CGContextStrokeLineSegments(ctx, p, 4);
+    
+    
+    if( dotted ) {
+        
+        const CGFloat midx_offset = CGRectGetWidth(frame)/4;
+        const CGFloat midy_offset = CGRectGetHeight(frame)/4;
+        CGPoint pos[16] = {{midx - 2, midy + 2}, {midx - 2, midy + 2 + midy_offset}, {midx - 2, midy + 2}, {midx - 2 - midx_offset, midy + 2},
+            {midx + 2, midy + 2}, {midx + 2, midy + 2 + midy_offset}, {midx + 2, midy + 2}, {midx + 2 + midx_offset, midy + 2},
+            {midx - 2, midy - 2}, {midx - 2, midy - 2 - midy_offset}, {midx - 2, midy - 2}, {midx - 2 - midx_offset, midy - 2},
+            {midx + 2, midy - 2}, {midx + 2, midy - 2 - midy_offset}, {midx + 2, midy - 2}, {midx + 2 + midx_offset, midy - 2}};
+        if( ! self.s ) {pos[8].x = pos[9].x = pos[10].x = pos[11].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
+            pos[8].y = pos[9].y = pos[10].y = pos[11].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
+        
+        if( ! self.n ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[4].x = pos[5].x = pos[6].x = pos[7].x = midx;
+            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[4].y = pos[5].y = pos[6].y = pos[7].y = midy;}
+        
+        if( ! self.w ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[8].x = pos[9].x = pos[10].x = pos[11].x = midx;
+            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[8].y = pos[9].y = pos[10].y = pos[11].y = midy;}
+        
+        if( ! self.e ) {pos[4].x = pos[5].x = pos[6].x = pos[7].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
+            pos[4].y = pos[5].y = pos[6].y = pos[7].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
+        
+        CGContextStrokeLineSegments(ctx, pos, 16);
     }
+    
+    if( cross ) {
+        CGPoint crossp[4] = {{midx - CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}, 
+            {midx + CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
+            {midx - CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
+            {midx + CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}};
+        CGContextStrokeLineSegments(ctx, crossp, 4);
+    }                                                                                                                                      
 }
-
-
-- (NSSet*) getGroup: (int*)outLiberties
-{
-    NSMutableSet *group=[NSMutableSet set], *liberties=nil;
-    if( outLiberties )
-        liberties = [NSMutableSet set];
-    [self x_addToGroup: group liberties: liberties owner: self._bit._owner];
-    if( outLiberties )
-        *outLiberties = liberties.count;
-    return group;
-}
-
-
-#pragma mark -
-#pragma mark DRAG-AND-DROP:
-
-
-// An image from another app can be dragged onto a Dispenser to change the Piece's appearance.
-
-
-//- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
-//{
-//    NSPasteboard *pb = [sender draggingPasteboard];
-//    if( [NSImage canInitWithPasteboard: pb] )
-//        return NSDragOperationCopy;
-//    else
-//        return NSDragOperationNone;
-//}
-//
-//- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-//{
-//    CGImageRef image = GetCGImageFromPasteboard([sender draggingPasteboard]);
-//    if( image ) {
-//        _grid.cellColor = CreatePatternColor(image);
-//        [_grid setNeedsDisplay];
-//        return YES;
-//    } else
-//        return NO;
-//}
-
-
-@end
-
-
-
-
-#pragma mark -
-
-@implementation RectGrid
-
-
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-            spacing: (CGSize)spacing
-           position: (CGPoint)pos
-{
-    self = [super initWithRows: nRows columns: nColumns spacing: spacing position: pos];
-    if( self ) {
-        _cellClass = [Square class];
-    }
-    return self;
-}
-
-
-- (CGColorRef) altCellColor                         {return _altCellColor;}
-- (void) setAltCellColor: (CGColorRef)altCellColor  {[self setcolor:&_altCellColor withNewColor:altCellColor];}
-
-
-@end
-
-
-
-#pragma mark -
-
-@implementation Square
-
-
-- (void) drawInParentContext: (CGContextRef)ctx fill: (BOOL)fill
-{
-    if( fill ) {
-        CGColorRef c = ((RectGrid*)_grid).altCellColor;
-        if( c ) {
-            if( ! ((_row+_column) & 1) )
-                c = _grid.cellColor;
-            CGContextSetFillColorWithColor(ctx, c);
-        }
-    }
-    [super drawInParentContext: ctx fill: fill];
-}
-
 
 - (void) setHighlighted: (BOOL)highlighted
 {
@@ -453,137 +338,13 @@
     self.borderWidth = (highlighted ?3 :0);
 }
 
-
-- (Square*) nw     {return (Square*)[_grid cellAtRow: _row+1 column: _column-1];}
-- (Square*) n      {return (Square*)[_grid cellAtRow: _row+1 column: _column  ];}
-- (Square*) ne     {return (Square*)[_grid cellAtRow: _row+1 column: _column+1];}
-- (Square*) e      {return (Square*)[_grid cellAtRow: _row   column: _column+1];}
-- (Square*) se     {return (Square*)[_grid cellAtRow: _row-1 column: _column+1];}
-- (Square*) s      {return (Square*)[_grid cellAtRow: _row-1 column: _column  ];}
-- (Square*) sw     {return (Square*)[_grid cellAtRow: _row-1 column: _column-1];}
-- (Square*) w      {return (Square*)[_grid cellAtRow: _row   column: _column-1];}
-
-// Directions relative to the current player:
-- (Square*) fl     {return self.fwdIsN ?self.nw :self.se;}
-- (Square*) f      {return self.fwdIsN ?self.n  :self.s;}
-- (Square*) fr     {return self.fwdIsN ?self.ne :self.sw;}
-- (Square*) r      {return self.fwdIsN ?self.e  :self.w;}
-- (Square*) br     {return self.fwdIsN ?self.se :self.nw;}
-- (Square*) b      {return self.fwdIsN ?self.s  :self.n;}
-- (Square*) bl     {return self.fwdIsN ?self.sw :self.ne;}
-- (Square*) l      {return self.fwdIsN ?self.w  :self.e;}
-
-
-//- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-//{
-//    CGImageRef image = GetCGImageFromPasteboard([sender draggingPasteboard]);
-//    if( image ) {
-//        CGColorRef color = CreatePatternColor(image);
-//        RectGrid *rectGrid = (RectGrid*)_grid;
-//        if( rectGrid.altCellColor && ((_row+_column) & 1) )
-//            rectGrid.altCellColor = color;
-//        else
-//            rectGrid.cellColor = color;
-//        [rectGrid setNeedsDisplay];
-//        return YES;
-//    } else
-//        return NO;
-//}
-
-@end
-
-#pragma mark XiangQi river square 
-@implementation XiangQiGrid
-@synthesize river;
-
-- (void)dealloc
-{
-    [river release];
-    [super dealloc];
-}
-
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-            spacing: (CGSize)spacing
-           position: (CGPoint)pos
-{
-    CGRect frame;
-    frame.origin.x = spacing.width/2;
-    frame.origin.y = 4 * spacing.height + spacing.height/2;
-    frame.size.height = spacing.height;
-    frame.size.width = spacing.width * 8;
-    self = [super initWithRows: nRows columns: nColumns spacing: spacing position: pos];
-    river = [[Square alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
-    [self addSublayer:river];
-    river.backgroundColor =  GetCGPatternNamed(@"board_320x480.png");
-    river.borderColor = kRedColor;
-    river.borderWidth = 1.0;
-    return self;
-}
-
-- (void)drawInContext:(CGContextRef)ctx
-{
-    [super drawInContext:ctx];
-}
-
-@end
-
-
-#pragma mark - XiangQi Square
-
-@implementation XiangQiSquare
-@synthesize _dotted;
-@synthesize cross;
-
-- (void) drawInParentContext: (CGContextRef)ctx fill: (BOOL)fill
-{
-    if( fill )
-        [super drawInParentContext: ctx fill: fill];
-    else {
-        CGRect frame = self.frame;
-        const CGFloat midx=floor(CGRectGetMidX(frame))+0.5, 
-                    midy=floor(CGRectGetMidY(frame))+0.5;
-        CGPoint p[4] = {{CGRectGetMinX(frame),midy},
-                        {CGRectGetMaxX(frame),midy},
-                        {midx,CGRectGetMinY(frame)},
-                        {midx,CGRectGetMaxY(frame)}};
-        if( ! self.s )  p[2].y = midy;
-        if( ! self.n )  p[3].y = midy;
-        if( ! self.w )  p[0].x = midx;
-        if( ! self.e )  p[1].x = midx;
-        CGContextStrokeLineSegments(ctx, p, 4);
-        
-        
-        if( _dotted ) {
-
-            const CGFloat midx_offset = CGRectGetWidth(frame)/4;
-            const CGFloat midy_offset = CGRectGetHeight(frame)/4;
-            CGPoint pos[16] = {{midx - 2, midy + 2}, {midx - 2, midy + 2 + midy_offset}, {midx - 2, midy + 2}, {midx - 2 - midx_offset, midy + 2},
-                {midx + 2, midy + 2}, {midx + 2, midy + 2 + midy_offset}, {midx + 2, midy + 2}, {midx + 2 + midx_offset, midy + 2},
-                {midx - 2, midy - 2}, {midx - 2, midy - 2 - midy_offset}, {midx - 2, midy - 2}, {midx - 2 - midx_offset, midy - 2},
-                {midx + 2, midy - 2}, {midx + 2, midy - 2 - midy_offset}, {midx + 2, midy - 2}, {midx + 2 + midx_offset, midy - 2}};
-            if( ! self.s ) {pos[8].x = pos[9].x = pos[10].x = pos[11].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
-            pos[8].y = pos[9].y = pos[10].y = pos[11].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
-            
-            if( ! self.n ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[4].x = pos[5].x = pos[6].x = pos[7].x = midx;
-            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[4].y = pos[5].y = pos[6].y = pos[7].y = midy;}
-            
-            if( ! self.w ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[8].x = pos[9].x = pos[10].x = pos[11].x = midx;
-            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[8].y = pos[9].y = pos[10].y = pos[11].y = midy;}
-            
-            if( ! self.e ) {pos[4].x = pos[5].x = pos[6].x = pos[7].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
-            pos[4].y = pos[5].y = pos[6].y = pos[7].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
-            
-            CGContextStrokeLineSegments(ctx, pos, 16);
-        }
-        
-        if( cross ) {
-            CGPoint crossp[4] = {{midx - CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}, 
-                {midx + CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
-                {midx - CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
-                {midx + CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}};
-            CGContextStrokeLineSegments(ctx, crossp, 4);
-        }                                                                                                                                      
-    }
-}
+- (GridCell*) nw     {return [_grid cellAtRow: _row+1 column: _column-1];}
+- (GridCell*) n      {return [_grid cellAtRow: _row+1 column: _column  ];}
+- (GridCell*) ne     {return [_grid cellAtRow: _row+1 column: _column+1];}
+- (GridCell*) e      {return [_grid cellAtRow: _row   column: _column+1];}
+- (GridCell*) se     {return [_grid cellAtRow: _row-1 column: _column+1];}
+- (GridCell*) s      {return [_grid cellAtRow: _row-1 column: _column  ];}
+- (GridCell*) sw     {return [_grid cellAtRow: _row-1 column: _column-1];}
+- (GridCell*) w      {return [_grid cellAtRow: _row   column: _column-1];}
 
 @end

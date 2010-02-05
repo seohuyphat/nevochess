@@ -58,7 +58,7 @@ enum {
 
 @interface CChessGame : Game
 {
-    RectGrid*       _grid;
+    Grid*           _grid;
     NSMutableArray* _pieceBox;
     BOOL            _blackAtTopSide;
 
@@ -74,7 +74,7 @@ enum {
 - (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo;
 - (void)x_movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*)x_getPieceAtRow:(int)row col:(int)col;
-- (XiangQiSquare*)x_getCellAtRow:(int)row col:(int)col;
+- (GridCell*)x_getCellAtRow:(int)row col:(int)col;
 
 - (int) getRobotMove:(int*)captured;
 - (int) humanMove:(int)row1 fromCol:(int)col1
@@ -92,7 +92,7 @@ enum {
 - (void)reverseView;
 
 @property (nonatomic, retain) NSString* _aiName;
-@property (nonatomic, readonly) RectGrid *_grid;
+@property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) int game_result;
 
