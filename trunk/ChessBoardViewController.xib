@@ -270,6 +270,28 @@
 						<int key="IBUIBaselineAdjustment">1</int>
 						<float key="IBUIMinimumFontSize">10</float>
 					</object>
+					<object class="IBUILabel" id="610252599">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">292</int>
+						<string key="NSFrame">{{111, 193}, {96, 21}}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<bool key="IBUIOpaque">NO</bool>
+						<bool key="IBUIClipsSubviews">YES</bool>
+						<bool key="IBUIUserInteractionEnabled">NO</bool>
+						<string key="IBUIText">Game Over</string>
+						<object class="NSFont" key="IBUIFont">
+							<string key="NSName">AndaleMono</string>
+							<double key="NSSize">17</double>
+							<int key="NSfFlags">16</int>
+						</object>
+						<object class="NSColor" key="IBUITextColor">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MSAwIDAAA</bytes>
+						</object>
+						<nil key="IBUIHighlightedColor"/>
+						<int key="IBUIBaselineAdjustment">1</int>
+						<float key="IBUIMinimumFontSize">10</float>
+					</object>
 				</object>
 				<string key="NSFrameSize">{320, 460}</string>
 				<reference key="NSSuperview"/>
@@ -414,6 +436,14 @@
 					</object>
 					<int key="connectionID">121</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">game_over_msg</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="610252599"/>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -439,6 +469,7 @@
 							<reference ref="392141871"/>
 							<reference ref="381686814"/>
 							<reference ref="133315880"/>
+							<reference ref="610252599"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -548,6 +579,11 @@
 						<reference key="object" ref="1073666595"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">122</int>
+						<reference key="object" ref="610252599"/>
+						<reference key="parent" ref="191373211"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -567,6 +603,7 @@
 					<string>115.IBPluginDependency</string>
 					<string>116.IBPluginDependency</string>
 					<string>117.IBPluginDependency</string>
+					<string>122.IBPluginDependency</string>
 					<string>23.IBPluginDependency</string>
 					<string>73.IBPluginDependency</string>
 					<string>74.IBPluginDependency</string>
@@ -582,7 +619,8 @@
 					<string>BoardViewController</string>
 					<string>UIResponder</string>
 					<string>BoardView</string>
-					<string>{{833, 128}, {320, 480}}</string>
+					<string>{{788, 126}, {320, 480}}</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -619,7 +657,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">121</int>
+			<int key="maxID">124</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -663,6 +701,7 @@
 							<string>black_move_time</string>
 							<string>black_seat</string>
 							<string>black_time</string>
+							<string>game_over_msg</string>
 							<string>nav_toolbar</string>
 							<string>red_label</string>
 							<string>red_move_time</string>
@@ -675,6 +714,7 @@
 							<string>UILabel</string>
 							<string>UILabel</string>
 							<string>UIButton</string>
+							<string>UILabel</string>
 							<string>UILabel</string>
 							<string>UIToolbar</string>
 							<string>UILabel</string>
