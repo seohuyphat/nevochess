@@ -226,18 +226,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
-    [activity setHidden:YES];
     [activity stopAnimating];
-    [self.view bringSubviewToFront:activity];
-    [self.view bringSubviewToFront:nav_toolbar];
-    [self.view bringSubviewToFront:red_label];
-    [self.view bringSubviewToFront:black_label];
-    [self.view bringSubviewToFront:red_time];
-    [self.view bringSubviewToFront:red_move_time];
-    [self.view bringSubviewToFront:black_time];
-    [self.view bringSubviewToFront:black_move_time];
-    [self.view bringSubviewToFront:red_seat];
-    [self.view bringSubviewToFront:black_seat];
+    [game_over_msg setHidden:YES];
     // TODO: _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
     self._initialTime = [TimeInfo allocTimeFromString:@"900/180/20"];
     self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
@@ -276,6 +266,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [black_time release];
     [black_move_time release];
     [activity release];
+    [game_over_msg release];
     [red_seat release];
     [black_seat release];
     [_timer release];
@@ -655,7 +646,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) displayEmptyBoard
 {
     [self resetBoard];
-    [self.view sendSubviewToBack:game_over_msg];
+    [game_over_msg setHidden:YES];
     [self setRedLabel:@""];
     [self setBlackLabel:@""];
     if (!_game.blackAtTopSide )

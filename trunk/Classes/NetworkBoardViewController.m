@@ -300,6 +300,8 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (self._connection == nil) {
         NSLog(@"%s: Connecting to network...", __FUNCTION__);
+        [activity setHidden:NO];
+        [activity startAnimating];
         self._connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;
         [_connection connect];
@@ -348,6 +350,7 @@
         NSLog(@"%s: Destroy Login view...", __FUNCTION__);
         self._loginController = nil;
     }
+    [activity stopAnimating];
 }
 
 - (void) _dismissListTableView
@@ -362,7 +365,7 @@
 {
     [self resetBoard];
     _isGameOver = NO;
-    [self.view sendSubviewToBack:game_over_msg];
+    [game_over_msg setHidden:YES];
 }
 
 #pragma mark -
@@ -567,7 +570,7 @@
 
     if ( [_tableId isEqualToString:tableId] ) {
         _isGameOver = YES;
-        [self.view bringSubviewToFront:game_over_msg];
+        [game_over_msg setHidden:NO];
     }
 }
 
