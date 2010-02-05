@@ -86,7 +86,7 @@
     _gameboard = [[CALayer alloc] init];
     _gameboard.frame = [self gameBoardFrame];
     self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-    [self.layer addSublayer: _gameboard];
+    [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
     
     _game = [[CChessGame alloc] initWithBoard: _gameboard];
     int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
