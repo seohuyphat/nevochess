@@ -26,6 +26,7 @@
 - (void) _showListTableView:(NSString*)event;
 - (void) _dismissLoginView;
 - (void) _dismissListTableView;
+- (void) _resetAndClearTable;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event;
@@ -183,7 +184,6 @@
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
             [self displayEmptyBoard];
-            [self.view sendSubviewToBack:game_over_msg];
             break;
         case ACTION_INDEX_RESIGN:
             [_connection send_RESIGN:_tableId];
@@ -267,7 +267,7 @@
     if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
-        [self resetBoard];
+        [self _resetAndClearTable];
     }
     [_connection send_NEW:@"900/180/20"];
 }
@@ -290,7 +290,7 @@
     } else if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
-        [self resetBoard];
+        [self _resetAndClearTable];
     }
     [_connection send_JOIN:table.tableId color:joinColor];
 }
@@ -356,6 +356,13 @@
         [self.navigationController popToViewController:self animated:YES];
         self._tableListController = nil;
     }
+}
+
+- (void) _resetAndClearTable
+{
+    [self resetBoard];
+    _isGameOver = NO;
+    [self.view sendSubviewToBack:game_over_msg];
 }
 
 #pragma mark -
@@ -464,7 +471,7 @@
     TableInfo* table = [TableInfo allocTableFromString:event];
 
     if (_tableId && ![_tableId isEqualToString:table.tableId]) {
-        [self resetBoard];
+        [self _resetAndClearTable];
     }
     self._tableId = table.tableId;
 
@@ -571,9 +578,7 @@
     
     NSLog(@"%s: Table:[%@] - Game Reset.", __FUNCTION__, tableId);
     if ( [_tableId isEqualToString:tableId] ) {
-        [self resetBoard];
-        _isGameOver = NO;
-        [self.view sendSubviewToBack:game_over_msg];
+        [self _resetAndClearTable];
     }
 }
 
