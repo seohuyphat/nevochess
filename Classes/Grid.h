@@ -53,15 +53,16 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 @class GridCell;
 
 
-/** Abstract superclass of regular geometric grids of GridCells that Bits can be placed on. */
+/** Regular geometric grids of GridCells that Bits can be placed on.
+ *  (customized for Xiangqi).
+ */
 @interface Grid : CALayer
 {
-    unsigned _nRows, _nColumns;                         
-    CGSize _spacing;                                    
-    Class _cellClass;                                   
-    CGColorRef _cellColor, _lineColor;                  
-    BOOL _usesDiagonals, _allowsMoves, _allowsCaptures;
-    NSMutableArray *_cells;                             // Really a 2D array, in row-major order.
+    unsigned _nRows, _nColumns;
+    CGSize          _spacing;                                                                       
+    CGColorRef      _lineColor;
+    NSMutableArray* _cells; // Really a 2D array, in row-major order.
+    GridCell*       _river;
 }
 
 /** Initializes a new Grid with the given dimensions and cell size, and position in superview.
@@ -76,12 +77,10 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 - (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
               frame: (CGRect)frame;
 
-@property (nonatomic, retain) Class cellClass;                      // What kind of GridCells to create
 @property (readonly) unsigned rows, columns;    // Dimensions of the grid
 @property (readonly) CGSize spacing;            // x,y spacing of GridCells
-@property CGColorRef cellColor, lineColor;      // Cell background color, line color (or nil)
-@property BOOL usesDiagonals;                   // Affects GridCell.neighbors, for rect grids
-@property BOOL allowsMoves, allowsCaptures;     // Can pieces be moved, and can they land on others?
+@property CGColorRef lineColor;      // Cell background color, line color (or nil)
+@property (nonatomic, retain) GridCell* _river;
 
 /** Returns the GridCell at the given coordinates, or nil if there is no cell there.
     It's OK to call this with off-the-board coordinates; it will just return nil.*/
@@ -106,12 +105,13 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 @end
 
 
-/** Abstract superclass of a single cell in a grid. */
+/** A single cell in a grid (customized for Xiangqi). */
 @interface GridCell : BitHolder
 {
     Grid *_grid;
     unsigned _row, _column;
-    NSMutableArray *_neighbors;
+    BOOL dotted;
+    BOOL cross;
 }
 
 - (id) initWithGrid: (Grid*)grid 
@@ -120,59 +120,10 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 @property (nonatomic, retain) Grid* _grid;
 @property (nonatomic) unsigned _row, _column;
-@property (nonatomic, retain, getter=neighbors) NSMutableArray* _neighbors;        // Dependent on grid.usesDiagonals
-
-/** Returns YES if 'forward' is north (increasing row#) for the current player */
-@property (readonly) BOOL fwdIsN;
-
-/* Go-style group detection. Returns the set of contiguous GridCells that have pieces of the same
-   owner as this one, and optionally a count of the number of "liberties", or adjacent empty cells. */
-- (NSSet*) getGroup: (int*)outLiberties;
+@property (nonatomic) BOOL dotted;
+@property (nonatomic) BOOL cross;
+@property (readonly) GridCell *nw, *n, *ne, *e, *se, *s, *sw, *w; // Absolute directions (n = increasing row#)
 
 // protected:
-- (void) drawInParentContext: (CGContextRef)ctx fill: (BOOL)fill;
-@end
-
-
-
-/** A rectangular grid of squares. */
-@interface RectGrid : Grid
-{
-    CGColorRef _altCellColor;
-}
-
-/** If non-nil, alternate cells will be drawn with this background color, in a checkerboard pattern.
-    The precise rule is that cells whose row+column is odd use the altCellColor.*/
-@property  CGColorRef altCellColor;
-
-@end
-
-
-
-/* A square in a RectGrid */
-@interface Square : GridCell
-
-@property (readonly) Square *nw, *n, *ne, *e, *se, *s, *sw, *w;    // Absolute directions (n = increasing row#)
-@property (readonly) Square *fl, *f, *fr, *r, *br, *b, *bl, *l;    // Relative to player (upside-down for player 2)
-
-@end
-
-#pragma mark  XiangQi structure
-@interface XiangQiGrid : RectGrid
-{
-    Square *river;
-}
-
-@property (nonatomic, retain) Square *river;
-
-@end
-
-@interface XiangQiSquare : Square
-{
-    BOOL _dotted;
-    BOOL cross;
-}
-
-@property (nonatomic) BOOL _dotted;
-@property (nonatomic) BOOL cross;
+- (void) drawInParentContext: (CGContextRef)ctx;
 @end

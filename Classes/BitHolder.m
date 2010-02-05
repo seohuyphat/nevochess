@@ -82,20 +82,8 @@
 
 - (BOOL) isEmpty    {return self._bit==nil;}
 
-
-
-- (Bit*) canDragBit: (Bit*)bit
-{
-    if( bit.superlayer == self && ! bit.unfriendly )
-        return bit;
-    else
-        return nil;
-}
-
 - (void) cancelDragBit: (Bit*)bit                       { }
 - (void) draggedBit: (Bit*)bit to: (id<BitHolder>)dst   {self._bit = nil;}
-
-- (BOOL) canDropBit: (Bit*)bit atPoint: (CGPoint)point  {return YES;}
 - (void) willNotDropBit: (Bit*)bit                      { }
 
 - (BOOL) dropBit: (Bit*)bit atPoint: (CGPoint)point
