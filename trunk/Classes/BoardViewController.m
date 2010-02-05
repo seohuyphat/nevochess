@@ -655,6 +655,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) displayEmptyBoard
 {
     [self resetBoard];
+    [self.view sendSubviewToBack:game_over_msg];
     [self setRedLabel:@""];
     [self setBlackLabel:@""];
     if (!_game.blackAtTopSide )
