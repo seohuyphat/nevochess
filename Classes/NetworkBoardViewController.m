@@ -183,6 +183,7 @@
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
             [self displayEmptyBoard];
+            [self.view sendSubviewToBack:game_over_msg];
             break;
         case ACTION_INDEX_RESIGN:
             [_connection send_RESIGN:_tableId];
@@ -559,18 +560,8 @@
 
     if ( [_tableId isEqualToString:tableId] ) {
         _isGameOver = YES;
+        [self.view bringSubviewToFront:game_over_msg];
     }
-    
-    [_audioHelper play_wav_sound:@"WIN"];
-    NSString* msg = NSLocalizedString(@"Game Over", @"");
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
-                                                    message:msg
-                                                   delegate:self 
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"OK", nil];
-    alert.tag = POC_ALERT_END_GAME;
-    [alert show];
-    [alert release];
 }
 
 - (void) _handleNetworkEvent_RESET:(NSString*)event
@@ -579,8 +570,11 @@
     NSString* tableId = [components objectAtIndex:0];
     
     NSLog(@"%s: Table:[%@] - Game Reset.", __FUNCTION__, tableId);
-    [self resetBoard];
-    _isGameOver = NO;
+    if ( [_tableId isEqualToString:tableId] ) {
+        [self resetBoard];
+        _isGameOver = NO;
+        [self.view sendSubviewToBack:game_over_msg];
+    }
 }
 
 - (void) _handleNetworkEvent_E_JOIN:(NSString*)event

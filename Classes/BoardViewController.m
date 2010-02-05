@@ -147,6 +147,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @synthesize _timer;
 @synthesize _tableId;
 @synthesize _initialTime, _redTime, _blackTime;
+@synthesize game_over_msg;
 
 // -------- TEMP functions (to be reviewed and moved later ------------
 - (NSString*) _allocStringFrom:(int)seconds

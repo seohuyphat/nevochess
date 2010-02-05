@@ -68,6 +68,7 @@ enum ActionIndexEnum
     IBOutlet UIButton    *red_seat;
     IBOutlet UIButton    *black_seat;
     IBOutlet UIActivityIndicatorView *activity;
+    IBOutlet UILabel     *game_over_msg;
 
     NSTimer *_timer;
 
@@ -104,6 +105,7 @@ enum ActionIndexEnum
 @property (nonatomic, retain) IBOutlet UILabel *black_move_time;
 @property (nonatomic, retain) IBOutlet UIButton *red_seat;
 @property (nonatomic, retain) IBOutlet UIButton *black_seat;
+@property (nonatomic, retain) IBOutlet UILabel *game_over_msg;
 
 @property (nonatomic, retain) NSTimer* _timer;
 @property (nonatomic, retain) NSString* _tableId;
