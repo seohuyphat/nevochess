@@ -21,6 +21,7 @@
 
 @interface NetworkBoardViewController (PrivateMethods)
 
+- (void) _handleCommandLogout;
 - (void) _connectToNetwork;
 - (void) _showLoginView:(NSString*)errorStr;
 - (void) _showListTableView:(NSString*)event;
@@ -39,6 +40,7 @@
 - (void) _handleNetworkEvent_E_JOIN:(NSString*)event;
 - (void) _handleNetworkEvent_LEAVE:(NSString*)event;
 - (void) _handleNetworkEvent_UPDATE:(NSString*)event;
+- (void) _handleNetworkEvent_MSG:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -60,6 +62,7 @@
 @synthesize _connection;
 @synthesize _loginController;
 @synthesize _tableListController;
+@synthesize _messageListController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -75,6 +78,7 @@
         _logoutPending = NO;
         self._loginController = nil;
         self._tableListController = nil;
+        self._messageListController = nil;
 
         self._connection = nil;
         [self _connectToNetwork];
@@ -130,11 +134,29 @@
     self._blackId = nil;
     self._loginController = nil;
     self._tableListController = nil;
+    self._messageListController = nil;
     [super dealloc];
 }
 
 
 - (IBAction)homePressed:(id)sender
+{
+    NSString* state = nil;
+    if (!_tableId) {
+        state = @"";
+    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
+               && !_isGameOver ) {
+        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
+    } else {
+        state = @"view";
+    }
+    
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
+    [actionSheet showInView:self.view];
+    [actionSheet release];
+}
+
+- (void) _handleCommandLogout
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (_connection == nil) {
@@ -149,7 +171,6 @@
         self._connection = nil;
         [self goBackToHomeMenu];
     }
-
 
     // !!!!!!!!!!!!!!!!!!!
     // NOTE: Let the handler for the 'NSStreamEventEndEncountered' event
@@ -169,13 +190,18 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSLog(@"%s: ENTER. buttonIndex = [%d].", __FUNCTION__, buttonIndex);
-    if (!_tableId) {
-        NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
-        return;
-    }
 
     BoardActionSheet* boardActionSheet = (BoardActionSheet*)actionSheet;
     NSInteger buttonValue = [boardActionSheet valueOfClickedButtonAtIndex:buttonIndex];
+    
+    if (!_tableId) {
+        if (buttonValue == ACTION_INDEX_LOGOUT) {
+            [self _handleCommandLogout];
+        } else {
+            NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
+        }
+        return;
+    }
     
     switch (buttonValue)
     {
@@ -198,19 +224,14 @@
 
 - (IBAction)actionPressed:(id)sender
 {
-    NSString* state = nil;
-    if (!_tableId) {
-        state = @"";
-    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
-               && !_isGameOver ) {
-        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
-    } else {
-        state = @"view";
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    if (_messageListController == nil) {
+        NSLog(@"%s: Creating new Message-List view...", __FUNCTION__);
+        self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
+        _messageListController.delegate = self;
     }
-    
-    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
-    [actionSheet showInView:self.view];
-    [actionSheet release];
+    [self.navigationController pushViewController:_messageListController animated:YES];
+    self.navigationController.navigationBarHidden = NO;
 }
 
 - (void) onLocalMoveMade:(int)move
@@ -293,6 +314,16 @@
         [self _resetAndClearTable];
     }
     [_connection send_JOIN:table.tableId color:joinColor];
+}
+
+- (void) handeNewMessageFromList
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    MessageInfo* message = [MessageInfo new];
+    message.sender = @"Myself";
+    message.msg = @"TODO: A message from me";
+    [_messageListController addNewMessage:message];
+    [message release];
 }
 
 - (void) _connectToNetwork
@@ -413,6 +444,8 @@
                     [self _handleNetworkEvent_LEAVE:content];
                 } else if ([op isEqualToString:@"UPDATE"]) {
                     [self _handleNetworkEvent_UPDATE:content];
+                } else if ([op isEqualToString:@"MSG"]) {
+                    [self _handleNetworkEvent_MSG:content];
                 }
             }
 
@@ -652,6 +685,21 @@
     [self setInitialTime:itimes];
     [self setRedTime:itimes];
     [self setBlackTime:itimes];
+}
+
+- (void) _handleNetworkEvent_MSG:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* pid = [components objectAtIndex:0];
+    NSString* msg = [components objectAtIndex:1];
+
+    NSLog(@"%s: [%@] sent MSG [%@].", __FUNCTION__, pid, msg);
+
+    MessageInfo* message = [MessageInfo new];
+    message.sender = pid;
+    message.msg = msg;
+    [_messageListController addNewMessage:message];
+    [message release];
 }
 
 #pragma mark -

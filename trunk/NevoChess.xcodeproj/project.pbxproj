@@ -71,6 +71,8 @@
 		AFA63FEF106FAC8F00D7B220 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA63FEE106FAC8F00D7B220 /* board_320x480.png */; };
 		AFB08A14106A663E00038488 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFB08A12106A663E00038488 /* Localizable.strings */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
+		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
+		AFF191D7111D118000849AEA /* MessageListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFF191D6111D118000849AEA /* MessageListView.xib */; };
 		DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DE3A5C1111033D12006D3CD3 /* DataManager.m */; };
 		DE964FCD1082511E00980CF6 /* GenericSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */; };
 		DE964FCE1082511E00980CF6 /* OptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCC1082511E00980CF6 /* OptionsView.xib */; };
@@ -175,6 +177,9 @@
 		AFB08A13106A663E00038488 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; wrapsLines = 1; };
 		AFB08A15106A665300038488 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
+		AFF191C6111D0E2900849AEA /* MessageListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageListViewController.m; sourceTree = "<group>"; };
+		AFF191D6111D118000849AEA /* MessageListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MessageListView.xib; sourceTree = "<group>"; };
 		AFF89D0F106FEF2B00E2136D /* Enums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enums.h; sourceTree = "<group>"; };
 		DE3A5C1011033D12006D3CD3 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
 		DE3A5C1111033D12006D3CD3 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
@@ -231,6 +236,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				AFF191D6111D118000849AEA /* MessageListView.xib */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -297,6 +303,8 @@
 				AF534CAE1111435400067844 /* LoginViewController.m */,
 				AF19B6861112069600CB9D76 /* TableListViewController.h */,
 				AF19B6871112069600CB9D76 /* TableListViewController.m */,
+				AFF191C5111D0E2900849AEA /* MessageListViewController.h */,
+				AFF191C6111D0E2900849AEA /* MessageListViewController.m */,
 				AF28B5DA1111D1CC00B3EAD8 /* NetworkConnection.h */,
 				AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */,
 				4BE40D93106B5AFB006154CC /* OptionsViewController.h */,
@@ -484,6 +492,7 @@
 				AFF0CF2C10879DC800C81662 /* Default.png in Resources */,
 				AF534CB81111440F00067844 /* LoginView.xib in Resources */,
 				AF112F911115FAAF004C1452 /* TableListView.xib in Resources */,
+				AFF191D7111D118000849AEA /* MessageListView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,6 +553,7 @@
 				AF534CAF1111435400067844 /* LoginViewController.m in Sources */,
 				AF28B5DC1111D1CC00B3EAD8 /* NetworkConnection.m in Sources */,
 				AF19B6881112069600CB9D76 /* TableListViewController.m in Sources */,
+				AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

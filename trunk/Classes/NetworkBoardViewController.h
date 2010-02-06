@@ -21,9 +21,11 @@
 #import "BoardViewController.h"
 #import "LoginViewController.h"
 #import "TableListViewController.h"
+#import "MessageListViewController.h"
 #import "NetworkConnection.h"
 
-@interface NetworkBoardViewController : BoardViewController <LoginDelegate, TableListDelegate, NetworkHandler, UIActionSheetDelegate>
+@interface NetworkBoardViewController : BoardViewController <LoginDelegate,
+    TableListDelegate, MessageListDelegate, NetworkHandler, UIActionSheetDelegate>
 {
     NSString*          _username;
     NSString*          _password;
@@ -39,6 +41,7 @@
     BOOL               _logoutPending;
     LoginViewController*     _loginController;
     TableListViewController* _tableListController;
+    MessageListViewController* _messageListController;
 }
 
 @property (nonatomic, retain) NSString* _username;
@@ -48,6 +51,7 @@
 @property (nonatomic, retain) NetworkConnection* _connection;
 @property (nonatomic, retain) LoginViewController* _loginController;
 @property (nonatomic, retain) TableListViewController* _tableListController;
+@property (nonatomic, retain) MessageListViewController* _messageListController;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;

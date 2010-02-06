@@ -73,6 +73,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         closeIndex = -1;
         resignIndex = 0;
         drawIndex = 1;
+        logoutIndex = -1;
         cancelIndex = 2;
         self = [super initWithTitle:nil delegate:delegate
                   cancelButtonTitle:@"Cancel"
@@ -83,6 +84,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         closeIndex = 0;
         resignIndex = -1;
         drawIndex = -1;
+        logoutIndex = -1;
         cancelIndex = 1;
         self = [super initWithTitle:nil delegate:delegate
                   cancelButtonTitle:@"Cancel"
@@ -93,10 +95,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         closeIndex = -1;
         resignIndex = -1;
         drawIndex = -1;
-        cancelIndex = 0;
+        logoutIndex = 0;
+        cancelIndex = 1;
         self = [super initWithTitle:nil delegate:delegate
                   cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:nil
+             destructiveButtonTitle:@"Logout"
                   otherButtonTitles:nil];
     }
 
@@ -109,6 +112,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     if (buttonIndex == closeIndex) { return ACTION_INDEX_CLOSE; }
     if (buttonIndex == resignIndex) { return ACTION_INDEX_RESIGN; }
     if (buttonIndex == drawIndex) { return ACTION_INDEX_DRAW; }
+    if (buttonIndex == logoutIndex) { return ACTION_INDEX_LOGOUT; }
     return ACTION_INDEX_CANCEL;
 }
 
