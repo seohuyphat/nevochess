@@ -43,6 +43,7 @@
 //------------------------------------------------
 @implementation MessageListViewController
 
+@synthesize tableId, nNew;
 @synthesize addButton;
 @synthesize listView;
 @synthesize delegate;
@@ -52,10 +53,13 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        self.tableId = nil;
+        nNew = 0;
         _messages = [[NSMutableArray alloc] init];
         self._dateFormatter = [[NSDateFormatter alloc] init];
         [_dateFormatter setDateStyle:NSDateFormatterShortStyle];
         [_dateFormatter setTimeStyle:kCFDateFormatterMediumStyle];
+        _inputController = nil;
     }
     return self;
 }
@@ -72,16 +76,23 @@
     self.navigationItem.rightBarButtonItem = addButton;
 }
 
+- (void)viewDidAppear:(BOOL)animated 
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    nNew = 0;
+}
+
+- (void) setTableId:(NSString *)id
+{
+    tableId = id;
+    self.navigationItem.rightBarButtonItem = (tableId ? addButton : nil);
+}
+
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
 	
 	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload {
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
 }
 
 #pragma mark Table view methods
@@ -96,7 +107,6 @@
     NSLog(@"%s: ENTER. section = [%d]", __FUNCTION__, section);
     return [_messages count];
 }
-
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -127,20 +137,37 @@
 
 - (void)dealloc
 {
+    [tableId release];
     self.addButton = nil;
     self.listView = nil;
     [_messages release];
     [delegate release];
     [_dateFormatter release];
+    [_inputController release];
     [super dealloc];
 }
 
-- (void) addNewMessage:(MessageInfo*)message
+- (void) newMessage:(NSString*)msg from:(NSString*)pid
 {
+    MessageInfo* message = [MessageInfo new];
+    message.sender = pid;
+    message.msg = msg;
     [_messages addObject:message];
+    [message release];
     [self.listView reloadData];
     [self.listView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:([_messages count]-1) inSection:0]
                          atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if (self != [self.navigationController topViewController]) {
+        ++nNew;
+    }
+}
+
+- (void) handleItemInput:(NSString *)button input:(NSString*)input
+{
+    [self dismissModalViewControllerAnimated:YES];
+    if (button) {
+        [delegate handeNewMessageFromList:input];
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,7 +181,13 @@
 
 - (void) _addNewMessage
 {
-    [delegate handeNewMessageFromList];
+    if (_inputController == nil) {
+        _inputController = [[ItemInputViewController alloc] initWithNibName:@"ItemInputView" bundle:nil];
+        _inputController.delegate = self;
+    }
+    UINavigationController* navigationController = [[UINavigationController alloc] initWithRootViewController:_inputController];
+    [[self navigationController] presentModalViewController:navigationController animated:YES];
+    [navigationController release];
 }
 
 @end

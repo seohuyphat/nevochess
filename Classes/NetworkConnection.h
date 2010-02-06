@@ -75,5 +75,6 @@ typedef enum
 - (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr;
 - (void) send_RESIGN:(NSString*)tableId;
 - (void) send_DRAW:(NSString*)tableId;
+- (void) send_MSG:(NSString*)tableId msg:(NSString*)msg;
 
 @end

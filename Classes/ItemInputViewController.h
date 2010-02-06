@@ -18,50 +18,24 @@
  ***************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import "ItemInputViewController.h"
+
 
 // --------------------------------------
-@interface MessageInfo : NSObject
-{
-    NSString* sender;
-    NSString* msg;
-    NSDate* time;
-}
-
-@property (nonatomic, retain) NSString* sender;
-@property (nonatomic, retain) NSString* msg;
-@property (nonatomic, retain) NSDate* time;
-
+@protocol ItemInputDelegate <NSObject>
+// button == nil on Cancel
+- (void) handleItemInput:(NSString *)button input:(NSString*)input;
 @end
 
 // --------------------------------------
-@protocol MessageListDelegate <NSObject>
-- (void) handeNewMessageFromList:(NSString*)msg;
-@end
-
-// --------------------------------------
-@interface MessageListViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, ItemInputDelegate>
+@interface ItemInputViewController : UIViewController
 {
-    NSString*             tableId;
-    int                   nNew; // The number of new messages
-
-    UIBarButtonItem*      addButton;
-    IBOutlet UITableView* listView;
-
-    NSMutableArray* _messages;
-    id <MessageListDelegate> delegate;
-    
-    NSDateFormatter* _dateFormatter;
-    ItemInputViewController* _inputController;
+    IBOutlet UITextField* textField;
+    id <ItemInputDelegate> delegate;
 }
 
-@property (nonatomic, retain) NSString* tableId;
-@property (readonly) int nNew;
-@property (nonatomic, retain) IBOutlet UIBarButtonItem* addButton;
-@property (nonatomic, retain) IBOutlet UITableView* listView;
-@property (nonatomic, retain) id <MessageListDelegate> delegate;
-@property (nonatomic, retain) NSDateFormatter* _dateFormatter;
+@property (nonatomic, retain) id <ItemInputDelegate> delegate;
 
-- (void) newMessage:(NSString*)msg from:(NSString*)pid;
+- (IBAction)enterButtonPressed:(id)sender;
+- (IBAction)cancelButtonPressed:(id)sender;
 
 @end

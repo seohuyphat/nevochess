@@ -42,6 +42,7 @@
     LoginViewController*     _loginController;
     TableListViewController* _tableListController;
     MessageListViewController* _messageListController;
+    UIBarButtonItem* _messagesButton;
 }
 
 @property (nonatomic, retain) NSString* _username;

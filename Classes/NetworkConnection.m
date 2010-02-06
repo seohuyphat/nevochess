@@ -144,6 +144,13 @@
     [self _flushOutgoingData];
 }
 
+- (void) send_MSG:(NSString*)tableId msg:(NSString*)msg
+{
+    NSString* outStr = [NSString stringWithFormat:@"op=MSG&pid=%@&tid=%@&msg=%@\n", _username, tableId, msg];
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
+    [self _flushOutgoingData];
+}
+
 - (void) _openIOStreams
 {
     const NSString *urlStr = @"games.playxiangqi.com";
