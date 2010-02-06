@@ -40,6 +40,7 @@ enum ActionIndexEnum
     ACTION_INDEX_CLOSE,
     ACTION_INDEX_RESIGN,
     ACTION_INDEX_DRAW,
+    ACTION_INDEX_LOGOUT,
     ACTION_INDEX_CANCEL
 };
 
@@ -48,6 +49,7 @@ enum ActionIndexEnum
     int closeIndex;  // Close the current table.
     int resignIndex;
     int drawIndex;
+    int logoutIndex;
     int cancelIndex;
 }
 - (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate;
