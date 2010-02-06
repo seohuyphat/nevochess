@@ -28,6 +28,7 @@
 - (void) _dismissLoginView;
 - (void) _dismissListTableView;
 - (void) _resetAndClearTable;
+- (void) _onNewMessage:(NSString*)msg from:(NSString*)pid;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event;
@@ -41,6 +42,8 @@
 - (void) _handleNetworkEvent_LEAVE:(NSString*)event;
 - (void) _handleNetworkEvent_UPDATE:(NSString*)event;
 - (void) _handleNetworkEvent_MSG:(NSString*)event;
+- (void) _handleNetworkEvent_DRAW:(NSString*)event;
+- (void) _handleNetworkEvent_INVITE:(NSString*)event toTable:(NSString*)tableId;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -78,7 +81,9 @@
         _logoutPending = NO;
         self._loginController = nil;
         self._tableListController = nil;
-        self._messageListController = nil;
+
+        self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
+        _messageListController.delegate = self;
 
         self._connection = nil;
         [self _connectToNetwork];
@@ -102,6 +107,9 @@
     [newItems replaceObjectAtIndex:1 withObject:newButton];
     [newButton release];
     nav_toolbar.items = newItems;
+
+    _messagesButton = (UIBarButtonItem*) [items objectAtIndex:([items count]-1)];
+    _messagesButton.enabled = NO;
 } 
 
 - (void)viewWillAppear:(BOOL)animated
@@ -111,6 +119,8 @@
 
     NSLog(@"%s: Hide the navigation-bar.", __FUNCTION__);
     self.navigationController.navigationBarHidden = YES;
+
+    _messagesButton.title = @"0";
 }
 
 - (void)viewDidAppear:(BOOL)animated 
@@ -224,14 +234,9 @@
 
 - (IBAction)actionPressed:(id)sender
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    if (_messageListController == nil) {
-        NSLog(@"%s: Creating new Message-List view...", __FUNCTION__);
-        self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
-        _messageListController.delegate = self;
-    }
     [self.navigationController pushViewController:_messageListController animated:YES];
     self.navigationController.navigationBarHidden = NO;
+    [_messageListController setTableId:_tableId];
 }
 
 - (void) onLocalMoveMade:(int)move
@@ -316,14 +321,14 @@
     [_connection send_JOIN:table.tableId color:joinColor];
 }
 
-- (void) handeNewMessageFromList
+- (void) handeNewMessageFromList:(NSString*)msg
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    MessageInfo* message = [MessageInfo new];
-    message.sender = @"Myself";
-    message.msg = @"TODO: A message from me";
-    [_messageListController addNewMessage:message];
-    [message release];
+    if (!_username || !_tableId) {
+        NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
+        return;
+    }
+    [self _onNewMessage:msg from:_username];
+    [_connection send_MSG:_tableId msg:msg];
 }
 
 - (void) _connectToNetwork
@@ -399,6 +404,12 @@
     [game_over_msg setHidden:YES];
 }
 
+- (void) _onNewMessage:(NSString*)msg from:(NSString*)pid
+{
+    [_messageListController newMessage:msg from:pid];
+    _messagesButton.title = [NSString stringWithFormat:@"%d", _messageListController.nNew];
+}
+
 #pragma mark -
 #pragma mark Network-event handers
 
@@ -418,6 +429,7 @@
             NSString* op = [newEvent objectForKey:@"op"];
             int code = [[newEvent objectForKey:@"code"] integerValue];
             NSString* content = [newEvent objectForKey:@"content"];
+            NSString* tableId = [newEvent objectForKey:@"tid"];
 
             if ([op isEqualToString:@"LOGIN"]) {
                 [self _handleNetworkEvent_LOGIN:code withContent:content];
@@ -446,6 +458,10 @@
                     [self _handleNetworkEvent_UPDATE:content];
                 } else if ([op isEqualToString:@"MSG"]) {
                     [self _handleNetworkEvent_MSG:content];
+                } else if ([op isEqualToString:@"DRAW"]) {
+                    [self _handleNetworkEvent_DRAW:content];
+                } else if ([op isEqualToString:@"INVITE"]) {
+                    [self _handleNetworkEvent_INVITE:content toTable:tableId];
                 }
             }
 
@@ -494,6 +510,8 @@
     }
     _loginAuthenticated = YES;
     [self _dismissLoginView];
+
+    _messagesButton.enabled = YES;
 }
 
 - (void) _handleNetworkEvent_LIST:(NSString*)event
@@ -694,12 +712,32 @@
     NSString* msg = [components objectAtIndex:1];
 
     NSLog(@"%s: [%@] sent MSG [%@].", __FUNCTION__, pid, msg);
+    [self _onNewMessage:msg from:pid];
+}
 
-    MessageInfo* message = [MessageInfo new];
-    message.sender = pid;
-    message.msg = msg;
-    [_messageListController addNewMessage:message];
-    [message release];
+- (void) _handleNetworkEvent_DRAW:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* pid = [components objectAtIndex:1];
+    
+    NSLog(@"%s: [%@] sent DRAW at table [%@].", __FUNCTION__, pid, tableId);
+
+    NSString* msg = @"Requesting a DRAW";
+    [self _onNewMessage:msg from:pid];
+}
+
+- (void) _handleNetworkEvent_INVITE:(NSString*)event toTable:(NSString*)tableId
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* pid = [components objectAtIndex:0];
+    NSString* rating = [components objectAtIndex:1];
+
+    NSString* playerInfo = [NSString stringWithFormat:@"%@ (%@)", pid, rating];
+    NSLog(@"%s: [%@] sent INVITE to [%@].", __FUNCTION__, playerInfo, tableId);
+
+    NSString* msg = [NSString stringWithFormat:@"*INVITE to Table [%@]", tableId ? tableId : @""];
+    [self _onNewMessage:msg from:playerInfo];
 }
 
 #pragma mark -
