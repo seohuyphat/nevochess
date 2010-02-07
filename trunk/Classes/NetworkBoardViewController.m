@@ -99,12 +99,12 @@
 
     // Replace the image of "addButton" with Search image.
     NSArray* items = nav_toolbar.items;
-    UIBarButtonItem* addButton = (UIBarButtonItem*) [items objectAtIndex:1];
+    UIBarButtonItem* addButton = (UIBarButtonItem*) [items objectAtIndex:2];
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:items];
     UIBarButtonItem* newButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch 
                                                                                target:addButton.target action:addButton.action];
-    newButton.style = UIBarButtonItemStyleBordered;
-    [newItems replaceObjectAtIndex:1 withObject:newButton];
+    newButton.style = UIBarButtonItemStylePlain;
+    [newItems replaceObjectAtIndex:2 withObject:newButton];
     [newButton release];
     nav_toolbar.items = newItems;
 
@@ -151,16 +151,7 @@
 
 - (IBAction)homePressed:(id)sender
 {
-    NSString* state = nil;
-    if (!_tableId) {
-        state = @"";
-    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
-               && !_isGameOver ) {
-        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
-    } else {
-        state = @"view";
-    }
-    
+    NSString* state = @"logout";
     BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
     [actionSheet showInView:self.view];
     [actionSheet release];
@@ -188,6 +179,7 @@
     // !!!!!!!!!!!!!!!!!!!
 }
 
+// 'Reset' is now a LIST command.
 - (IBAction)resetPressed:(id)sender
 {
     if (!_loginAuthenticated) {
@@ -203,16 +195,16 @@
 
     BoardActionSheet* boardActionSheet = (BoardActionSheet*)actionSheet;
     NSInteger buttonValue = [boardActionSheet valueOfClickedButtonAtIndex:buttonIndex];
-    
-    if (!_tableId) {
-        if (buttonValue == ACTION_INDEX_LOGOUT) {
-            [self _handleCommandLogout];
-        } else {
-            NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
-        }
+
+    if (buttonValue == ACTION_INDEX_LOGOUT) {
+        [self _handleCommandLogout];
         return;
     }
-    
+    if (!_tableId) {
+        NSLog(@"%s: No current table. Do nothing.", __FUNCTION__);
+        return;
+    }
+
     switch (buttonValue)
     {
         case ACTION_INDEX_CLOSE:
@@ -233,6 +225,23 @@
 }
 
 - (IBAction)actionPressed:(id)sender
+{
+    NSString* state = nil;
+    if (!_tableId) {
+        state = @"";
+    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
+               && !_isGameOver ) {
+        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
+    } else {
+        state = @"view";
+    }
+    
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
+    [actionSheet showInView:self.view];
+    [actionSheet release];
+}
+
+- (IBAction)messagesPressed:(id)sender
 {
     [self.navigationController pushViewController:_messageListController animated:YES];
     self.navigationController.navigationBarHidden = NO;
