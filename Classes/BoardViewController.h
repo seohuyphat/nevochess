@@ -72,6 +72,10 @@ enum ActionIndexEnum
     IBOutlet UIActivityIndicatorView *activity;
     IBOutlet UILabel     *game_over_msg;
 
+    IBOutlet UIButton    *preview_prev;
+    IBOutlet UIButton    *preview_next;
+    NSDate*              _previewLastTouched;
+    
     NSTimer *_timer;
 
     AudioHelper *_audioHelper;
@@ -114,12 +118,14 @@ enum ActionIndexEnum
 @property (nonatomic, retain) TimeInfo* _initialTime;
 @property (nonatomic, retain) TimeInfo* _redTime;
 @property (nonatomic, retain) TimeInfo* _blackTime;
+@property (nonatomic, retain) NSDate* _previewLastTouched;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
 - (IBAction)actionPressed:(id)sender;
+- (IBAction)messagesPressed:(id)sender;
 
 - (void) onLocalMoveMade:(int)move;
 

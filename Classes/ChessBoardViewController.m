@@ -126,6 +126,8 @@
     NSArray *items = nav_toolbar.items;    
     NSMutableArray *newItems = [NSMutableArray arrayWithArray:items];
     [newItems removeLastObject];
+    [newItems removeLastObject];
+    [newItems removeLastObject];
     nav_toolbar.items = newItems;
     
     // Robot

@@ -91,7 +91,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
              destructiveButtonTitle:@"Close Table"
                   otherButtonTitles:nil];
     }
-    else {
+    else if ([state isEqualToString:@"logout"]) {
         closeIndex = -1;
         resignIndex = -1;
         drawIndex = -1;
@@ -100,6 +100,17 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         self = [super initWithTitle:nil delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:@"Logout"
+                  otherButtonTitles:nil];
+    }
+    else {
+        closeIndex = -1;
+        resignIndex = -1;
+        drawIndex = -1;
+        logoutIndex = -1;
+        cancelIndex = 0;
+        self = [super initWithTitle:nil delegate:delegate
+                  cancelButtonTitle:@"Cancel"
+             destructiveButtonTitle:nil
                   otherButtonTitles:nil];
     }
 
@@ -152,6 +163,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @synthesize _tableId;
 @synthesize _initialTime, _redTime, _blackTime;
 @synthesize game_over_msg;
+@synthesize _previewLastTouched;
 
 // -------- TEMP functions (to be reviewed and moved later ------------
 - (NSString*) _allocStringFrom:(int)seconds
@@ -212,6 +224,13 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void)_ticked:(NSTimer*)timer
 {
+    NSTimeInterval timeInterval = - [_previewLastTouched timeIntervalSinceNow]; // in seconds.
+    //NSLog(@"%s: ... timeInterval = [%f].", __FUNCTION__, timeInterval);
+    if (!_inReview && timeInterval > 5) { // hide if older than 5 seconds?
+        preview_prev.hidden = YES;
+        preview_next.hidden = YES;
+    }
+
     // NOTE: On networked games, at least one Move made by EACH player before
     //       the timer is started. However, it is more user-friendly for
     //       this App (with AI only) to start the timer right after one Move
@@ -249,6 +268,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     red_label.text = @"";
     black_label.text = @"";
 
+    preview_prev.hidden = YES;
+    preview_next.hidden = YES;
+    self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
+    NSLog(@"%s: _previewLastTouched = [%@].", __FUNCTION__, _previewLastTouched);
+
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
@@ -273,6 +297,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [game_over_msg release];
     [red_seat release];
     [black_seat release];
+    [preview_prev release];
+    [preview_next release];
+    [_previewLastTouched release];
     [_timer release];
     [_audioHelper release];
     [_game release];
@@ -299,6 +326,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (IBAction)movePrevPressed:(id)sender
 {
+    self._previewLastTouched = [NSDate date];
+
     if (_nthMove < 1) {  // No Move made yet?
         return;
     }
@@ -331,6 +360,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (IBAction)moveNextPressed:(id)sender
 {
+    self._previewLastTouched = [NSDate date];
+
     BOOL bNext = NO; // One "Next" click was serviced.
     // This variable is introduced to enforce the rule:
     // "Only one Move is replayed PER click".
@@ -372,22 +403,39 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     NSLog(@"%s: ENTER.", __FUNCTION__);
 }
 
+- (IBAction)messagesPressed:(id)sender
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+}
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if ( [[event allTouches] count] != 1 // Valid for single touch only
-        ||  _inReview    // Do nothing if we are in the middle of Move-Review.
+    if ( [[event allTouches] count] != 1 ) { // Valid for single touch only
+        return;
+    }
+
+    UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    CGPoint p = [touch locationInView:self.view];
+    NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
+
+    BoardView *view = (BoardView*) self.view;
+    Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+
+    if (!piece && p.y > 382) {
+        preview_prev.hidden = NO;
+        preview_next.hidden = NO;
+        self._previewLastTouched = [NSDate date]; // now.
+    }
+
+    if (    _inReview           // Do nothing if in the middle of Move-Review.
         || ![self isMyTurnNext] // Ignore when it is not my turn.
         || ![self isGameReady] )
     { 
         return;
     }
 
-    BoardView *view = (BoardView*) self.view;
     GridCell *holder = nil;
-    
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint p = [touch locationInView:self.view];
-    Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+
     if(piece) {
         // Generate moves for the selected piece.
         holder = (GridCell*)piece.holder;
