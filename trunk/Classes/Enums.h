@@ -34,6 +34,8 @@
 #define POC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
 #define POC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
 
+#define NC_GUEST_PREFIX           @"Guest#"
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    Common Enums

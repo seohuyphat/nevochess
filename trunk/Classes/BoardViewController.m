@@ -81,6 +81,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 @implementation BoardActionSheet
 
 - (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
+                   title:(NSString*)title
 {
     if ([state isEqualToString:@"play"]) {
         closeIndex = -1;
@@ -88,7 +89,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         drawIndex = 1;
         logoutIndex = -1;
         cancelIndex = 2;
-        self = [super initWithTitle:nil delegate:delegate
+        self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:@"Resign"
                   otherButtonTitles:@"Draw", nil];
@@ -99,7 +100,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         drawIndex = -1;
         logoutIndex = -1;
         cancelIndex = 1;
-        self = [super initWithTitle:nil delegate:delegate
+        self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:@"Close Table"
                   otherButtonTitles:nil];
@@ -110,7 +111,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         drawIndex = -1;
         logoutIndex = 0;
         cancelIndex = 1;
-        self = [super initWithTitle:nil delegate:delegate
+        self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:@"Logout"
                   otherButtonTitles:nil];
@@ -121,7 +122,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         drawIndex = -1;
         logoutIndex = -1;
         cancelIndex = 0;
-        self = [super initWithTitle:nil delegate:delegate
+        self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:nil
                   otherButtonTitles:nil];

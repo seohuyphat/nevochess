@@ -58,8 +58,7 @@
 
 @implementation NetworkBoardViewController
 
-@synthesize _username;
-@synthesize _password;
+@synthesize _username, _password, _rating;
 @synthesize _redId;
 @synthesize _blackId;
 @synthesize _connection;
@@ -73,6 +72,7 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self._username = nil;
         self._password = nil;
+        self._rating = nil;
         self._redId = nil;
         self._blackId = nil;
         _isGameOver = NO;
@@ -137,11 +137,12 @@
 
 - (void)dealloc
 {
-    self._username = nil;
-    self._password = nil;
+    [_username release];
+    [_password release];
+    [_rating release];
     self._connection = nil;
-    self._redId = nil;
-    self._blackId = nil;
+    [_redId release];
+    [_blackId release];
     self._loginController = nil;
     self._tableListController = nil;
     self._messageListController = nil;
@@ -151,8 +152,12 @@
 
 - (IBAction)homePressed:(id)sender
 {
+    NSString* title = nil;
+    if (_username) {
+        title = [NSString stringWithFormat:@"%@ (%@)", _username, _rating];
+    }
     NSString* state = @"logout";
-    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self title:title];
     [actionSheet showInView:self.view];
     [actionSheet release];
 }
@@ -236,7 +241,7 @@
         state = @"view";
     }
     
-    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self];
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self title:nil];
     [actionSheet showInView:self.view];
     [actionSheet release];
 }
@@ -356,10 +361,12 @@
 - (void) _showLoginView:(NSString*)errorStr
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    BOOL bFirstDisplayed = NO;
     if (self._loginController == nil) {
         NSLog(@"%s: Creating new Login view...", __FUNCTION__);
         self._loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
         _loginController.delegate = self;
+        bFirstDisplayed = YES;
     }
     [_loginController setErrorString:errorStr];
 
@@ -367,6 +374,16 @@
     if (topController != _loginController) {
         [self.navigationController pushViewController:_loginController animated:YES];
         self.navigationController.navigationBarHidden = NO;
+    }
+
+    // Load the existing Login info, if available, the 1st time.
+    if (bFirstDisplayed) {
+        NSString* username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
+        if (username && [username length]) {
+            NSString* password = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
+            NSLog(@"%s: Load existing LOGIN [%@, %@].", __FUNCTION__, username, password);
+            [_loginController setInitialLogin:username password:password];
+        }
     }
 }
 
@@ -511,16 +528,31 @@
 
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     if (code != 0) {  // Error
         NSLog(@"%s: Login failed. Error: [%@].", __FUNCTION__, event);
         [self _showLoginView:event];
         return;
     }
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* pid = [components objectAtIndex:0];
+    NSString* rating = [components objectAtIndex:1];
+    NSLog(@"%s: [%@ %@] LOGIN.", __FUNCTION__, pid, rating);
+
+    if (![_username isEqualToString:pid]) { // not mine?
+        return; // Other users' login. Ignore for now.
+    }
+
+    self._rating = rating;  // Save my Rating.
     _loginAuthenticated = YES;
     [self _dismissLoginView];
 
     _messagesButton.enabled = YES;
+
+    // Save the Login info after a successful login.
+    if (![_username hasPrefix:NC_GUEST_PREFIX]) { // A normal account?
+        [[NSUserDefaults standardUserDefaults] setObject:_username forKey:@"network_username"];
+        [[NSUserDefaults standardUserDefaults] setObject:_password forKey:@"network_password"];
+    }
 }
 
 - (void) _handleNetworkEvent_LIST:(NSString*)event
@@ -754,11 +786,10 @@
 
 - (NSString*) _generateGuestUserName
 {
-    const const char* GUEST_PREFIX  = "Guest#";
     const unsigned int MAX_GUEST_ID = 10000;
 
     const int randNum = [self _generateRandomNumber:MAX_GUEST_ID];
-    NSString* sGuestId = [NSString stringWithFormat:@"%sip%d", GUEST_PREFIX, randNum];
+    NSString* sGuestId = [NSString stringWithFormat:@"%@ip%d", NC_GUEST_PREFIX, randNum];
     return sGuestId;
 }
 

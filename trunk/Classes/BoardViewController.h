@@ -52,7 +52,8 @@ enum ActionIndexEnum
     int logoutIndex;
     int cancelIndex;
 }
-- (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate;
+- (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
+                   title:(NSString*)title;
 - (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex;
 @end
 

@@ -29,6 +29,7 @@
 {
     NSString*          _username;
     NSString*          _password;
+    NSString*          _rating;
     NetworkConnection* _connection;
 
     NSString*          _redId; // TODO: We should use the 'players' in Game class.
@@ -47,6 +48,7 @@
 
 @property (nonatomic, retain) NSString* _username;
 @property (nonatomic, retain) NSString* _password;
+@property (nonatomic, retain) NSString* _rating;
 @property (nonatomic, retain) NSString* _redId;
 @property (nonatomic, retain) NSString* _blackId;
 @property (nonatomic, retain) NetworkConnection* _connection;
