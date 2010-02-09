@@ -231,17 +231,21 @@
 
 - (IBAction)actionPressed:(id)sender
 {
-    NSString* state = nil;
-    if (!_tableId) {
-        state = @"";
-    } else if ( (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
-               && !_isGameOver ) {
-        state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
-    } else {
-        state = @"view";
+    NSString* state = @"";
+    NSString* title = nil;
+
+    if (_tableId)
+    {
+        title = [NSString stringWithFormat:@"Table #%@", _tableId];
+        if ((_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
+            && !_isGameOver ) {
+            state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
+        } else {
+            state = @"view";
+        }
     }
-    
-    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self title:nil];
+
+    BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self title:title];
     [actionSheet showInView:self.view];
     [actionSheet release];
 }
@@ -403,6 +407,10 @@
         [self.navigationController pushViewController:_tableListController animated:YES];
         self.navigationController.navigationBarHidden = NO;
     }
+
+    _tableListController.viewOnly =
+        ( _tableId
+         && ([_username isEqualToString:_redId] || [_username isEqualToString:_blackId]));
 }
 
 - (void) _dismissLoginView

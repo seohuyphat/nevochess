@@ -77,11 +77,13 @@
 
     NSMutableArray* _tables;
     id <TableListDelegate> delegate;
+    BOOL                  _viewOnly;
 }
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem* addButton;
 @property (nonatomic, retain) IBOutlet UITableView* listView;
 @property (nonatomic, retain) id <TableListDelegate> delegate;
+@property (nonatomic)         BOOL viewOnly;
 
 - (IBAction) refreshButtonPressed:(id)sender;
 

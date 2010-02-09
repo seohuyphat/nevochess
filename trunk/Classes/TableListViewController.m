@@ -91,7 +91,7 @@
 @synthesize addButton;
 @synthesize listView;
 @synthesize delegate;
-
+@synthesize viewOnly=_viewOnly;
 
 - (id)initWithList:(NSString *)tablesStr
 {
@@ -119,8 +119,13 @@
     // Create the Add button.
     self.addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                               target:self action:@selector(_addNewTable)];
-    //addButton.enabled = NO;
     self.navigationItem.rightBarButtonItem = addButton;
+}
+
+- (void) setViewOnly:(BOOL)value
+{
+    _viewOnly = value;
+    addButton.enabled = !_viewOnly;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -177,7 +182,8 @@
                          : [NSString stringWithFormat:@"%@(%@)", table.blackId, table.blackRating]); 
     cell.textLabel.text = [NSString stringWithFormat:@"#%@: %@ vs. %@", table.tableId, redInfo, blackInfo];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"%@  %@", table.rated ? @"Rated" : @"Nonrated", table.itimes];
-    cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+    cell.accessoryType = (_viewOnly ? UITableViewCellAccessoryNone
+                                    : UITableViewCellAccessoryDetailDisclosureButton);
 	
     return cell;
 }
@@ -185,6 +191,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
+    if (_viewOnly) {
+        return;
+    }
     TableInfo* table = [_tables objectAtIndex:indexPath.row];
 
     NSString* joinColor = @"None"; // Default: an observer.
