@@ -27,6 +27,12 @@
 BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
 BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
 
+enum HistoryIndex // NOTE: Do not change the constants 'values below.
+{
+    HISTORY_INDEX_END   = -2,
+    HISTORY_INDEX_BEGIN = -1
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    MoveAtom
@@ -39,15 +45,22 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @synthesize srcPiece;
 @synthesize capturedPiece;
 
-- (id)init
+- (id)initWithMove:(int)mv
 {
-    self = [super init];
-    if (self ) {
-        move = nil;
-        srcPiece = nil;
-        capturedPiece = nil;
+    if (self = [super init]) {
+        self.move = [NSNumber numberWithInteger:mv];
+        self.srcPiece = nil;
+        self.capturedPiece = nil;
     }
     return self;
+}
+
+- (NSString*) description
+{
+    int m = [(NSNumber*)self.move intValue];
+    int sqSrc = SRC(m);
+    int sqDst = DST(m);
+    return [NSString stringWithFormat: @"%u%u -> %u%u)", ROW(sqSrc), COLUMN(sqSrc), ROW(sqDst), COLUMN(sqDst)];
 }
 
 - (void)dealloc
@@ -140,6 +153,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (id)   _initSoundSystem;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer:(int)color;
+- (BOOL) _isInReview;
 
 @end
 
@@ -211,9 +225,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         _game = ((BoardView*)self.view).game;
         [_game retain];
         _moves = [[NSMutableArray alloc] initWithCapacity: POC_MAX_MOVES_PER_GAME];
-        _nthMove = -1;
-        _inReview = NO;
-        _latestMove = INVALID_MOVE;
+        _nthMove = HISTORY_INDEX_END;
 
         self._tableId = nil;
         _myColor = NC_COLOR_UNKNOWN;
@@ -226,7 +238,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     NSTimeInterval timeInterval = - [_previewLastTouched timeIntervalSinceNow]; // in seconds.
     //NSLog(@"%s: ... timeInterval = [%f].", __FUNCTION__, timeInterval);
-    if (!_inReview && timeInterval > 5) { // hide if older than 5 seconds?
+    if (![self _isInReview] && timeInterval > 5) { // hide if older than 5 seconds?
         preview_prev.hidden = YES;
         preview_next.hidden = YES;
     }
@@ -328,13 +340,19 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     self._previewLastTouched = [NSDate date];
 
-    if (_nthMove < 1) {  // No Move made yet?
+    if ([_moves count] == 0) {
+        NSLog(@"%s: No Moves made yet.", __FUNCTION__);
         return;
     }
-    
-    _inReview = YES;  // Enter the Move-Review mode immediately!
-    
-    MoveAtom *pMove = [_moves objectAtIndex:--_nthMove];
+    else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
+        _nthMove = [_moves count] - 1; // Get the latest move.
+    }
+    else if (_nthMove == HISTORY_INDEX_BEGIN) {
+        NSLog(@"%s: The index is already at BEGIN. Do nothing.", __FUNCTION__);
+        return;
+    }
+
+    MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
     int move = [(NSNumber*)pMove.move intValue];
     int sqSrc = SRC(move);
     int sqDst = DST(move);
@@ -349,10 +367,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     }
     
+    // Highlight the Piece (if any) of the "next-PREV" Move.
+    --_nthMove;
     int prevMove = INVALID_MOVE;
-    if (_nthMove > 0) {  // No more Move?
-        int prevIndex = _nthMove - 1;
-        pMove = [_moves objectAtIndex:prevIndex];
+    if (_nthMove >= 0) {
+        pMove = [_moves objectAtIndex:_nthMove];
         prevMove = [(NSNumber*)pMove.move intValue];
     }
     [self showHighlightOfMove:prevMove];
@@ -362,40 +381,42 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     self._previewLastTouched = [NSDate date];
 
-    BOOL bNext = NO; // One "Next" click was serviced.
-    // This variable is introduced to enforce the rule:
-    // "Only one Move is replayed PER click".
-    //
-    int nMoves = [_moves count];
-    if (_nthMove >= 0 && _nthMove < nMoves) {
-        MoveAtom *pMove = [_moves objectAtIndex:_nthMove++];
-        int move = [(NSNumber*)pMove.move intValue];
-        int sqDst = DST(move);
-        int row2 = ROW(sqDst);
-        int col2 = COLUMN(sqDst);
-        [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
-        Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
-        if (capture) {
-            [capture removeFromSuperlayer];
-        }
-        [_game x_movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
-        [self showHighlightOfMove:move];
-        bNext = YES;
+    if ([_moves count] == 0) {
+        NSLog(@"%s: No Moves made yet.", __FUNCTION__);
+        return;
     }
-    
-    if (_nthMove == nMoves)  // Are we reaching the latest Move end?
-    {
-        if ( _latestMove == INVALID_MOVE ) {
-            _inReview = NO;
-        }
-        else if ( ! bNext ) {
-            _inReview = NO;
-            // Perform the latest Move if not yet done so.
-            NSNumber *moveInfo = [NSNumber numberWithInteger:_latestMove];
-            _latestMove = INVALID_MOVE;
-            [self handleNewMove:moveInfo];
-        }
+    else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
+        NSLog(@"%s: No PREV done. Do nothing.", __FUNCTION__);
+        return;
     }
+
+    ++_nthMove;
+    NSAssert1(_nthMove >= 0 && _nthMove < [_moves count], @"Invalid index [%d]", _nthMove);
+
+    const MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
+
+    if (_nthMove == [_moves count] - 1) {
+        _nthMove = HISTORY_INDEX_END;
+    }
+
+    int move = [(NSNumber*)pMove.move intValue];
+    int sqDst = DST(move);
+    int row2 = ROW(sqDst);
+    int col2 = COLUMN(sqDst);
+    [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
+    Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
+    if (capture) {
+        [capture removeFromSuperlayer];
+    }
+    if (!pMove.srcPiece) { // not yet processed?
+        NSLog(@"%s: Process pending move [%@]...", __FUNCTION__, pMove);
+        int sqSrc = SRC(move);
+        pMove.srcPiece = [_game x_getPieceAtRow:ROW(sqSrc) col:COLUMN(sqSrc)];
+        NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
+        pMove.capturedPiece = capture;
+    }
+    [_game x_movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
+    [self showHighlightOfMove:move];
 }
 
 - (IBAction)actionPressed:(id)sender
@@ -427,7 +448,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         self._previewLastTouched = [NSDate date]; // now.
     }
 
-    if (    _inReview           // Do nothing if in the middle of Move-Review.
+    if (    [self _isInReview]   // Do nothing if in the middle of Move-Review.
         || ![self isMyTurnNext] // Ignore when it is not my turn.
         || ![self isGameReady] )
     { 
@@ -572,6 +593,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
+- (BOOL) _isInReview
+{
+    return (_nthMove != HISTORY_INDEX_END);
+}
+
 - (void) setHighlightCells:(BOOL)bHighlight
 {
     // Set (or Clear) highlighted cells.
@@ -608,19 +634,22 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) handleNewMove:(NSNumber *)moveInfo
 {
-    int  move     = [moveInfo integerValue];
-    BOOL isAI     = ([_game get_sdPlayer] == 0);  // AI just made this Move.
+    int  move = [moveInfo integerValue];
+    BOOL isAI = ([_game get_sdPlayer] == 0);  // AI just made this Move.
 
     [self resetMoveTime:(isAI ? NC_COLOR_BLACK : NC_COLOR_RED)];
-    
+
+    MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
+    NSLog(@"%s: Add new move [%@].", __FUNCTION__, pMove);
+    [_moves addObject:pMove];
+
     // Delay update the UI if in Preview mode.
-    if ( _inReview ) {
-        NSAssert1(_latestMove == INVALID_MOVE,
-                  @"The latest Move should not be set [%d]", _latestMove);
-        _latestMove = move;  // NOTE: Save the Move to be processed later.
+    if ([self _isInReview]) {
+        // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
+        //       to signal that it is NOT yet processed.
         return;
     }
-    
+
     int sqSrc = SRC(move);
     int sqDst = DST(move);
     int row1 = ROW(sqSrc);
@@ -637,9 +666,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         [capture removeFromSuperlayer];
         sound = (isAI ? @"CAPTURE2" : @"CAPTURE");
     }
-    
+
     [_audioHelper play_wav_sound:sound];
-    
+
     [_game x_movePiece:piece toRow:row2 toCol:col2];
     [self showHighlightOfMove:move];
 
@@ -648,15 +677,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
         [self handleEndGameInUI];
     }
-    
+
     // Add this new Move to the Move-History.
-    MoveAtom *pMove = [[MoveAtom alloc] init];
     pMove.srcPiece = piece;
     pMove.capturedPiece = capture;
-    pMove.move = [NSNumber numberWithInteger:move];
-    [_moves addObject:pMove];
-    [pMove release];
-    _nthMove = [_moves count];
 }
 
 - (void) handleEndGameInUI
@@ -690,9 +714,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
     [_game reset_game];
     [_moves removeAllObjects];
-    _nthMove = -1;
-    _inReview = NO;
-    _latestMove = INVALID_MOVE;
+    _nthMove = HISTORY_INDEX_END;
 }
 
 - (void) displayEmptyBoard
