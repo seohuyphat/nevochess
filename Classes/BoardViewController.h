@@ -91,8 +91,6 @@ enum ActionIndexEnum
 
     NSMutableArray *_moves;       // MOVE history
     int             _nthMove;     // pivot for the Move Review
-    BOOL            _inReview;
-    int             _latestMove;  // Latest Move waiting to be UI-updated.
 
     // ---------
     NSString*       _tableId;
