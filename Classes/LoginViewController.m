@@ -49,6 +49,12 @@ enum LoginButtonEnum
     [_username becomeFirstResponder]; // to have the first keyboard focus
 }
 
+- (void)setInitialLogin:(NSString *)username password:(NSString*)password
+{
+    _username.text = username;
+    _password.text = password;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];

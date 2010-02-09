@@ -37,6 +37,7 @@
 
 @property (nonatomic, retain) id <LoginDelegate> delegate;
 
+- (void)setInitialLogin:(NSString *)username password:(NSString*)password;
 - (void)setErrorString:(NSString*)errorStr;
 
 - (IBAction)loginButtonPressed:(id)sender;
