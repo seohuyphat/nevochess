@@ -23,15 +23,6 @@
 #import "CChessGame.h"
 #import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
 
-BOOL layerIsBit( CALayer* layer );
-BOOL layerIsBitHolder( CALayer* layer );
-
-enum AlertViewEnum
-{
-    POC_ALERT_END_GAME,
-    POC_ALERT_RESUME_GAME,
-    POC_ALERT_RESET_GAME
-};
 
 // TODO: Temporary place here! ---------------------------------------
 
@@ -61,23 +52,23 @@ enum ActionIndexEnum
 @interface BoardViewController : UIViewController <BoardOwner>
 {
     
-    IBOutlet UIToolbar   *nav_toolbar;
-    IBOutlet UIButton    *red_seat;
-    IBOutlet UIButton    *black_seat;
+    IBOutlet UIToolbar*   nav_toolbar;
+    IBOutlet UIButton*    red_seat;
+    IBOutlet UIButton*    black_seat;
     IBOutlet UIActivityIndicatorView *activity;
-    IBOutlet UILabel     *game_over_msg;
+    IBOutlet UILabel*     game_over_msg;
 
-    BoardView*      _board;
-    CChessGame*     _game;
+    BoardView*            _board;
+    CChessGame*           _game;
 
-    NSString*       _tableId;
-    ColorEnum       _myColor;     // The color (role) of the LOCAL player.
+    NSString*             _tableId;
+    ColorEnum             _myColor;  // The color (role) of the LOCAL player.
 }
 
-@property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
-@property (nonatomic, retain) IBOutlet UIButton *red_seat;
-@property (nonatomic, retain) IBOutlet UIButton *black_seat;
-@property (nonatomic, retain) IBOutlet UILabel *game_over_msg;
+@property (nonatomic, retain) IBOutlet UIToolbar* nav_toolbar;
+@property (nonatomic, retain) IBOutlet UIButton* red_seat;
+@property (nonatomic, retain) IBOutlet UIButton* black_seat;
+@property (nonatomic, retain) IBOutlet UILabel* game_over_msg;
 
 @property (nonatomic, retain) BoardView* _board;
 @property (nonatomic, retain) CChessGame* _game;

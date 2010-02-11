@@ -34,10 +34,13 @@
 #pragma mark -
 #pragma mark The private interface of CChessGame
 
-@interface CChessGame ()
+@interface CChessGame (PrivateMethods)
 
-- (int) _convertStringToAIType:(NSString *)aiSelection;
-- (void)_setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
+- (void) _setupPieces;
+- (void) _resetPieces;
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col forPlayer:(unsigned)playerNo;
+- (int)  _convertStringToAIType:(NSString *)aiSelection;
+- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 
 @end
 
@@ -55,12 +58,12 @@
 
 @synthesize _aiName;
 @synthesize _grid;
-@synthesize game_result;
+@synthesize gameResult=_gameResult;
 @synthesize blackAtTopSide=_blackAtTopSide;
 
-- (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col forPlayer:(unsigned)playerNo
 {
-    GridCell *s = [_grid cellAtRow: row column: col]; 
+    GridCell *s = [_grid cellAtRow:row column:col]; 
     CGRect frame = s.frame;
     CGPoint position;
     position.x = CGRectGetMidX(frame);
@@ -84,7 +87,7 @@
     [piece release];
 }
 
-- (void)x_movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
+- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
     if (!_blackAtTopSide) {
         row = 9 - row;
@@ -93,7 +96,7 @@
     [self _setPiece:piece toRow:row toCol:col];
 }
 
-- (void)_setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
+- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
     GridCell *s = [_grid cellAtRow: row column: col]; 
     CGRect frame = s.frame;
@@ -109,7 +112,7 @@
     }
 }
 
-- (Piece*)x_getPieceAtRow:(int)row col:(int)col
+- (Piece*) getPieceAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
         row = 9 - row;
@@ -129,7 +132,7 @@
     return nil;
 }
 
-- (GridCell*)x_getCellAtRow:(int)row col:(int)col
+- (GridCell*) getCellAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
         row = 9 - row;
@@ -152,8 +155,7 @@
 
 - (id) initWithBoard: (CALayer*)board
 {
-    self = [super initWithBoard: board];
-    if (self != nil) {
+    if (self = [super initWithBoard: board]) {
         [self setNumberOfPlayers: 2];
         
         CGSize size = board.bounds.size;
@@ -169,7 +171,7 @@
         [board addSublayer: _grid];
         
         _pieceBox = [[NSMutableArray alloc] initWithCapacity:32];
-        [self setupCChessPieces];
+        [self _setupPieces];
         
         [_grid cellAtRow: 3 column: 0].dotted = YES;
         [_grid cellAtRow: 6 column: 0].dotted = YES;
@@ -190,7 +192,7 @@
         [_grid cellAtRow: 8 column: 4].cross = YES;
 
         _blackAtTopSide = YES;
-        game_result = kXiangQi_InPlay;
+        _gameResult = kXiangQi_InPlay;
         
         // Create a Referee to manage the Game.
         _referee = [[Referee alloc] init];
@@ -216,12 +218,13 @@
         }
 
         [_aiEngine initGame];
+        int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
+        [_aiEngine setDifficultyLevel:nDifficulty];
     }
     return self;
 }
 
-
-- (int)getRobotMove:(int*)captured
+- (int) getRobotMove:(int*)captured
 {
     int row1 = 0, col1 = 0, row2 = 0, col2 = 0;
     [_aiEngine generateMove:&row1 fromCol:&col1 toRow:&row2 toCol:&col2];
@@ -234,8 +237,7 @@
     return move;
 }
 
-- (int)humanMove:(int)row1 fromCol:(int)col1
-            toRow:(int)row2 toCol:(int)col2
+- (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
 {
     int sqSrc = TOSQUARE(row1, col1);
     int sqDst = TOSQUARE(row2, col2);
@@ -246,11 +248,6 @@
     [_referee makeMove:move captured:&captured];
     
     return captured;
-}
-
-- (void)setSearchDepth:(int)depth
-{
-    [_aiEngine setDifficultyLevel:depth];
 }
 
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs
@@ -287,7 +284,7 @@
     }
 
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
-        game_result = nGameResult;
+        _gameResult = nGameResult;
     }
 
     return nGameResult;
@@ -296,11 +293,11 @@
 - (int) get_sdPlayer { return [_referee get_sdPlayer]; }
 - (int) get_nMoveNum { return [_referee get_nMoveNum]; }
 
-- (void)reset_game
+- (void) resetGame
 {
     BOOL saved_blackAtTopSide = _blackAtTopSide;
     _blackAtTopSide = YES;
-    [self resetCChessPieces];
+    [self _resetPieces];
     if (!saved_blackAtTopSide) {
         [self reverseView];
     }
@@ -308,7 +305,7 @@
     
     [_referee initGame];
     [_aiEngine initGame];
-    game_result = kXiangQi_InPlay;
+    _gameResult = kXiangQi_InPlay;
 }
 
 - (NSString*) getAIName
@@ -332,103 +329,103 @@
     _blackAtTopSide = !_blackAtTopSide;
 }
 
-- (void)resetCChessPieces
+- (void) _resetPieces
 {
     // reset the pieces in pieceBox by the order they are created
     // chariot
-    [self x_movePiece:[_pieceBox objectAtIndex:0] toRow:0 toCol:0];
-    [self x_movePiece:[_pieceBox objectAtIndex:1] toRow:0 toCol:8];
-    [self x_movePiece:[_pieceBox objectAtIndex:2] toRow:9 toCol:0];
-    [self x_movePiece:[_pieceBox objectAtIndex:3] toRow:9 toCol:8];
+    [self movePiece:[_pieceBox objectAtIndex:0] toRow:0 toCol:0];
+    [self movePiece:[_pieceBox objectAtIndex:1] toRow:0 toCol:8];
+    [self movePiece:[_pieceBox objectAtIndex:2] toRow:9 toCol:0];
+    [self movePiece:[_pieceBox objectAtIndex:3] toRow:9 toCol:8];
     
     // horse
-    [self x_movePiece:[_pieceBox objectAtIndex:4] toRow:0 toCol:1];
-    [self x_movePiece:[_pieceBox objectAtIndex:5] toRow:0 toCol:7];
-    [self x_movePiece:[_pieceBox objectAtIndex:6] toRow:9 toCol:1];
-    [self x_movePiece:[_pieceBox objectAtIndex:7] toRow:9 toCol:7];
+    [self movePiece:[_pieceBox objectAtIndex:4] toRow:0 toCol:1];
+    [self movePiece:[_pieceBox objectAtIndex:5] toRow:0 toCol:7];
+    [self movePiece:[_pieceBox objectAtIndex:6] toRow:9 toCol:1];
+    [self movePiece:[_pieceBox objectAtIndex:7] toRow:9 toCol:7];
     
     // elephant
-    [self x_movePiece:[_pieceBox objectAtIndex:8] toRow:0 toCol:2];
-    [self x_movePiece:[_pieceBox objectAtIndex:9] toRow:0 toCol:6];
-    [self x_movePiece:[_pieceBox objectAtIndex:10] toRow:9 toCol:2];
-    [self x_movePiece:[_pieceBox objectAtIndex:11] toRow:9 toCol:6];
+    [self movePiece:[_pieceBox objectAtIndex:8] toRow:0 toCol:2];
+    [self movePiece:[_pieceBox objectAtIndex:9] toRow:0 toCol:6];
+    [self movePiece:[_pieceBox objectAtIndex:10] toRow:9 toCol:2];
+    [self movePiece:[_pieceBox objectAtIndex:11] toRow:9 toCol:6];
     
     // advisor
-    [self x_movePiece:[_pieceBox objectAtIndex:12] toRow:0 toCol:3];
-    [self x_movePiece:[_pieceBox objectAtIndex:13] toRow:0 toCol:5];
-    [self x_movePiece:[_pieceBox objectAtIndex:14] toRow:9 toCol:3];
-    [self x_movePiece:[_pieceBox objectAtIndex:15] toRow:9 toCol:5];
+    [self movePiece:[_pieceBox objectAtIndex:12] toRow:0 toCol:3];
+    [self movePiece:[_pieceBox objectAtIndex:13] toRow:0 toCol:5];
+    [self movePiece:[_pieceBox objectAtIndex:14] toRow:9 toCol:3];
+    [self movePiece:[_pieceBox objectAtIndex:15] toRow:9 toCol:5];
     
     // king
-    [self x_movePiece:[_pieceBox objectAtIndex:16] toRow:0 toCol:4];
-    [self x_movePiece:[_pieceBox objectAtIndex:17] toRow:9 toCol:4];
+    [self movePiece:[_pieceBox objectAtIndex:16] toRow:0 toCol:4];
+    [self movePiece:[_pieceBox objectAtIndex:17] toRow:9 toCol:4];
     
     // cannon
-    [self x_movePiece:[_pieceBox objectAtIndex:18] toRow:2 toCol:1];
-    [self x_movePiece:[_pieceBox objectAtIndex:19] toRow:2 toCol:7];
-    [self x_movePiece:[_pieceBox objectAtIndex:20] toRow:7 toCol:1];
-    [self x_movePiece:[_pieceBox objectAtIndex:21] toRow:7 toCol:7];
+    [self movePiece:[_pieceBox objectAtIndex:18] toRow:2 toCol:1];
+    [self movePiece:[_pieceBox objectAtIndex:19] toRow:2 toCol:7];
+    [self movePiece:[_pieceBox objectAtIndex:20] toRow:7 toCol:1];
+    [self movePiece:[_pieceBox objectAtIndex:21] toRow:7 toCol:7];
     
     // pawn
-    [self x_movePiece:[_pieceBox objectAtIndex:22] toRow:3 toCol:0];
-    [self x_movePiece:[_pieceBox objectAtIndex:23] toRow:3 toCol:2];
-    [self x_movePiece:[_pieceBox objectAtIndex:24] toRow:3 toCol:4];
-    [self x_movePiece:[_pieceBox objectAtIndex:25] toRow:3 toCol:6];
-    [self x_movePiece:[_pieceBox objectAtIndex:26] toRow:3 toCol:8];
-    [self x_movePiece:[_pieceBox objectAtIndex:27] toRow:6 toCol:0];
-    [self x_movePiece:[_pieceBox objectAtIndex:28] toRow:6 toCol:2];
-    [self x_movePiece:[_pieceBox objectAtIndex:29] toRow:6 toCol:4];
-    [self x_movePiece:[_pieceBox objectAtIndex:30] toRow:6 toCol:6];
-    [self x_movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];
+    [self movePiece:[_pieceBox objectAtIndex:22] toRow:3 toCol:0];
+    [self movePiece:[_pieceBox objectAtIndex:23] toRow:3 toCol:2];
+    [self movePiece:[_pieceBox objectAtIndex:24] toRow:3 toCol:4];
+    [self movePiece:[_pieceBox objectAtIndex:25] toRow:3 toCol:6];
+    [self movePiece:[_pieceBox objectAtIndex:26] toRow:3 toCol:8];
+    [self movePiece:[_pieceBox objectAtIndex:27] toRow:6 toCol:0];
+    [self movePiece:[_pieceBox objectAtIndex:28] toRow:6 toCol:2];
+    [self movePiece:[_pieceBox objectAtIndex:29] toRow:6 toCol:4];
+    [self movePiece:[_pieceBox objectAtIndex:30] toRow:6 toCol:6];
+    [self movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];
 }
 
-- (void)setupCChessPieces
+- (void) _setupPieces
 {
     // chariot      
-    [self x_createPiece:@"bchariot.png" row:0 col:0 forPlayer:0];
-    [self x_createPiece:@"bchariot.png" row:0 col:8 forPlayer:0];         
-    [self x_createPiece:@"rchariot.png" row:9 col:0 forPlayer:1];     
-    [self x_createPiece:@"rchariot.png" row:9 col:8 forPlayer:1];  
+    [self _createPiece:@"bchariot.png" row:0 col:0 forPlayer:0];
+    [self _createPiece:@"bchariot.png" row:0 col:8 forPlayer:0];         
+    [self _createPiece:@"rchariot.png" row:9 col:0 forPlayer:1];     
+    [self _createPiece:@"rchariot.png" row:9 col:8 forPlayer:1];  
 
     // horse    
-    [self x_createPiece:@"bhorse.png" row:0 col:1 forPlayer:0];        
-    [self x_createPiece:@"bhorse.png" row:0 col:7 forPlayer:0];         
-    [self x_createPiece:@"rhorse.png" row:9 col:1 forPlayer:1];      
-    [self x_createPiece:@"rhorse.png" row:9 col:7 forPlayer:1];
+    [self _createPiece:@"bhorse.png" row:0 col:1 forPlayer:0];        
+    [self _createPiece:@"bhorse.png" row:0 col:7 forPlayer:0];         
+    [self _createPiece:@"rhorse.png" row:9 col:1 forPlayer:1];      
+    [self _createPiece:@"rhorse.png" row:9 col:7 forPlayer:1];
     
     // elephant      
-    [self x_createPiece:@"belephant.png" row:0 col:2 forPlayer:0];        
-    [self x_createPiece:@"belephant.png" row:0 col:6 forPlayer:0];        
-    [self x_createPiece:@"relephant.png" row:9 col:2 forPlayer:1];     
-    [self x_createPiece:@"relephant.png" row:9 col:6 forPlayer:1]; 
+    [self _createPiece:@"belephant.png" row:0 col:2 forPlayer:0];        
+    [self _createPiece:@"belephant.png" row:0 col:6 forPlayer:0];        
+    [self _createPiece:@"relephant.png" row:9 col:2 forPlayer:1];     
+    [self _createPiece:@"relephant.png" row:9 col:6 forPlayer:1]; 
     
     // advisor      
-    [self x_createPiece:@"badvisor.png" row:0 col:3 forPlayer:0];         
-    [self x_createPiece:@"badvisor.png" row:0 col:5 forPlayer:0];         
-    [self x_createPiece:@"radvisor.png" row:9 col:3 forPlayer:1];        
-    [self x_createPiece:@"radvisor.png" row:9 col:5 forPlayer:1];
+    [self _createPiece:@"badvisor.png" row:0 col:3 forPlayer:0];         
+    [self _createPiece:@"badvisor.png" row:0 col:5 forPlayer:0];         
+    [self _createPiece:@"radvisor.png" row:9 col:3 forPlayer:1];        
+    [self _createPiece:@"radvisor.png" row:9 col:5 forPlayer:1];
     
     // king       
-    [self x_createPiece:@"bking.png" row:0 col:4 forPlayer:0];       
-    [self x_createPiece:@"rking.png" row:9 col:4 forPlayer:1];
+    [self _createPiece:@"bking.png" row:0 col:4 forPlayer:0];       
+    [self _createPiece:@"rking.png" row:9 col:4 forPlayer:1];
     
     // cannon     
-    [self x_createPiece:@"bcannon.png" row:2 col:1 forPlayer:0];       
-    [self x_createPiece:@"bcannon.png" row:2 col:7 forPlayer:0];          
-    [self x_createPiece:@"rcannon.png" row:7 col:1 forPlayer:1];        
-    [self x_createPiece:@"rcannon.png" row:7 col:7 forPlayer:1];
+    [self _createPiece:@"bcannon.png" row:2 col:1 forPlayer:0];       
+    [self _createPiece:@"bcannon.png" row:2 col:7 forPlayer:0];          
+    [self _createPiece:@"rcannon.png" row:7 col:1 forPlayer:1];        
+    [self _createPiece:@"rcannon.png" row:7 col:7 forPlayer:1];
 
     // pawn       
-    [self x_createPiece:@"bpawn.png" row:3 col:0 forPlayer:0];         
-    [self x_createPiece:@"bpawn.png" row:3 col:2 forPlayer:0];         
-    [self x_createPiece:@"bpawn.png" row:3 col:4 forPlayer:0];        
-    [self x_createPiece:@"bpawn.png" row:3 col:6 forPlayer:0];      
-    [self x_createPiece:@"bpawn.png" row:3 col:8 forPlayer:0];     
-    [self x_createPiece:@"rpawn.png" row:6 col:0 forPlayer:1];      
-    [self x_createPiece:@"rpawn.png" row:6 col:2 forPlayer:1];         
-    [self x_createPiece:@"rpawn.png" row:6 col:4 forPlayer:1];       
-    [self x_createPiece:@"rpawn.png" row:6 col:6 forPlayer:1];      
-    [self x_createPiece:@"rpawn.png" row:6 col:8 forPlayer:1];
+    [self _createPiece:@"bpawn.png" row:3 col:0 forPlayer:0];         
+    [self _createPiece:@"bpawn.png" row:3 col:2 forPlayer:0];         
+    [self _createPiece:@"bpawn.png" row:3 col:4 forPlayer:0];        
+    [self _createPiece:@"bpawn.png" row:3 col:6 forPlayer:0];      
+    [self _createPiece:@"bpawn.png" row:3 col:8 forPlayer:0];     
+    [self _createPiece:@"rpawn.png" row:6 col:0 forPlayer:1];      
+    [self _createPiece:@"rpawn.png" row:6 col:2 forPlayer:1];         
+    [self _createPiece:@"rpawn.png" row:6 col:4 forPlayer:1];       
+    [self _createPiece:@"rpawn.png" row:6 col:6 forPlayer:1];      
+    [self _createPiece:@"rpawn.png" row:6 col:8 forPlayer:1];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

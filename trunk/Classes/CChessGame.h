@@ -62,38 +62,33 @@ enum {
     NSMutableArray* _pieceBox;
     BOOL            _blackAtTopSide;
 
-    NSString* _aiName;
-    int _aiType;
-    Referee  *_referee;
-    AIEngine *_aiEngine;
+    NSString*       _aiName;
+    int             _aiType;
+    Referee*        _referee;
+    AIEngine*       _aiEngine;
 
-    int game_result;
+    int             _gameResult;
 }
 
-- (void)setupCChessPieces;
-- (void)x_createPiece: (NSString*)imageName row: (int)row col: (int)col forPlayer: (unsigned)playerNo;
-- (void)x_movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
-- (Piece*)x_getPieceAtRow:(int)row col:(int)col;
-- (GridCell*)x_getCellAtRow:(int)row col:(int)col;
+- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
+- (Piece*) getPieceAtRow:(int)row col:(int)col;
+- (GridCell*) getCellAtRow:(int)row col:(int)col;
 
 - (int) getRobotMove:(int*)captured;
-- (int) humanMove:(int)row1 fromCol:(int)col1
-             toRow:(int)row2   toCol:(int)col2;
+- (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
 
-- (void)setSearchDepth:(int)depth;
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
-- (BOOL)isLegalMove:(int)mv;
-- (int)checkGameStatus:(BOOL)isAI;
+- (BOOL) isLegalMove:(int)mv;
+- (int) checkGameStatus:(BOOL)isAI;
 - (int) get_sdPlayer;
 - (int) get_nMoveNum;
-- (void)resetCChessPieces;
-- (void)reset_game;
+- (void) resetGame;
 - (NSString*) getAIName;
-- (void)reverseView;
+- (void) reverseView;
 
 @property (nonatomic, retain) NSString* _aiName;
 @property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
-@property (nonatomic, readonly) int game_result;
+@property (nonatomic, readonly) int gameResult;
 
 @end
