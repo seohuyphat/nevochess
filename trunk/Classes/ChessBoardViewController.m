@@ -22,6 +22,9 @@
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
 #import "Piece.h"
+#import "AI_HaQiKiD.h"
+#import "AI_XQWLight.h"
+#import "XiangQi.h"  // XQWLight Objective-C based AI
 
 enum AlertViewEnum
 {
@@ -41,6 +44,7 @@ enum AlertViewEnum
 - (void) _AIMove;
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
+- (int) _convertStringToAIType:(NSString *)aiSelection;
 
 @end
 
@@ -53,18 +57,39 @@ enum AlertViewEnum
 
 @implementation ChessBoardViewController
 
-//
-// The designated initializer.
-// Override if you create the controller programmatically and want to perform
-// customization that is not appropriate for viewDidLoad.
-//
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
+        // Determine the type of AI.
+        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
+        int aiType = [self _convertStringToAIType:_aiName];
+        switch (aiType) {
+            case kNevoChess_AI_xqwlight:
+                _aiEngine = [[AI_XQWLight alloc] init];
+                break;
+            case kNevoChess_AI_haqikid:
+                _aiEngine = [[AI_HaQiKiD alloc] init];
+                break;
+            case kNevoChess_AI_xqwlight_objc:
+                // NOTE: The Objective-c AI is still in experimental stage.
+                _aiEngine = [[AI_XQWLightObjC alloc] init];
+                break;
+            default:
+                _aiEngine = nil;
+        }
+        [_aiEngine initGame];
+        int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
+        [_aiEngine setDifficultyLevel:nDifficulty];
+
+        // Robot
+        _robotPort = [[NSMachPort port] retain]; //retain here otherwise it will be autoreleased
+        [_robotPort setDelegate:self];
+        [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
+
         _myColor = NC_COLOR_RED;
         [_board setRedLabel:@"You"];
-        [_board setBlackLabel:[_game getAIName]];
+        [_board setBlackLabel:_aiName];
         
         // Restore pending game, if any.
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
@@ -74,6 +99,26 @@ enum AlertViewEnum
     }
     
     return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    // Remove the Actions button.
+    NSArray *items = nav_toolbar.items;    
+    NSMutableArray *newItems = [NSMutableArray arrayWithArray:items];
+    [newItems removeLastObject];
+    [newItems removeLastObject];
+    [newItems removeLastObject];
+    nav_toolbar.items = newItems;
+}
+
+- (void)dealloc
+{
+    [_aiEngine release];
+    [_robotPort release];
+    [super dealloc];
 }
 
 - (void)robotThread:(void*)param
@@ -119,28 +164,10 @@ enum AlertViewEnum
     }
 }
 
-
-//
-// Implement viewDidLoad to do additional setup after loading the view,
-// typically from a nib.
-//
-- (void)viewDidLoad
+- (void) resetBoard
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    [super viewDidLoad];
-    
-    // Remove the Actions button.
-    NSArray *items = nav_toolbar.items;    
-    NSMutableArray *newItems = [NSMutableArray arrayWithArray:items];
-    [newItems removeLastObject];
-    [newItems removeLastObject];
-    [newItems removeLastObject];
-    nav_toolbar.items = newItems;
-    
-    // Robot
-    _robotPort = [[NSMachPort port] retain]; //retain here otherwise it will be autoreleased
-    [_robotPort setDelegate:self];
-    [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
+    [_aiEngine initGame];
+    [super resetBoard];
 }
 
 //
@@ -179,12 +206,6 @@ enum AlertViewEnum
 	// Release any cached data, images, etc that aren't in use.
 }
 
-- (void)dealloc
-{
-    [_robotPort release];
-    [super dealloc];
-}
-
 #pragma mark Button actions
 
 - (IBAction)homePressed:(id)sender
@@ -219,12 +240,19 @@ enum AlertViewEnum
 //
 - (void)_AIMove
 {
-    int captured = 0;
-    int move = [_game getRobotMove:&captured];
+    int row1 = 0, col1 = 0, row2 = 0, col2 = 0;
+    [_aiEngine generateMove:&row1 fromCol:&col1 toRow:&row2 toCol:&col2];
+
+    int sqSrc = TOSQUARE(row1, col1);
+    int sqDst = TOSQUARE(row2, col2);
+    int move = MOVE(sqSrc, sqDst);
+
     if (move == INVALID_MOVE) {
         NSLog(@"ERROR: %s: Invalid move [%d].", __FUNCTION__, move); 
         return;
     }
+
+    [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
 
     NSNumber *moveInfo = [NSNumber numberWithInteger:move];
     [self performSelectorOnMainThread:@selector(handleNewMove:)
@@ -233,6 +261,11 @@ enum AlertViewEnum
 
 - (void) onLocalMoveMade:(int)move
 {
+    // Inform the AI.
+    int sqSrc = SRC(move);
+    int sqDst = DST(move);
+    [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    
     // AI's turn.
     if ( _game.gameResult == kXiangQi_InPlay ) {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
@@ -337,6 +370,8 @@ enum AlertViewEnum
 
         [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                    toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
@@ -348,6 +383,18 @@ enum AlertViewEnum
     if ( bAIturn && _game.gameResult == kXiangQi_InPlay ) {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
+}
+
+- (int) _convertStringToAIType:(NSString *)aiSelection
+{
+    if ([aiSelection isEqualToString:@"XQWLight"]) {
+        return kNevoChess_AI_xqwlight;
+    } else if ([aiSelection isEqualToString:@"HaQiKiD"]) {
+        return kNevoChess_AI_haqikid;
+    } else if ([aiSelection isEqualToString:@"XQWLightObjc"]) {
+        return kNevoChess_AI_xqwlight_objc;
+    }
+    return kNevoChess_AI_xqwlight; // Default!
 }
 
 #pragma mark NSMachPort message handle 

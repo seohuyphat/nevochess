@@ -21,8 +21,6 @@
 #import "CChessGame.h"
 #import "Piece.h"
 #import "QuartzUtils.h"
-#import "AI_HaQiKiD.h"
-#import "AI_XQWLight.h"
 #import "XiangQi.h"  // XQWLight Objective-C based AI
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +37,6 @@
 - (void) _setupPieces;
 - (void) _resetPieces;
 - (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col forPlayer:(unsigned)playerNo;
-- (int)  _convertStringToAIType:(NSString *)aiSelection;
 - (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 
 @end
@@ -56,7 +53,6 @@
 
 @implementation CChessGame
 
-@synthesize _aiName;
 @synthesize _grid;
 @synthesize gameResult=_gameResult;
 @synthesize blackAtTopSide=_blackAtTopSide;
@@ -71,12 +67,9 @@
     CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
     // western or Chinese?
     BOOL toggleWestern = [[NSUserDefaults standardUserDefaults] boolForKey:@"toggle_western"];
-    if(toggleWestern) {
-        imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil inDirectory:@"pieces/alfaerie_31x31"];
-    } else {
-        imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil inDirectory:@"pieces/xqwizard_31x31"];
-    }
-    
+    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
+                                           inDirectory:(toggleWestern ? @"pieces/alfaerie_31x31" : @"pieces/xqwizard_31x31")];
+
     Piece *piece = [[Piece alloc] initWithImageNamed: imageName scale: pieceSize];
     piece._owner = [self._players objectAtIndex: playerNo];
     piece.holder = [_grid cellAtRow:row column:col];
@@ -147,9 +140,7 @@
     [_grid removeAllCells];
     [_grid release];
     [_pieceBox release];
-    [_aiName release];
     [_referee release];
-    [_aiEngine release];
     [super dealloc];
 }
 
@@ -197,44 +188,8 @@
         // Create a Referee to manage the Game.
         _referee = [[Referee alloc] init];
         [_referee initGame];
-        
-        // Determine the type of AI.
-        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
-        _aiType = [self _convertStringToAIType:_aiName];
-
-        switch (_aiType) {
-            case kNevoChess_AI_xqwlight:
-                _aiEngine = [[AI_XQWLight alloc] init];
-                break;
-            case kNevoChess_AI_haqikid:
-                _aiEngine = [[AI_HaQiKiD alloc] init];
-                break;
-            case kNevoChess_AI_xqwlight_objc:
-                // NOTE: The Objective-c AI is still in experimental stage.
-                _aiEngine = [[AI_XQWLightObjC alloc] init];
-                break;
-            default:
-                break;
-        }
-
-        [_aiEngine initGame];
-        int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
-        [_aiEngine setDifficultyLevel:nDifficulty];
     }
     return self;
-}
-
-- (int) getRobotMove:(int*)captured
-{
-    int row1 = 0, col1 = 0, row2 = 0, col2 = 0;
-    [_aiEngine generateMove:&row1 fromCol:&col1 toRow:&row2 toCol:&col2];
-    
-    int sqSrc = TOSQUARE(row1, col1);
-    int sqDst = TOSQUARE(row2, col2);
-    int move = MOVE(sqSrc, sqDst);
-
-    [_referee makeMove:move captured:captured];
-    return move;
 }
 
 - (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
@@ -244,9 +199,7 @@
     int move = MOVE(sqSrc, sqDst);
     int captured = 0;
 
-    [_aiEngine onHumanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
-    [_referee makeMove:move captured:&captured];
-    
+    [_referee makeMove:move captured:&captured];    
     return captured;
 }
 
@@ -304,13 +257,7 @@
     _blackAtTopSide = saved_blackAtTopSide;
     
     [_referee initGame];
-    [_aiEngine initGame];
     _gameResult = kXiangQi_InPlay;
-}
-
-- (NSString*) getAIName
-{
-    return _aiName;
 }
 
 - (void) reverseView
@@ -426,27 +373,6 @@
     [self _createPiece:@"rpawn.png" row:6 col:4 forPlayer:1];       
     [self _createPiece:@"rpawn.png" row:6 col:6 forPlayer:1];      
     [self _createPiece:@"rpawn.png" row:6 col:8 forPlayer:1];
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Implementation of Private methods
-//
-///////////////////////////////////////////////////////////////////////////////
-
-#pragma mark -
-#pragma mark Private methods
-
-- (int) _convertStringToAIType:(NSString *)aiSelection;
-{
-    if ([aiSelection isEqualToString:@"XQWLight"]) {
-        return kNevoChess_AI_xqwlight;
-    } else if ([aiSelection isEqualToString:@"HaQiKiD"]) {
-        return kNevoChess_AI_haqikid;
-    } else if ([aiSelection isEqualToString:@"XQWLightObjc"]) {
-        return kNevoChess_AI_xqwlight_objc;
-    }
-    return kNevoChess_AI_xqwlight; // Default!
 }
 
 @end
