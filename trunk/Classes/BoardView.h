@@ -58,15 +58,24 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <QuartzCore/QuartzCore.h>
 #import "CChessGame.h"
+#import "AudioHelper.h"
 
 @class Bit, Card, Grid;
 @protocol BitHolder;
+@class TimeInfo;
 
 
 // Hit-testing callbacks (to identify which layers caller is interested in):
 typedef BOOL (*LayerMatchCallback)(CALayer*);
 
-/** NSView that hosts a game. */
+// --------------------------------------
+@protocol BoardOwner <NSObject>
+- (BOOL) isMyTurnNext;
+- (BOOL) isGameReady;
+- (void) onLocalMoveMade:(int)move;
+@end
+
+/** UIView that hosts a game. */
 @interface BoardView : UIView
 {
     CChessGame *_game;                          // Current Game
@@ -86,6 +95,37 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
     // Used while handling incoming drags:
     CALayer *_viewDropTarget;                   // Current drop target during an incoming drag-n-drop
     //NSDragOperation _viewDropOp;                // Current drag operation
+    
+    ////////////////
+    AudioHelper*          _audioHelper;
+
+    id <BoardOwner>       _boardOwner;
+    
+    IBOutlet UILabel*     _red_label;
+    IBOutlet UILabel*     _black_label;
+    IBOutlet UILabel*     _red_time;
+    IBOutlet UILabel*     _red_move_time;
+    IBOutlet UILabel*     _black_time;
+    IBOutlet UILabel*     _black_move_time;
+
+    IBOutlet UIButton*    _preview_prev;
+    IBOutlet UIButton*    _preview_next;
+    NSDate*               _previewLastTouched;
+
+    NSTimer*              _timer;
+    
+    TimeInfo*             _initialTime;
+    TimeInfo*             _redTime;
+    TimeInfo*             _blackTime;
+
+    // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
+    int                   _hl_moves[MAX_GEN_MOVES];
+    int                   _hl_nMoves;
+    int                   _hl_lastMove; // The last Move that was highlighted.    
+    Piece*                _selectedPiece;
+
+    NSMutableArray*       _moves;       // MOVE history
+    int                   _nthMove;     // pivot for the Move Review
 }
 
 - (CALayer*) hitTestPoint: (CGPoint)locationInWindow
@@ -94,8 +134,72 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 
 @property (readonly) CChessGame *game;
 @property (readonly) CALayer *gameboard;
-
 - (CGRect) gameBoardFrame;
+//////////////////////////////////////////////////
+@property (nonatomic, retain) id <BoardOwner> boardOwner;
+@property (nonatomic, retain) NSTimer* _timer;
+@property (nonatomic, retain) TimeInfo* _initialTime;
+@property (nonatomic, retain) TimeInfo* _redTime;
+@property (nonatomic, retain) TimeInfo* _blackTime;
+@property (nonatomic, retain) NSDate* _previewLastTouched;
+- (IBAction)movePrevPressed:(id)sender;
+- (IBAction)moveNextPressed:(id)sender;
+
+- (void) setRedLabel:(NSString*)label;
+- (void) setBlackLabel:(NSString*)label;
+- (void) setInitialTime:(NSString*)times;
+- (void) setRedTime:(NSString*)times;
+- (void) setBlackTime:(NSString*)times;
+- (void) rescheduleTimer;
+- (void) destroyTimer;
+- (int) onNewMove:(NSNumber *)moveInfo;
+- (void) playSound:(NSString*)sound;
+- (NSUInteger) getMovesCount;
+- (NSMutableArray*) getMoves;
+- (void) showHighlightOfMove:(int)move;
+- (void) resetBoard;
+- (void) displayEmptyBoard;
+- (void) reverseBoardView;
 
 @end
 
+////////////////////////////////////////////////////////////////////
+//
+// Move review holder unit
+//
+////////////////////////////////////////////////////////////////////
+
+@interface MoveAtom : NSObject {
+    id move;
+    id srcPiece;
+    id capturedPiece;
+}
+
+@property(nonatomic,retain) id move;
+@property(nonatomic,retain) id srcPiece;
+@property(nonatomic,retain) id capturedPiece;
+
+- (id)initWithMove:(int)mv;
+
+@end
+
+////////////////////////////////////////////////////////////////////
+//
+// TimeInfo
+//
+////////////////////////////////////////////////////////////////////
+@interface TimeInfo : NSObject
+{
+    int  gameTime;  // Game-time (in seconds).
+    int  moveTime;  // Move-time (in seconds).
+    int  freeTime;  // Free-time (in seconds).
+}
+
+@property (nonatomic) int gameTime;
+@property (nonatomic) int moveTime;
+@property (nonatomic) int freeTime;
+
+- (id)initWithTime:(TimeInfo*)other;
++ (id)allocTimeFromString:(NSString *)timeContent;
+
+@end

@@ -56,8 +56,8 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
         _myColor = NC_COLOR_RED;
-        [self setRedLabel:@"You"];
-        [self setBlackLabel:[_game getAIName]];
+        [_board setRedLabel:@"You"];
+        [_board setBlackLabel:[_game getAIName]];
         
         // Restore pending game, if any.
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
@@ -185,8 +185,7 @@
     [activity setHidden:NO];
     [activity startAnimating];
 
-    if (self._timer) [self._timer invalidate];
-    self._timer = nil;
+    [_board destroyTimer];
 
     [self performSelector:@selector(resetRobot:) onThread:robot withObject:nil waitUntilDone:NO];
     [self saveGame];
@@ -195,7 +194,7 @@
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ( [_moves count] == 0 ) return;  // Do nothing if game not yet started.
+    if ([_board getMovesCount] == 0) return;  // Do nothing if game not yet started.
 
     UIAlertView *alert =
         [[UIAlertView alloc] initWithTitle:@"NevoChess"
@@ -274,7 +273,7 @@
     
     if ( !sound ) return;
 
-    [_audioHelper play_wav_sound:sound];
+    [_board playSound:sound];
 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
                                                     message:msg
@@ -304,7 +303,8 @@
     NSMutableString *sMoves = [NSMutableString new];
 
     if ( _game.game_result == kXiangQi_InPlay ) {
-        for (MoveAtom *pMove in _moves) {
+        NSMutableArray* moves = [_board getMoves];
+        for (MoveAtom *pMove in moves) {
             NSNumber *move = pMove.move;
             if ([sMoves length]) [sMoves appendString:@","];
             [sMoves appendFormat:@"%d",[move integerValue]];

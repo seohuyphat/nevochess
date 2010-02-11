@@ -19,8 +19,8 @@
 
 
 #import <UIKit/UIKit.h>
+#import "BoardView.h"
 #import "CChessGame.h"
-#import "AudioHelper.h"
 #import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
 
 BOOL layerIsBit( CALayer* layer );
@@ -58,71 +58,33 @@ enum ActionIndexEnum
 @end
 
 // -------------------------------------------------------
-@interface BoardViewController : UIViewController
+@interface BoardViewController : UIViewController <BoardOwner>
 {
     
     IBOutlet UIToolbar   *nav_toolbar;
-    IBOutlet UILabel     *red_label;
-    IBOutlet UILabel     *black_label;
-    IBOutlet UILabel     *red_time;
-    IBOutlet UILabel     *red_move_time;
-    IBOutlet UILabel     *black_time;
-    IBOutlet UILabel     *black_move_time;
     IBOutlet UIButton    *red_seat;
     IBOutlet UIButton    *black_seat;
     IBOutlet UIActivityIndicatorView *activity;
     IBOutlet UILabel     *game_over_msg;
 
-    IBOutlet UIButton    *preview_prev;
-    IBOutlet UIButton    *preview_next;
-    NSDate*              _previewLastTouched;
-    
-    NSTimer *_timer;
+    BoardView*      _board;
+    CChessGame*     _game;
 
-    AudioHelper *_audioHelper;
-
-    // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
-    int    _hl_moves[MAX_GEN_MOVES];
-    int    _hl_nMoves;
-    int    _hl_lastMove;      // The last Move that was highlighted.
-
-    Piece *_selectedPiece;
-
-    CChessGame *_game;
-
-    NSMutableArray *_moves;       // MOVE history
-    int             _nthMove;     // pivot for the Move Review
-
-    // ---------
     NSString*       _tableId;
-    TimeInfo*       _initialTime;
-    TimeInfo*       _redTime;
-    TimeInfo*       _blackTime;
     ColorEnum       _myColor;     // The color (role) of the LOCAL player.
 }
 
 @property (nonatomic, retain) IBOutlet UIToolbar *nav_toolbar;
-@property (nonatomic, retain) IBOutlet UILabel *red_label;
-@property (nonatomic, retain) IBOutlet UILabel *black_label;
-@property (nonatomic, retain) IBOutlet UILabel *red_time;
-@property (nonatomic, retain) IBOutlet UILabel *red_move_time;
-@property (nonatomic, retain) IBOutlet UILabel *black_time;
-@property (nonatomic, retain) IBOutlet UILabel *black_move_time;
 @property (nonatomic, retain) IBOutlet UIButton *red_seat;
 @property (nonatomic, retain) IBOutlet UIButton *black_seat;
 @property (nonatomic, retain) IBOutlet UILabel *game_over_msg;
 
-@property (nonatomic, retain) NSTimer* _timer;
+@property (nonatomic, retain) BoardView* _board;
+@property (nonatomic, retain) CChessGame* _game;
 @property (nonatomic, retain) NSString* _tableId;
-@property (nonatomic, retain) TimeInfo* _initialTime;
-@property (nonatomic, retain) TimeInfo* _redTime;
-@property (nonatomic, retain) TimeInfo* _blackTime;
-@property (nonatomic, retain) NSDate* _previewLastTouched;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
-- (IBAction)movePrevPressed:(id)sender;
-- (IBAction)moveNextPressed:(id)sender;
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)messagesPressed:(id)sender;
 
@@ -141,29 +103,8 @@ enum ActionIndexEnum
 - (void) displayEmptyBoard;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
-- (void) setHighlightCells:(BOOL)bHighlight;
-- (void) showHighlightOfMove:(int)move;
 - (void) handleNewMove:(NSNumber *)pMove;
 - (void) handleEndGameInUI;
 - (void) reverseBoardView;
-
-@end
-
-
-////////////////////////////////////////////////////////////////////
-//
-// Move review holder unit
-//
-////////////////////////////////////////////////////////////////////
-
-@interface MoveAtom : NSObject {
-    id move;
-    id srcPiece;
-    id capturedPiece;
-}
-
-@property(nonatomic,retain) id move;
-@property(nonatomic,retain) id srcPiece;
-@property(nonatomic,retain) id capturedPiece;
 
 @end

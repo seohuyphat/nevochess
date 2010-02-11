@@ -20,35 +20,6 @@
 #import "TableListViewController.h"
 
 //------------------------------------------------
-@implementation TimeInfo
-
-@synthesize gameTime, moveTime, freeTime;
-
-- (id)initWithTime:(TimeInfo*)other
-{
-    if (self = [self init]) {
-        gameTime = other.gameTime;
-        moveTime = other.moveTime;
-        freeTime = other.freeTime;
-    }
-    return self;
-}
-
-+ (id)allocTimeFromString:(NSString *)timeContent
-{
-    TimeInfo* newTime = [TimeInfo new];
-    NSArray* components = [timeContent componentsSeparatedByString:@"/"];
-
-    newTime.gameTime = [[components objectAtIndex:0] intValue];
-    newTime.moveTime = [[components objectAtIndex:1] intValue];
-    newTime.freeTime = [[components objectAtIndex:2] intValue];
-
-    return newTime;
-}
-
-@end
-
-//------------------------------------------------
 @implementation TableInfo
 
 @synthesize tableId;
