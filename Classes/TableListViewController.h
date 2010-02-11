@@ -19,22 +19,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TimeInfo : NSObject
-{
-    int  gameTime;  // Game-time (in seconds).
-    int  moveTime;  // Move-time (in seconds).
-    int  freeTime;  // Free-time (in seconds).
-}
-
-@property (nonatomic) int gameTime;
-@property (nonatomic) int moveTime;
-@property (nonatomic) int freeTime;
-
-- (id)initWithTime:(TimeInfo*)other;
-+ (id)allocTimeFromString:(NSString *)timeContent;
-
-@end
-
 @interface TableInfo : NSObject
 {
     NSString* tableId;
