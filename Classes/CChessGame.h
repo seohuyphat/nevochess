@@ -20,7 +20,6 @@
 #import "Enums.h"
 #import "Grid.h"
 #import "Game.h"
-#import "AIEngine.h"
 #import "Referee.h"
 
 #define INVALID_MOVE         (-1)
@@ -62,11 +61,7 @@ enum {
     NSMutableArray* _pieceBox;
     BOOL            _blackAtTopSide;
 
-    NSString*       _aiName;
-    int             _aiType;
     Referee*        _referee;
-    AIEngine*       _aiEngine;
-
     int             _gameResult;
 }
 
@@ -74,7 +69,6 @@ enum {
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
 
-- (int) getRobotMove:(int*)captured;
 - (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
 
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
@@ -83,10 +77,8 @@ enum {
 - (int) get_sdPlayer;
 - (int) get_nMoveNum;
 - (void) resetGame;
-- (NSString*) getAIName;
 - (void) reverseView;
 
-@property (nonatomic, retain) NSString* _aiName;
 @property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) int gameResult;
