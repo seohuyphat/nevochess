@@ -23,6 +23,13 @@
 #import "Grid.h"
 #import "Piece.h"
 
+enum AlertViewEnum
+{
+    POC_ALERT_END_GAME,
+    POC_ALERT_RESUME_GAME,
+    POC_ALERT_RESET_GAME
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    Private methods
@@ -194,7 +201,7 @@
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ([_board getMovesCount] == 0) return;  // Do nothing if game not yet started.
+    if ([_game get_nMoveNum] == 0) return;  // Do nothing if game not yet started.
 
     UIAlertView *alert =
         [[UIAlertView alloc] initWithTitle:@"NevoChess"
@@ -227,7 +234,7 @@
 - (void) onLocalMoveMade:(int)move
 {
     // AI's turn.
-    if ( _game.game_result == kXiangQi_InPlay ) {
+    if ( _game.gameResult == kXiangQi_InPlay ) {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }
@@ -246,7 +253,7 @@
     NSString *sound = nil;
     NSString *msg   = nil;
 
-    switch ( _game.game_result ) {
+    switch ( _game.gameResult ) {
         case kXiangQi_YouWin:
             sound = @"WIN";
             msg = NSLocalizedString(@"You win,congratulations!", @"");
@@ -302,7 +309,7 @@
 {
     NSMutableString *sMoves = [NSMutableString new];
 
-    if ( _game.game_result == kXiangQi_InPlay ) {
+    if ( _game.gameResult == kXiangQi_InPlay ) {
         NSMutableArray* moves = [_board getMoves];
         for (MoveAtom *pMove in moves) {
             NSNumber *move = pMove.move;
@@ -338,7 +345,7 @@
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
-    if ( bAIturn && _game.game_result == kXiangQi_InPlay ) {
+    if ( bAIturn && _game.gameResult == kXiangQi_InPlay ) {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }

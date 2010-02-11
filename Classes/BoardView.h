@@ -78,25 +78,9 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 /** UIView that hosts a game. */
 @interface BoardView : UIView
 {
-    CChessGame *_game;                          // Current Game
-    CALayer *_gameboard;                        // Game's main layer
-    
-    // Used during mouse-down tracking:
-    //NSPoint _dragStartPos;                      // Starting position of mouseDown
-    Bit *_dragBit;                              // Bit being dragged
-    id<BitHolder> _oldHolder;                   // Bit's original holder
-    CALayer *_oldSuperlayer;                    // Bit's original superlayer
-    int _oldLayerIndex;                         // Bit's original index in _oldSuperlayer.layers
-    CGPoint _oldPos;                            // Bit's original x/y position
-    CGPoint _dragOffset;                        // Offset of mouse position from _dragBit's origin
-    BOOL _dragMoved;                            // Has the mouse moved more than 3 pixels since mouseDown?
-    id<BitHolder> _dropTarget;                  // Current BitHolder the cursor is over
-    
-    // Used while handling incoming drags:
-    CALayer *_viewDropTarget;                   // Current drop target during an incoming drag-n-drop
-    //NSDragOperation _viewDropOp;                // Current drag operation
-    
-    ////////////////
+    CChessGame*           _game;           // Current Game
+    CALayer*              _gameboard;      // Game's main layer
+
     AudioHelper*          _audioHelper;
 
     id <BoardOwner>       _boardOwner;
@@ -132,16 +116,14 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
        LayerMatchCallback: (LayerMatchCallback)match
                    offset: (CGPoint*)outOffset;
 
-@property (readonly) CChessGame *game;
-@property (readonly) CALayer *gameboard;
-- (CGRect) gameBoardFrame;
-//////////////////////////////////////////////////
+@property (readonly) CChessGame* game;
 @property (nonatomic, retain) id <BoardOwner> boardOwner;
 @property (nonatomic, retain) NSTimer* _timer;
 @property (nonatomic, retain) TimeInfo* _initialTime;
 @property (nonatomic, retain) TimeInfo* _redTime;
 @property (nonatomic, retain) TimeInfo* _blackTime;
 @property (nonatomic, retain) NSDate* _previewLastTouched;
+
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
 
@@ -154,9 +136,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 - (void) destroyTimer;
 - (int) onNewMove:(NSNumber *)moveInfo;
 - (void) playSound:(NSString*)sound;
-- (NSUInteger) getMovesCount;
 - (NSMutableArray*) getMoves;
-- (void) showHighlightOfMove:(int)move;
 - (void) resetBoard;
 - (void) displayEmptyBoard;
 - (void) reverseBoardView;

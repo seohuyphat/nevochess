@@ -150,68 +150,36 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+//
+// Private methods (BoardView)
+//
+@interface BoardView (PrivateMethods)
+- (CGRect) _gameBoardFrame;
+- (id) _initSoundSystem;
+- (void) _showHighlightOfMove:(int)move;
+- (NSString*) _allocStringFrom:(int)seconds;
+@end
+
 @implementation BoardView
 
-@synthesize game=_game, gameboard=_gameboard;
+@synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
 @synthesize _timer, _previewLastTouched;
 @synthesize _initialTime, _redTime, _blackTime;
 
-// -------- TEMP functions (to be reviewed and moved later ------------
-- (NSString*) _allocStringFrom:(int)seconds
-{
-    return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
-}
-
-- (id) _initSoundSystem
-{
-    AudioHelper* audioHelper = [[AudioHelper alloc] init];
-    
-    if ( audioHelper != nil ) {
-        NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
-                              @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
-                              @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
-                              nil];
-        for (NSString *sound in soundList) {
-            [audioHelper load_wav_sound:sound];
-        }
-    }
-    return audioHelper;
-}
-
-- (void)dealloc
-{
-    [_gameboard removeFromSuperlayer];
-    [_gameboard release];
-    [_game release];
-    ////////////////
-    [_boardOwner release];
-    [_timer release];
-    [_moves release];
-    [_previewLastTouched release];
-    ////////////////
-    [super dealloc];
-}
 
 - (void) awakeFromNib
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     ((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController.navigationBarHidden = YES;
 
-    if( _gameboard ) {
-        [_gameboard removeFromSuperlayer];
-        _gameboard = nil;
-    }
     _gameboard = [[CALayer alloc] init];
-    _gameboard.frame = [self gameBoardFrame];
+    _gameboard.frame = [self _gameBoardFrame];
     self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
     [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
-    
-    _game = [[CChessGame alloc] initWithBoard: _gameboard];
-    int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
-    [_game setSearchDepth:nDifficulty];
-    
-    ///////////////////////////////////
+
+    _game = [[CChessGame alloc] initWithBoard:_gameboard];
+
     _audioHelper = [self _initSoundSystem];
     _boardOwner = nil;
 
@@ -219,31 +187,41 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     self._initialTime = [TimeInfo allocTimeFromString:@"900/180/20"];
     self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
     self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
-    [_red_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    [_red_move_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
+    _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+    _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
     _red_time.text = [self _allocStringFrom:_redTime.gameTime];
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
     
-    [_black_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
-    [_black_move_time setFont:[UIFont fontWithName:@"DBLCDTempBlack" size:13.0]];
+    _black_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+    _black_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
-    
-    _moves = [[NSMutableArray alloc] initWithCapacity: POC_MAX_MOVES_PER_GAME];
+
+    _moves = [[NSMutableArray alloc] initWithCapacity:POC_MAX_MOVES_PER_GAME];
     _nthMove = HISTORY_INDEX_END;
-    
+
     memset(_hl_moves, 0x0, sizeof(_hl_moves));
     _hl_nMoves = 0;
     _hl_lastMove = INVALID_MOVE;
     _selectedPiece = nil;
-    
+
     self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
-    NSLog(@"%s: _previewLastTouched = [%@].", __FUNCTION__, _previewLastTouched);
-    
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
-- (CGRect) gameBoardFrame
+- (void)dealloc
+{
+    [_gameboard removeFromSuperlayer];
+    [_gameboard release];
+    [_game release];
+    [_boardOwner release];
+    [_timer release];
+    [_moves release];
+    [_previewLastTouched release];
+    [super dealloc];
+}
+
+- (CGRect) _gameBoardFrame
 {
     CGRect bounds = self.layer.bounds;
 /*
@@ -256,17 +234,30 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     return bounds;
 }
 
+- (id) _initSoundSystem
+{
+    AudioHelper* audioHelper = [[AudioHelper alloc] init];
+
+    NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
+                          @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
+                          @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
+                          nil];
+    for (NSString* sound in soundList) {
+        [audioHelper load_wav_sound:sound];
+    }
+    return audioHelper;
+}
+
 
 #pragma mark -
 #pragma mark HIT-TESTING:
 
 
-/** Locates the layer at a given point in window coords.
-    If the leaf layer doesn't pass the layer-match callback, the nearest ancestor that does is returned.
-    If outOffset is provided, the point's position relative to the layer is stored into it. */
+// Locates the layer at a given point in window coords.
+//    If the leaf layer doesn't pass the layer-match callback, the nearest ancestor that does is returned.
+//    If outOffset is provided, the point's position relative to the layer is stored into it.
 - (CALayer*) hitTestPoint: (CGPoint)locationInWindow
-       LayerMatchCallback: (LayerMatchCallback)match
-                   offset: (CGPoint*)outOffset
+       LayerMatchCallback: (LayerMatchCallback)match offset: (CGPoint*)outOffset
 {
     CGPoint where = locationInWindow;
     where = [_gameboard convertPoint: where fromLayer: self.layer];
@@ -283,8 +274,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
     return nil;
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 - (void) setRedLabel:(NSString*)label
 {
@@ -345,12 +334,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     // Set (or Clear) highlighted cells.
     for(int i = 0; i < _hl_nMoves; ++i) {
         int sqDst = DST(_hl_moves[i]);
-        int row = ROW(sqDst);
-        int col = COLUMN(sqDst);
         if ( ! bHighlight ) {
             _hl_moves[i] = 0;
         }
-        [_game x_getCellAtRow:row col:col]._highlighted = bHighlight;
+        [_game getCellAtRow:ROW(sqDst) col:COLUMN(sqDst)]._highlighted = bHighlight;
     }
     
     if ( ! bHighlight ) {
@@ -358,7 +345,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void) showHighlightOfMove:(int)move
+- (void) _showHighlightOfMove:(int)move
 {
     if (_hl_lastMove != INVALID_MOVE) {
         _hl_nMoves = 1;
@@ -366,12 +353,17 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         [self setHighlightCells:NO];
         _hl_lastMove = INVALID_MOVE;
     }
-    
+
     if (move != INVALID_MOVE) {
         int sqDst = DST(move);
-        [_game x_getCellAtRow:ROW(sqDst) col:COLUMN(sqDst)]._highlighted = YES;
+        [_game getCellAtRow:ROW(sqDst) col:COLUMN(sqDst)]._highlighted = YES;
         _hl_lastMove = move;
     }
+}
+
+- (NSString*) _allocStringFrom:(int)seconds
+{
+    return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
 - (int) onNewMove:(NSNumber *)moveInfo
@@ -401,8 +393,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
     NSString* sound = @"MOVE";
 
-    Piece* capture = [_game x_getPieceAtRow:row2 col:col2];
-    Piece* piece = [_game x_getPieceAtRow:row1 col:col1];
+    Piece* capture = [_game getPieceAtRow:row2 col:col2];
+    Piece* piece = [_game getPieceAtRow:row1 col:col1];
 
     if (capture) {
         [capture removeFromSuperlayer];
@@ -411,14 +403,13 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
     [_audioHelper play_wav_sound:sound];
 
-    [_game x_movePiece:piece toRow:row2 toCol:col2];
-    [self showHighlightOfMove:move];
+    [_game movePiece:piece toRow:row2 toCol:col2];
+    [self _showHighlightOfMove:move];
 
     // Add this new Move to the Move-History.
     pMove.srcPiece = piece;
     pMove.capturedPiece = capture;
 
-    // Check End-Game status.
     int nGameResult = [_game checkGameStatus:isAI];
     return nGameResult;
 }
@@ -437,7 +428,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void)_ticked:(NSTimer*)timer
 {
     NSTimeInterval timeInterval = - [_previewLastTouched timeIntervalSinceNow]; // in seconds.
-    //NSLog(@"%s: ... timeInterval = [%f].", __FUNCTION__, timeInterval);
     if (![self _isInReview] && timeInterval > 5) { // hide if older than 5 seconds?
         _preview_prev.hidden = YES;
         _preview_next.hidden = YES;
@@ -448,7 +438,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     //       this App (with AI only) to start the timer right after one Move
     //       is made (by RED).
     //
-    if ( _game.game_result == kXiangQi_InPlay && [_moves count] > 0 ) {
+    if ( _game.gameResult == kXiangQi_InPlay && [_moves count] > 0 ) {
         [self _updateTimer:[_game get_sdPlayer]];
     }
 }
@@ -468,11 +458,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) playSound:(NSString*)sound
 {
     [_audioHelper play_wav_sound:sound];
-}
-
-- (NSUInteger) getMovesCount
-{
-    return [_moves count];
 }
 
 - (NSMutableArray*) getMoves
@@ -506,9 +491,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
     //
-    [_game x_movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
+    [_game movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
     if (pMove.capturedPiece) {
-        [_game x_movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_game movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     }
     
     // Highlight the Piece (if any) of the "next-PREV" Move.
@@ -518,7 +503,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         pMove = [_moves objectAtIndex:_nthMove];
         prevMove = [(NSNumber*)pMove.move intValue];
     }
-    [self showHighlightOfMove:prevMove];
+    [self _showHighlightOfMove:prevMove];
 }
 
 - (IBAction)moveNextPressed:(id)sender
@@ -548,24 +533,23 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     int row2 = ROW(sqDst);
     int col2 = COLUMN(sqDst);
     [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
-    Piece *capture = [_game x_getPieceAtRow:row2 col:col2];
+    Piece *capture = [_game getPieceAtRow:row2 col:col2];
     if (capture) {
         [capture removeFromSuperlayer];
     }
     if (!pMove.srcPiece) { // not yet processed?
         NSLog(@"%s: Process pending move [%@]...", __FUNCTION__, pMove);
         int sqSrc = SRC(move);
-        pMove.srcPiece = [_game x_getPieceAtRow:ROW(sqSrc) col:COLUMN(sqSrc)];
+        pMove.srcPiece = [_game getPieceAtRow:ROW(sqSrc) col:COLUMN(sqSrc)];
         NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
         pMove.capturedPiece = capture;
     }
-    [_game x_movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
-    [self showHighlightOfMove:move];
+    [_game movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
+    [self _showHighlightOfMove:move];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     if ( [[event allTouches] count] != 1 ) { // Valid for single touch only
         return;
     }
@@ -637,7 +621,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         int sqSrc = TOSQUARE(row1, col1);
         int sqDst = TOSQUARE(row2, col2);
         int move = MOVE(sqSrc, sqDst);
-        if([_game isLegalMove:move])
+        if ([_game isLegalMove:move])
         {
             [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
             
@@ -649,7 +633,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     } else {
         [self setHighlightCells:NO];  // Clear highlighted.
     }
-    
+
     _selectedPiece = nil;  // Reset selected state.
 }
 
@@ -657,7 +641,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     [self setHighlightCells:NO];
     _selectedPiece = nil;
-    [self showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
     self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
     self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
     memset(_hl_moves, 0x0, sizeof(_hl_moves));
@@ -665,8 +649,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
-    
-    [_game reset_game];
+
+    [_game resetGame];
     [_moves removeAllObjects];
     _nthMove = HISTORY_INDEX_END;
 }
