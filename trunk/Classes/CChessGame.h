@@ -68,12 +68,13 @@ enum {
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
+- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight;
 
 - (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
 
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
 - (BOOL) isLegalMove:(int)mv;
-- (int) checkGameStatus:(BOOL)isAI;
+- (int) checkGameStatus;
 - (ColorEnum) getNextColor;
 - (int) getMoveCount;
 - (void) resetGame;
