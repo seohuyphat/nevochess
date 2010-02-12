@@ -109,13 +109,9 @@
 
 @implementation BoardViewController
 
-@synthesize nav_toolbar;
-@synthesize red_seat;
-@synthesize black_seat;
 @synthesize _board;
 @synthesize _game;
 @synthesize _tableId;
-@synthesize game_over_msg;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -140,7 +136,6 @@
     [super viewDidLoad];
 
     [activity stopAnimating];
-    [game_over_msg setHidden:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -152,11 +147,6 @@
 
 - (void)dealloc
 {
-    [nav_toolbar release];
-    [activity release];
-    [game_over_msg release];
-    [red_seat release];
-    [black_seat release];
     [_board release];
     [_game release];
     [_tableId release];
@@ -260,7 +250,6 @@
 - (void) displayEmptyBoard
 {
     [_board displayEmptyBoard];
-    [game_over_msg setHidden:YES];
 }
 
 - (BOOL) isMyTurnNext

@@ -391,14 +391,6 @@
 					<int key="connectionID">110</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">game_over_msg</string>
-						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="610252599"/>
-					</object>
-					<int key="connectionID">124</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">messagesPressed:</string>
 						<reference key="source" ref="350535961"/>
@@ -503,6 +495,14 @@
 						<reference key="destination" ref="22132559"/>
 					</object>
 					<int key="connectionID">154</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">_game_over_msg</string>
+						<reference key="source" ref="191373211"/>
+						<reference key="destination" ref="610252599"/>
+					</object>
+					<int key="connectionID">155</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -733,7 +733,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">154</int>
+			<int key="maxID">155</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -761,6 +761,7 @@
 							<string>_black_label</string>
 							<string>_black_move_time</string>
 							<string>_black_time</string>
+							<string>_game_over_msg</string>
 							<string>_preview_next</string>
 							<string>_preview_prev</string>
 							<string>_red_label</string>
@@ -769,6 +770,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>UILabel</string>
 							<string>UILabel</string>
 							<string>UILabel</string>
 							<string>UILabel</string>
@@ -809,34 +811,16 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>activity</string>
-							<string>black_label</string>
-							<string>black_move_time</string>
 							<string>black_seat</string>
-							<string>black_time</string>
-							<string>game_over_msg</string>
 							<string>nav_toolbar</string>
-							<string>preview_next</string>
-							<string>preview_prev</string>
-							<string>red_label</string>
-							<string>red_move_time</string>
 							<string>red_seat</string>
-							<string>red_time</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UIActivityIndicatorView</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
 							<string>UIButton</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
 							<string>UIToolbar</string>
 							<string>UIButton</string>
-							<string>UIButton</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
-							<string>UIButton</string>
-							<string>UILabel</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">

@@ -197,6 +197,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
+    _game_over_msg.hidden = YES;
+
     _moves = [[NSMutableArray alloc] initWithCapacity:POC_MAX_MOVES_PER_GAME];
     _nthMove = HISTORY_INDEX_END;
 
@@ -275,15 +277,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     return nil;
 }
 
-- (void) setRedLabel:(NSString*)label
-{
-    _red_label.text = label;
-}
-
-- (void) setBlackLabel:(NSString*)label
-{
-    _black_label.text = label;
-}
+- (void) setRedLabel:(NSString*)label  { _red_label.text = label; }
+- (void) setBlackLabel:(NSString*)label { _black_label.text = label; }
 
 - (void) setInitialTime:(NSString*)times
 {
@@ -331,7 +326,6 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) setHighlightCells:(BOOL)bHighlight
 {
-    // Set (or Clear) highlighted cells.
     for(int i = 0; i < _hl_nMoves; ++i) {
         int sqDst = DST(_hl_moves[i]);
         if ( ! bHighlight ) {
@@ -412,6 +406,11 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
     int nGameResult = [_game checkGameStatus:isAI];
     return nGameResult;
+}
+
+- (void) onGameOver
+{
+    _game_over_msg.hidden = NO;
 }
 
 - (void) _updateTimer:(int)color
@@ -649,6 +648,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
+
+    _game_over_msg.hidden = YES;
 
     [_game resetGame];
     [_moves removeAllObjects];

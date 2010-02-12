@@ -314,6 +314,7 @@ enum AlertViewEnum
     if ( !sound ) return;
 
     [_board playSound:sound];
+    [_board onGameOver];
 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
                                                     message:msg

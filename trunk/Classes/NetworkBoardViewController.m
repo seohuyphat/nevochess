@@ -435,7 +435,6 @@
 {
     [self resetBoard];
     _isGameOver = NO;
-    [game_over_msg setHidden:YES];
 }
 
 - (void) _onNewMessage:(NSString*)msg from:(NSString*)pid
@@ -670,7 +669,7 @@
 
     if ( [_tableId isEqualToString:tableId] ) {
         _isGameOver = YES;
-        [game_over_msg setHidden:NO];
+        [_board onGameOver];
     }
 }
 
