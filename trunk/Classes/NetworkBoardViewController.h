@@ -40,10 +40,11 @@
     BOOL               _loginCanceled;
     BOOL               _loginAuthenticated;
     BOOL               _logoutPending;
-    LoginViewController*     _loginController;
-    TableListViewController* _tableListController;
+
+    LoginViewController*       _loginController;
+    TableListViewController*   _tableListController;
     MessageListViewController* _messageListController;
-    UIBarButtonItem* _messagesButton;
+    UIBarButtonItem*           _messagesButton;
 }
 
 @property (nonatomic, retain) NSString* _username;

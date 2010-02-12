@@ -74,8 +74,8 @@ enum {
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
 - (BOOL) isLegalMove:(int)mv;
 - (int) checkGameStatus:(BOOL)isAI;
-- (int) get_sdPlayer;
-- (int) get_nMoveNum;
+- (ColorEnum) getNextColor;
+- (int) getMoveCount;
 - (void) resetGame;
 - (void) reverseView;
 

@@ -222,7 +222,7 @@ enum AlertViewEnum
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ([_game get_nMoveNum] == 0) return;  // Do nothing if game not yet started.
+    if ([_game getMoveCount] == 0) return;  // Do nothing if game not yet started.
 
     UIAlertView *alert =
         [[UIAlertView alloc] initWithTitle:@"NevoChess"

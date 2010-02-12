@@ -76,8 +76,6 @@ enum ActionIndexEnum
 - (void) onLocalMoveMade:(int)move;
 
 - (void) goBackToHomeMenu;
-- (void) setRedLabel:(NSString*)label;
-- (void) setBlackLabel:(NSString*)label;
 - (void) setInitialTime:(NSString*)times;
 - (void) setRedTime:(NSString*)times;
 - (void) setBlackTime:(NSString*)times;
