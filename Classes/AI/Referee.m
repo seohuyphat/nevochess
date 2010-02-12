@@ -58,7 +58,6 @@ extern int  Referee_get_sdPlayer();
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)moves
 {
     return Referee_generate_move_from(sqSrc, moves);
-    return POC_RC_REF_OK;
 }
 
 - (BOOL) isLegalMove:(int)move

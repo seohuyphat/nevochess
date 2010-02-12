@@ -156,7 +156,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 @interface BoardView (PrivateMethods)
 - (CGRect) _gameBoardFrame;
 - (id) _initSoundSystem;
+- (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _showHighlightOfMove:(int)move;
+- (void) _ticked:(NSTimer*)timer;
+- (void) _updateTimer;
 - (NSString*) _allocStringFrom:(int)seconds;
 @end
 
@@ -197,6 +200,8 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
+    _red_label.text = @"";
+    _black_label.text = @"";
     _game_over_msg.hidden = YES;
 
     _moves = [[NSMutableArray alloc] initWithCapacity:POC_MAX_MOVES_PER_GAME];
@@ -324,7 +329,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void) setHighlightCells:(BOOL)bHighlight
+- (void) _setHighlightCells:(BOOL)bHighlight
 {
     for(int i = 0; i < _hl_nMoves; ++i) {
         int sqDst = DST(_hl_moves[i]);
@@ -344,7 +349,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     if (_hl_lastMove != INVALID_MOVE) {
         _hl_nMoves = 1;
         _hl_moves[0] = _hl_lastMove;
-        [self setHighlightCells:NO];
+        [self _setHighlightCells:NO];
         _hl_lastMove = INVALID_MOVE;
     }
 
@@ -363,7 +368,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (int) onNewMove:(NSNumber *)moveInfo
 {
     int  move = [moveInfo integerValue];
-    BOOL isAI = ([_game get_sdPlayer] == 0);  // AI just made this Move.
+    BOOL isAI = ([_game getNextColor] == NC_COLOR_RED); // AI just made this Move.
 
     [self resetMoveTime:(isAI ? NC_COLOR_BLACK : NC_COLOR_RED)];
 
@@ -413,9 +418,9 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _game_over_msg.hidden = NO;
 }
 
-- (void) _updateTimer:(int)color
+- (void) _updateTimer
 {
-    if ( color == 1 ) {
+    if ([_game getNextColor] == NC_COLOR_BLACK) {
         _black_time.text = [self _allocStringFrom:_blackTime.gameTime--];
         _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime--];
     } else {
@@ -424,7 +429,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 }
 
-- (void)_ticked:(NSTimer*)timer
+- (void) _ticked:(NSTimer*)timer
 {
     NSTimeInterval timeInterval = - [_previewLastTouched timeIntervalSinceNow]; // in seconds.
     if (![self _isInReview] && timeInterval > 5) { // hide if older than 5 seconds?
@@ -438,7 +443,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     //       is made (by RED).
     //
     if ( _game.gameResult == kXiangQi_InPlay && [_moves count] > 0 ) {
-        [self _updateTimer:[_game get_sdPlayer]];
+        [self _updateTimer];
     }
 }
 
@@ -588,10 +593,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
             }
             //*******************
             int sqSrc = TOSQUARE(row, col);
-            [self setHighlightCells:NO]; // Clear old highlight.
+            [self _setHighlightCells:NO]; // Clear old highlight.
             
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
-            [self setHighlightCells:YES];
+            [self _setHighlightCells:YES];
             _selectedPiece = piece;
             [self playSound:@"CLICK"];
             return;
@@ -602,7 +607,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     
     // Make a Move from the last selected cell to the current selected cell.
     if(holder && holder._highlighted && _selectedPiece != nil && _hl_nMoves > 0) {
-        [self setHighlightCells:NO]; // Clear highlighted.
+        [self _setHighlightCells:NO]; // Clear highlighted.
         
         GridCell *cell = (GridCell*)_selectedPiece.holder;
         //*******************
@@ -630,7 +635,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
             [_boardOwner onLocalMoveMade:move];
         }
     } else {
-        [self setHighlightCells:NO];  // Clear highlighted.
+        [self _setHighlightCells:NO];  // Clear highlighted.
     }
 
     _selectedPiece = nil;  // Reset selected state.
@@ -638,12 +643,13 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) resetBoard
 {
-    [self setHighlightCells:NO];
+    [self _setHighlightCells:NO];
     _selectedPiece = nil;
     [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    memset(_hl_moves, 0x0, sizeof(_hl_moves));
+
     self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
     self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
-    memset(_hl_moves, 0x0, sizeof(_hl_moves));
     _red_time.text = [self _allocStringFrom:_redTime.gameTime];
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];

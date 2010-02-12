@@ -243,8 +243,8 @@
     return nGameResult;
 }
 
-- (int) get_sdPlayer { return [_referee get_sdPlayer]; }
-- (int) get_nMoveNum { return [_referee get_nMoveNum]; }
+- (ColorEnum) getNextColor { return [_referee get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED; }
+- (int) getMoveCount { return [_referee get_nMoveNum]; }
 
 - (void) resetGame
 {

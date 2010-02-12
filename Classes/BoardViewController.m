@@ -118,8 +118,6 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self._board = (BoardView*) self.view;
         _board.boardOwner = self;
-        [_board setRedLabel:@""];
-        [_board setBlackLabel:@""];
 
         self._game = ((BoardView*)self.view).game;
 
@@ -185,16 +183,6 @@
     [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
 }
 
-- (void) setRedLabel:(NSString*)label
-{
-    [_board setRedLabel:label];
-}
-
-- (void) setBlackLabel:(NSString*)label
-{
-    [_board setBlackLabel:label];
-}
-
 - (void) setInitialTime:(NSString*)times
 {
     [_board setInitialTime:times];
@@ -254,9 +242,7 @@
 
 - (BOOL) isMyTurnNext
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    const ColorEnum nextColor = ([_game get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED); 
-    return (nextColor == _myColor);
+    return ([_game getNextColor] == _myColor);
 }
 
 - (BOOL) isGameReady

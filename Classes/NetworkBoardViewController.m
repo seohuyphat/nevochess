@@ -239,7 +239,7 @@
         title = [NSString stringWithFormat:@"Table #%@", _tableId];
         if ((_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
             && !_isGameOver ) {
-            state = ([_game get_nMoveNum] == 0 ? @"ready" : @"play");
+            state = ([_game getMoveCount] == 0 ? @"ready" : @"play");
         } else {
             state = @"view";
         }
@@ -593,8 +593,8 @@
                          : [NSString stringWithFormat:@"%@ (%@)", table.redId, table.redRating]);
     NSString* blackInfo = ([table.blackId length] == 0 ? @"*"
                            : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
-    [self setRedLabel:redInfo];
-    [self setBlackLabel:blackInfo];
+    [_board setRedLabel:redInfo];
+    [_board setBlackLabel:blackInfo];
     [self setInitialTime:table.itimes];
     [self setRedTime:table.redTimes];
     [self setBlackTime:table.blackTimes];
@@ -701,18 +701,18 @@
     }
     if ([color isEqualToString:@"Red"]) {
         self._redId = pid;
-        [self setRedLabel:playerInfo];
+        [_board setRedLabel:playerInfo];
     } else if ([color isEqualToString:@"Black"]) {
         self._blackId = pid;
-        [self setBlackLabel:playerInfo];
+        [_board setBlackLabel:playerInfo];
     } else if ([color isEqualToString:@"None"]) {
         NSLog(@"%s: Player: [%@] joined as an observer.", __FUNCTION__, playerInfo);
         if ([pid isEqualToString:self._redId]) {
             self._redId = nil;
-            [self setRedLabel:@"*"];
+            [_board setRedLabel:@"*"];
         } else if ([pid isEqualToString:self._blackId]) {
             self._blackId = nil;
-            [self setBlackLabel:@"*"];
+            [_board setBlackLabel:@"*"];
         }
     }
 }
@@ -729,10 +729,10 @@
     }
     if ([pid isEqualToString:self._redId]) {
         self._redId = nil;
-        [self setRedLabel:@"*"];
+        [_board setRedLabel:@"*"];
     } else if ([pid isEqualToString:self._blackId]) {
         self._blackId = nil;
-        [self setBlackLabel:@"*"];
+        [_board setBlackLabel:@"*"];
     }
 }
 
