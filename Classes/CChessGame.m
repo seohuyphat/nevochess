@@ -135,6 +135,11 @@
     return s;
 }
 
+- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
+{
+    [self getCellAtRow:ROW(cell) col:COLUMN(cell)]._highlighted = bHighlight;
+}
+
 - (void)dealloc
 {
     [_grid removeAllCells];
@@ -213,10 +218,11 @@
     return [_referee isLegalMove:mv];
 }
 
-- (int) checkGameStatus:(BOOL)isAI
+- (int) checkGameStatus
 {
     int nGameResult = kXiangQi_Unknown;
-    
+    BOOL isAI = ([self getNextColor] == NC_COLOR_RED); // AI just made this Move.
+
     if ( [_referee isMate] ) {
         nGameResult = (isAI ? kXiangQi_ComputerWin : kXiangQi_YouWin);
     }
