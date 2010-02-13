@@ -58,6 +58,8 @@
 		AF4E2ADC111D99A2009E2EC8 /* ItemInputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF4E2ADB111D99A2009E2EC8 /* ItemInputViewController.m */; };
 		AF534CAF1111435400067844 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF534CAE1111435400067844 /* LoginViewController.m */; };
 		AF534CB81111440F00067844 /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF534CB71111440F00067844 /* LoginView.xib */; };
+		AF559E55112720F900C6236D /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = AF559E54112720F900C6236D /* help.png */; };
+		AF559E811127245100C6236D /* background_320x460.png in Resources */ = {isa = PBXBuildFile; fileRef = AF559E801127245100C6236D /* background_320x460.png */; };
 		AF624878108013F60019D2E9 /* ChessBoardViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB5F881033069500243E55 /* ChessBoardViewController.xib */; };
 		AF7FBAD9110F6D07004F7691 /* BoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF7FBAD8110F6D07004F7691 /* BoardViewController.m */; };
 		AF7FBB12110F72BF004F7691 /* NetworkBoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF7FBB10110F72BF004F7691 /* NetworkBoardViewController.m */; };
@@ -163,6 +165,8 @@
 		AF534CAD1111435400067844 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		AF534CAE1111435400067844 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		AF534CB71111440F00067844 /* LoginView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginView.xib; sourceTree = "<group>"; };
+		AF559E54112720F900C6236D /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
+		AF559E801127245100C6236D /* background_320x460.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background_320x460.png; sourceTree = "<group>"; };
 		AF7FBAD7110F6D07004F7691 /* BoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardViewController.h; sourceTree = "<group>"; };
 		AF7FBAD8110F6D07004F7691 /* BoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardViewController.m; sourceTree = "<group>"; };
 		AF7FBB10110F72BF004F7691 /* NetworkBoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkBoardViewController.m; sourceTree = "<group>"; };
@@ -391,6 +395,7 @@
 		AFA63FE3106FABD700D7B220 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				AF559E54112720F900C6236D /* help.png */,
 				AF1B672E108558D600032C01 /* start-here.png */,
 				AF1B6723108555DC00032C01 /* applications-internet.png */,
 				AF1B671F1085546100032C01 /* preferences-system.png */,
@@ -400,6 +405,7 @@
 				AF32D2A1107BA45E000C356A /* go-previous.png */,
 				AFA4663F106FB2C60006DAFE /* Icon.png */,
 				AFA63FEE106FAC8F00D7B220 /* board_320x480.png */,
+				AF559E801127245100C6236D /* background_320x460.png */,
 				AFA63FE4106FABD700D7B220 /* background_320x480.png */,
 			);
 			path = images;
@@ -502,6 +508,8 @@
 				AF112F911115FAAF004C1452 /* TableListView.xib in Resources */,
 				AFF191D7111D118000849AEA /* MessageListView.xib in Resources */,
 				AF4E2AC4111D988C009E2EC8 /* ItemInputView.xib in Resources */,
+				AF559E55112720F900C6236D /* help.png in Resources */,
+				AF559E811127245100C6236D /* background_320x460.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
