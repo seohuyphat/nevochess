@@ -31,6 +31,7 @@ enum ActionIndexEnum
     ACTION_INDEX_CLOSE,
     ACTION_INDEX_RESIGN,
     ACTION_INDEX_DRAW,
+    ACTION_INDEX_RESET,
     ACTION_INDEX_LOGOUT,
     ACTION_INDEX_CANCEL
 };
@@ -40,6 +41,7 @@ enum ActionIndexEnum
     int closeIndex;  // Close the current table.
     int resignIndex;
     int drawIndex;
+    int resetIndex;
     int logoutIndex;
     int cancelIndex;
 }

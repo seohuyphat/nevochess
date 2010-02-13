@@ -235,6 +235,9 @@
         case ACTION_INDEX_DRAW:
             [_connection send_DRAW:_tableId];
             break;
+        case ACTION_INDEX_RESET:
+            [_connection send_RESET:_tableId];
+            break;
         default:
             break; // Do nothing.
     };
@@ -248,9 +251,13 @@
     if (_tableId)
     {
         title = [NSString stringWithFormat:@"Table #%@", _tableId];
-        if ((_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
-            && !_isGameOver ) {
-            state = ([_game getMoveCount] == 0 ? @"ready" : @"play");
+        if (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
+        {
+            if (_isGameOver) {
+                state = @"ended";
+            } else {
+                state = ([_game getMoveCount] == 0 ? @"ready" : @"play");
+            }
         } else {
             state = @"view";
         }
