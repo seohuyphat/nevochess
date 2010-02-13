@@ -61,14 +61,14 @@
 
 @synthesize addButton;
 @synthesize listView;
-@synthesize delegate;
+@synthesize _delegate;
 @synthesize viewOnly=_viewOnly;
 
-- (id)initWithList:(NSString *)tablesStr
+- (id)initWithDelegate:(id<TableListDelegate>)delegate
 {
     if (self = [self initWithNibName:@"TableListView" bundle:nil]) {
         _tables = [[NSMutableArray alloc] init];
-        [self _parseTablesStr:tablesStr];
+        self._delegate = delegate;
     }
     return self;
 }
@@ -79,6 +79,7 @@
     [self.listView reloadData];
     [self.listView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
                          atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    [_activity stopAnimating];
 }
 
 - (void)viewDidLoad
@@ -91,6 +92,19 @@
     self.addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                               target:self action:@selector(_addNewTable)];
     self.navigationItem.rightBarButtonItem = addButton;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_activity setHidden:NO];
+    [_activity startAnimating];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_activity stopAnimating];
 }
 
 - (void) setViewOnly:(BOOL)value
@@ -115,7 +129,9 @@
 
 - (IBAction) refreshButtonPressed:(id)sender
 {
-    [delegate handeRefreshFromList];
+    [_activity setHidden:NO];
+    [_activity startAnimating];
+    [_delegate handeRefreshFromList];
 }
 
 #pragma mark Table view methods
@@ -127,7 +143,6 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSLog(@"%s: ENTER. section = [%d]", __FUNCTION__, section);
     return [_tables count];
 }
 
@@ -170,7 +185,7 @@
     NSString* joinColor = @"None"; // Default: an observer.
     if ([table.redId length] == 0) { joinColor = @"Red"; }
     else if ([table.blackId length] == 0) { joinColor = @"Black"; }
-    [delegate handeTableJoin:table color:joinColor];
+    [_delegate handeTableJoin:table color:joinColor];
 }
 
 - (void)dealloc
@@ -178,7 +193,7 @@
     self.addButton = nil;
     self.listView = nil;
     [_tables release];
-    [delegate release];
+    self._delegate = nil;
     [super dealloc];
 }
 
@@ -193,6 +208,9 @@
 
 - (void) _parseTablesStr:(NSString *)tablesStr
 {
+    if (!tablesStr || [tablesStr length] == 0) {
+        return;
+    }
     [_tables removeAllObjects];
     NSArray* entries = [tablesStr componentsSeparatedByString:@"\n"];
     for (NSString *entry in entries) {
@@ -204,7 +222,7 @@
 
 - (void) _addNewTable
 {
-    [delegate handeNewFromList];
+    [_delegate handeNewFromList];
 }
 
 @end

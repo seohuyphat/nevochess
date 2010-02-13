@@ -39,7 +39,6 @@ enum LoginButtonEnum
     return self;
 }
 
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
@@ -90,7 +89,10 @@ enum LoginButtonEnum
 
 - (void)setErrorString:(NSString*)errorStr
 {
-    _error.text = errorStr;
+    if (errorStr) {
+        _error.text = errorStr;
+        _clickedButton = BUTTON_NONE;
+    }
 }
 
 - (IBAction)loginButtonPressed:(id)sender
