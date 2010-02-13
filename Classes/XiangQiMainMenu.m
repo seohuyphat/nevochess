@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #import "XiangQiMainMenu.h"
-#import "ChessBoardViewController.h"
+#import "AIBoardViewController.h"
 #import "NetworkBoardViewController.h"
 #import "AboutViewController.h"
 #import "OptionsViewController.h"
@@ -63,7 +63,7 @@
 
 - (IBAction)newGamePressed:(id)sender
 {
-    ChessBoardViewController *chessboard = [[ChessBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
+    AIBoardViewController *chessboard = [[AIBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
     [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }

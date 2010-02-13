@@ -17,7 +17,7 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "ChessBoardViewController.h"
+#import "AIBoardViewController.h"
 #import "Enums.h"
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
@@ -39,7 +39,7 @@ enum AlertViewEnum
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-@interface ChessBoardViewController (PrivateMethods)
+@interface AIBoardViewController (PrivateMethods)
 
 - (void) _AIMove;
 - (void) _handleEndGameInUI;
@@ -56,7 +56,7 @@ enum AlertViewEnum
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-@implementation ChessBoardViewController
+@implementation AIBoardViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

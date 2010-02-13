@@ -21,7 +21,7 @@
 #import "BoardViewController.h"
 #import "AIEngine.h"
 
-@interface ChessBoardViewController : BoardViewController
+@interface AIBoardViewController : BoardViewController
 {
     NSString*       _aiName;
     AIEngine*       _aiEngine;
