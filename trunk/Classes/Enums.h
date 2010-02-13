@@ -34,7 +34,17 @@
 #define POC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
 #define POC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    Network (PlayXiangqi server) constants
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#define NC_SERVER_IP              @"games.playxiangqi.com"
+#define NC_SERVER_PORT            80
 #define NC_GUEST_PREFIX           @"Guest#"
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //

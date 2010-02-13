@@ -27,25 +27,41 @@
 //////////////////////////////////////////////////////////////////////////////
 @implementation BoardActionSheet
 
+- (void) _clearAllIndices
+{
+    closeIndex  = -1;
+    resignIndex = -1;
+    drawIndex   = -1;
+    resetIndex  = -1;
+    logoutIndex = -1;
+    cancelIndex = -1;
+}
+
 - (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
                    title:(NSString*)title
 {
+    [self _clearAllIndices];
+
     if ([state isEqualToString:@"play"]) {
-        closeIndex = -1;
         resignIndex = 0;
         drawIndex = 1;
-        logoutIndex = -1;
         cancelIndex = 2;
         self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
              destructiveButtonTitle:@"Resign"
                   otherButtonTitles:@"Draw", nil];
     }
+    else if ([state isEqualToString:@"ended"]) {
+        closeIndex = 0;
+        resetIndex = 1;
+        cancelIndex = 2;
+        self = [super initWithTitle:title delegate:delegate
+                  cancelButtonTitle:@"Cancel"
+             destructiveButtonTitle:@"Close Table"
+                  otherButtonTitles:@"Reset Table", nil];
+    }
     else if ([state isEqualToString:@"view"] || [state isEqualToString:@"ready"]) {
         closeIndex = 0;
-        resignIndex = -1;
-        drawIndex = -1;
-        logoutIndex = -1;
         cancelIndex = 1;
         self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
@@ -53,9 +69,6 @@
                   otherButtonTitles:nil];
     }
     else if ([state isEqualToString:@"logout"]) {
-        closeIndex = -1;
-        resignIndex = -1;
-        drawIndex = -1;
         logoutIndex = 0;
         cancelIndex = 1;
         self = [super initWithTitle:title delegate:delegate
@@ -64,10 +77,6 @@
                   otherButtonTitles:nil];
     }
     else {
-        closeIndex = -1;
-        resignIndex = -1;
-        drawIndex = -1;
-        logoutIndex = -1;
         cancelIndex = 0;
         self = [super initWithTitle:title delegate:delegate
                   cancelButtonTitle:@"Cancel"
@@ -84,6 +93,7 @@
     if (buttonIndex == closeIndex) { return ACTION_INDEX_CLOSE; }
     if (buttonIndex == resignIndex) { return ACTION_INDEX_RESIGN; }
     if (buttonIndex == drawIndex) { return ACTION_INDEX_DRAW; }
+    if (buttonIndex == resetIndex) { return ACTION_INDEX_RESET; }
     if (buttonIndex == logoutIndex) { return ACTION_INDEX_LOGOUT; }
     return ACTION_INDEX_CANCEL;
 }

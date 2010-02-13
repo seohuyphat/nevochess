@@ -18,11 +18,12 @@
  ***************************************************************************/
 
 #import "NetworkConnection.h"
+#import "Enums.h"
 
 @interface NetworkConnection (PrivateMethods)
 - (void) _openIOStreams;
 - (void) _closeIOStreams;
-- (void) _flushOutgoingData;
+- (void) _flushOutgoingData:(NSString*)outStr;
 - (unsigned int) _sendOutgoingData;
 - (unsigned int) _receiveIncomingData;
 @end
@@ -84,78 +85,74 @@
 - (void) send_LOGIN
 {
     NSString* outStr = [NSString stringWithFormat:@"op=LOGIN&pid=%@&password=%@\n", _username, _password];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_LOGOUT
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=LOGOUT&pid=%@\n", _username];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_LIST
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=LIST&pid=%@\n", _username];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_NEW:(NSString*)itimes
 {
     NSString* outStr = [NSString stringWithFormat:@"op=NEW&pid=%@&itimes=%@\n", _username, itimes];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_JOIN:(NSString*)tableId color:(NSString*)joinColor
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=JOIN&pid=%@&tid=%@&color=%@\n", _username, tableId, joinColor];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_LEAVE:(NSString*)tableId
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=LEAVE&pid=%@&tid=%@\n", _username, tableId];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_MOVE:(NSString*)tableId move:(NSString*)moveStr
 {
     NSString* outStr = [NSString stringWithFormat:@"op=MOVE&pid=%@&tid=%@&move=%@\n", _username, tableId, moveStr];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_RESIGN:(NSString*)tableId
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=RESIGN&pid=%@&tid=%@\n", _username, tableId];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_DRAW:(NSString*)tableId
-{    
+{
     NSString* outStr = [NSString stringWithFormat:@"op=DRAW&pid=%@&tid=%@\n", _username, tableId];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
+}
+
+- (void) send_RESET:(NSString*)tableId
+{
+    NSString* outStr = [NSString stringWithFormat:@"op=RESET&pid=%@&tid=%@\n", _username, tableId];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) send_MSG:(NSString*)tableId msg:(NSString*)msg
 {
     NSString* outStr = [NSString stringWithFormat:@"op=MSG&pid=%@&tid=%@&msg=%@\n", _username, tableId, msg];
-    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
-    [self _flushOutgoingData];
+    [self _flushOutgoingData:outStr];
 }
 
 - (void) _openIOStreams
 {
-    const NSString *urlStr = @"games.playxiangqi.com";
-    const UInt32 port = 80;
-    
+    const NSString* urlStr = NC_SERVER_IP;
+    const UInt32    port   = NC_SERVER_PORT;
+
     _connectionState = NC_CONN_STATE_CONNECTING;
     
     CFReadStreamRef readStream;
@@ -203,8 +200,9 @@
     _connectionState = NC_CONN_STATE_NONE;
 }
 
-- (void) _flushOutgoingData
-{    
+- (void) _flushOutgoingData:(NSString*)outStr
+{
+    [_outData appendBytes:(const void *)[outStr UTF8String] length:[outStr length]];
     if (_outAvailable) {
         [self _sendOutgoingData];
     }
