@@ -136,7 +136,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 - (void) setBlackTime:(NSString*)times;
 - (void) rescheduleTimer;
 - (void) destroyTimer;
-- (int) onNewMove:(NSNumber *)moveInfo;
+- (int) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup;
 - (void) onGameOver;
 - (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;
@@ -183,6 +183,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 @property (nonatomic) int freeTime;
 
 - (id)initWithTime:(TimeInfo*)other;
+- (void) decrement;
 + (id)allocTimeFromString:(NSString *)timeContent;
 
 @end

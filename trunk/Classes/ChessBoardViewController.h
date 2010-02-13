@@ -34,6 +34,7 @@
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
 
+- (void) handleNewMove:(NSNumber *)pMove;
 - (void) onLocalMoveMade:(int)move;
 - (void) saveGame;
 

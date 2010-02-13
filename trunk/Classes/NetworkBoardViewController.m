@@ -628,11 +628,11 @@
         int sqDst = TOSQUARE(row2, col2);
         int move = MOVE(sqSrc, sqDst);
         
-        [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                   toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-        [self handleNewMove:moveInfo];
+        [_board onNewMove:moveInfo inSetupMode:YES];
     }
 }
 
@@ -656,11 +656,11 @@
     int sqDst = TOSQUARE(row2, col2);
     int move = MOVE(sqSrc, sqDst);
     
-    [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-               toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+            toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     
     NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-    [self handleNewMove:moveInfo];
+    [_board onNewMove:moveInfo inSetupMode:NO];
 }
 
 - (void) _handleNetworkEvent_E_END:(NSString*)event

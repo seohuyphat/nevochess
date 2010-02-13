@@ -86,8 +86,6 @@ enum ActionIndexEnum
 - (void) displayEmptyBoard;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
-- (void) handleNewMove:(NSNumber *)pMove;
-- (void) handleEndGameInUI;
 - (void) reverseBoardView;
 
 @end
