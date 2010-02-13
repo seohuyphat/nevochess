@@ -58,20 +58,21 @@
 {
     UIBarButtonItem*      addButton;
     IBOutlet UITableView* listView;
+    IBOutlet UIActivityIndicatorView* _activity;
 
-    NSMutableArray* _tables;
-    id <TableListDelegate> delegate;
+    NSMutableArray*       _tables;
+    id<TableListDelegate> _delegate;
     BOOL                  _viewOnly;
 }
 
 @property (nonatomic, retain) IBOutlet UIBarButtonItem* addButton;
 @property (nonatomic, retain) IBOutlet UITableView* listView;
-@property (nonatomic, retain) id <TableListDelegate> delegate;
+@property (nonatomic, retain) id<TableListDelegate> _delegate;
 @property (nonatomic)         BOOL viewOnly;
 
 - (IBAction) refreshButtonPressed:(id)sender;
 
-- (id)initWithList:(NSString *)tablesStr;
+- (id)initWithDelegate:(id<TableListDelegate>)delegate;
 - (void)reinitWithList:(NSString *)tablesStr;
 
 @end

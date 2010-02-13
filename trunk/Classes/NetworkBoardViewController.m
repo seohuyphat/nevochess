@@ -135,6 +135,16 @@
     }
 }
 
+- (void) didReceiveMemoryWarning
+{
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+    self._tableListController = nil;
+    self._messageListController = nil;
+}
+
 - (void)dealloc
 {
     [_username release];
@@ -191,6 +201,7 @@
         [self _showLoginView:@""];
         return;
     }
+    [self _showListTableView:nil];
     [_connection send_LIST];
 }
 
@@ -365,12 +376,10 @@
 - (void) _showLoginView:(NSString*)errorStr
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    BOOL bFirstDisplayed = NO;
-    if (self._loginController == nil) {
+    if (!_loginController) {
         NSLog(@"%s: Creating new Login view...", __FUNCTION__);
         self._loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
         _loginController.delegate = self;
-        bFirstDisplayed = YES;
     }
     [_loginController setErrorString:errorStr];
 
@@ -381,7 +390,7 @@
     }
 
     // Load the existing Login info, if available, the 1st time.
-    if (bFirstDisplayed) {
+    if (!_username) {
         NSString* username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
         if (username && [username length]) {
             NSString* password = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
@@ -394,18 +403,17 @@
 - (void) _showListTableView:(NSString*)event
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    if (_tableListController == nil) {
-        NSLog(@"%s: Creating new Table-List view...", __FUNCTION__);
-        self._tableListController = [[TableListViewController alloc] initWithList:event];
-        _tableListController.delegate = self;
-    } else {
+    if (!_tableListController) {
+        self._tableListController = [[TableListViewController alloc] initWithDelegate:self];
+    }
+    if (event) {
         [_tableListController reinitWithList:event];
     }
 
     UIViewController* topController = [self.navigationController topViewController];
     if (topController != _tableListController) {
-        [self.navigationController pushViewController:_tableListController animated:YES];
         self.navigationController.navigationBarHidden = NO;
+        [self.navigationController pushViewController:_tableListController animated:YES];
     }
 
     _tableListController.viewOnly =
@@ -415,20 +423,13 @@
 
 - (void) _dismissLoginView
 {
-    if (_loginController != nil) {
-        [self.navigationController popToViewController:self animated:YES];
-        NSLog(@"%s: Destroy Login view...", __FUNCTION__);
-        self._loginController = nil;
-    }
+    [self.navigationController popToViewController:self animated:YES];
     [activity stopAnimating];
 }
 
 - (void) _dismissListTableView
 {
-    if (_tableListController != nil) {
-        [self.navigationController popToViewController:self animated:YES];
-        self._tableListController = nil;
-    }
+    [self.navigationController popToViewController:self animated:YES];
 }
 
 - (void) _resetAndClearTable
@@ -507,6 +508,8 @@
             self._connection = nil;
             if (_logoutPending) {
                 [self goBackToHomeMenu];
+            } else {
+                [self _showLoginView:nil];
             }
             break;
         }
@@ -515,6 +518,7 @@
             NSLog(@"%s: Got NC_CONN_EVENT_ERROR.", __FUNCTION__);
             [_connection disconnect];
             self._connection = nil;
+            [self _showLoginView:@"Connection error"];
             break;
         }
     }
