@@ -90,16 +90,6 @@
 
 @end
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Private methods (BoardViewController)
-//
-///////////////////////////////////////////////////////////////////////////////
-
-@interface BoardViewController (PrivateMethods)
-
-@end
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -198,28 +188,6 @@
     [_board setBlackTime:times];
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Implementation of Private methods
-//
-///////////////////////////////////////////////////////////////////////////////
-
-#pragma mark -
-#pragma mark Private methods
-
-- (void) handleNewMove:(NSNumber *)moveInfo
-{
-    int nGameResult = [_board onNewMove:moveInfo];
-    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
-        [self handleEndGameInUI];
-    }
-}
-
-- (void) handleEndGameInUI
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
 - (void) saveGame
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
@@ -247,7 +215,6 @@
 
 - (BOOL) isGameReady
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     return YES;
 }
 

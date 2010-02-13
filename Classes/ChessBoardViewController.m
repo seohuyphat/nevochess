@@ -42,6 +42,7 @@ enum AlertViewEnum
 @interface ChessBoardViewController (PrivateMethods)
 
 - (void) _AIMove;
+- (void) _handleEndGameInUI;
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 - (int) _convertStringToAIType:(NSString *)aiSelection;
@@ -252,11 +253,19 @@ enum AlertViewEnum
         return;
     }
 
-    [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
+    [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
 
     NSNumber *moveInfo = [NSNumber numberWithInteger:move];
     [self performSelectorOnMainThread:@selector(handleNewMove:)
                            withObject:moveInfo waitUntilDone:NO];
+}
+
+- (void) handleNewMove:(NSNumber *)moveInfo
+{
+    int nGameResult = [_board onNewMove:moveInfo inSetupMode:NO];
+    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
+        [self _handleEndGameInUI];
+    }
 }
 
 - (void) onLocalMoveMade:(int)move
@@ -281,7 +290,7 @@ enum AlertViewEnum
 #pragma mark -
 #pragma mark Private methods
 
-- (void) handleEndGameInUI
+- (void) _handleEndGameInUI
 {
     NSString *sound = nil;
     NSString *msg   = nil;
@@ -369,8 +378,8 @@ enum AlertViewEnum
         sqSrc = SRC(move);
         sqDst = DST(move);
 
-        [_game humanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                   toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                          toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 

@@ -197,7 +197,7 @@
     return self;
 }
 
-- (int) humanMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
+- (int) doMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
 {
     int sqSrc = TOSQUARE(row1, col1);
     int sqDst = TOSQUARE(row2, col2);

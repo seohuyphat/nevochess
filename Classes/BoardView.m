@@ -130,6 +130,12 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     return self;
 }
 
+- (void) decrement
+{
+    if (gameTime > 0) { --gameTime; }
+    if (moveTime > 0) { --moveTime; }
+}
+
 + (id)allocTimeFromString:(NSString *)timeContent
 {
     TimeInfo* newTime = [TimeInfo new];
@@ -357,12 +363,14 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
-- (int) onNewMove:(NSNumber *)moveInfo
+- (int) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup
 {
     int  move = [moveInfo integerValue];
     ColorEnum moveColor = ([_game getNextColor] == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
 
-    [self resetMoveTime:moveColor];
+    if (!bSetup) {
+        [self resetMoveTime:moveColor];
+    }
 
     MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
     NSLog(@"%s: Add new move [%@].", __FUNCTION__, pMove);
@@ -413,11 +421,13 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 - (void) _updateTimer
 {
     if ([_game getNextColor] == NC_COLOR_BLACK) {
-        _black_time.text = [self _allocStringFrom:_blackTime.gameTime--];
-        _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime--];
+        _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
+        _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
+        [_blackTime decrement];
     } else {
-        _red_time.text = [self _allocStringFrom:_redTime.gameTime--];
-        _red_move_time.text = [self _allocStringFrom:_redTime.moveTime--];
+        _red_time.text = [self _allocStringFrom:_redTime.gameTime];
+        _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
+        [_redTime decrement];
     }
 }
 
@@ -434,7 +444,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     //       this App (with AI only) to start the timer right after one Move
     //       is made (by RED).
     //
-    if ( _game.gameResult == kXiangQi_InPlay && [_moves count] > 0 ) {
+    if (_game_over_msg.hidden == YES && [_moves count] > 0) {
         [self _updateTimer];
     }
 }
@@ -618,10 +628,10 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
         int move = MOVE(sqSrc, sqDst);
         if ([_game isLegalMove:move])
         {
-            [_game humanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
+            [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
             
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            [self onNewMove:moveInfo];
+            [self onNewMove:moveInfo inSetupMode:NO];
             
             [_boardOwner onLocalMoveMade:move];
         }
