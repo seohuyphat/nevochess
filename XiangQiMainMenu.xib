@@ -43,7 +43,7 @@
 					<object class="IBUIImageView" id="919110211">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrameSize">{320, 467}</string>
+						<string key="NSFrame">{{0, -4}, {320, 467}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -51,13 +51,13 @@
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<object class="NSCustomResource" key="IBUIImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">background_320x480.png</string>
+							<string key="NSResourceName">background_320x460.png</string>
 						</object>
 					</object>
 					<object class="IBUIButton" id="220663960">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">316</int>
-						<string key="NSFrame">{{91, 207}, {165, 52}}</string>
+						<string key="NSFrame">{{91, 225}, {193, 52}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -67,6 +67,7 @@
 							<double key="NSSize">24</double>
 							<int key="NSfFlags">16</int>
 						</object>
+						<string key="IBUITitleShadowOffset">{1, 0}</string>
 						<string key="IBUINormalTitle"> Practice</string>
 						<object class="NSColor" key="IBUIHighlightedTitleColor" id="746675261">
 							<int key="NSColorSpace">3</int>
@@ -80,7 +81,7 @@
 							<int key="NSColorSpace">3</int>
 							<bytes key="NSWhite">MAA</bytes>
 						</object>
-						<object class="NSCustomResource" key="IBUINormalImage" id="798061564">
+						<object class="NSCustomResource" key="IBUINormalImage">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">start-here.png</string>
 						</object>
@@ -88,12 +89,13 @@
 					<object class="IBUIButton" id="1043031780">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">316</int>
-						<string key="NSFrame">{{91, 261}, {165, 52}}</string>
+						<string key="NSFrame">{{91, 280}, {193, 52}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 						<int key="IBUIContentVerticalAlignment">0</int>
 						<reference key="IBUIFont" ref="215111780"/>
+						<string key="IBUITitleShadowOffset">{1, 0}</string>
 						<string key="IBUINormalTitle"> Play Online</string>
 						<reference key="IBUIHighlightedTitleColor" ref="746675261"/>
 						<object class="NSColor" key="IBUINormalTitleColor">
@@ -101,12 +103,15 @@
 							<bytes key="NSRGB">MC42IDAuNiAwLjYgMC42AA</bytes>
 						</object>
 						<reference key="IBUINormalTitleShadowColor" ref="312173079"/>
-						<reference key="IBUINormalImage" ref="798061564"/>
+						<object class="NSCustomResource" key="IBUINormalImage">
+							<string key="NSClassName">NSImage</string>
+							<string key="NSResourceName">applications-internet.png</string>
+						</object>
 					</object>
 					<object class="IBUIButton" id="391002685">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{91, 332}, {174, 37}}</string>
+						<string key="NSFrame">{{91, 345}, {193, 37}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -125,7 +130,7 @@
 					<object class="IBUIButton" id="888550255">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">293</int>
-						<string key="NSFrame">{{91, 388}, {102, 37}}</string>
+						<string key="NSFrame">{{91, 401}, {193, 37}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -138,7 +143,7 @@
 						<reference key="IBUINormalTitleShadowColor" ref="312173079"/>
 						<object class="NSCustomResource" key="IBUINormalImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">applications-internet.png</string>
+							<string key="NSResourceName">help.png</string>
 						</object>
 					</object>
 				</object>
@@ -240,11 +245,11 @@
 						<reference key="object" ref="191373211"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="919110211"/>
 							<reference ref="888550255"/>
-							<reference ref="391002685"/>
 							<reference ref="220663960"/>
 							<reference ref="1043031780"/>
+							<reference ref="391002685"/>
+							<reference ref="919110211"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -304,7 +309,7 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>XiangQiMainMenu</string>
 					<string>UIResponder</string>
-					<string>{{0, 51}, {320, 480}}</string>
+					<string>{{111, 204}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
