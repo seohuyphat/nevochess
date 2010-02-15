@@ -44,6 +44,7 @@
     LoginViewController*       _loginController;
     TableListViewController*   _tableListController;
     MessageListViewController* _messageListController;
+    UIBarButtonItem*           _actionButton;
     UIBarButtonItem*           _messagesButton;
 }
 

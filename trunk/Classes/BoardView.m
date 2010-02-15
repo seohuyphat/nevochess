@@ -373,7 +373,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     }
 
     MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
-    NSLog(@"%s: Add new move [%@].", __FUNCTION__, pMove);
+    //NSLog(@"%s: Add new move [%@].", __FUNCTION__, pMove);
     [_moves addObject:pMove];
 
     // Delay update the UI if in Preview mode.

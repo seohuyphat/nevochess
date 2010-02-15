@@ -117,7 +117,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"MessageCell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {

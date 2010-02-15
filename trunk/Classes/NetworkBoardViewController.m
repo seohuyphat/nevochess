@@ -107,7 +107,9 @@
     [newButton release];
     nav_toolbar.items = newItems;
 
-    _messagesButton = (UIBarButtonItem*) [items objectAtIndex:([items count]-1)];
+    _actionButton = (UIBarButtonItem*)[items objectAtIndex:4];
+    _actionButton.enabled = NO;
+    _messagesButton = (UIBarButtonItem*)[items objectAtIndex:6];
     _messagesButton.enabled = NO;
 } 
 
@@ -225,6 +227,7 @@
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
             [self displayEmptyBoard];
+            _actionButton.enabled = NO;
             break;
         case ACTION_INDEX_RESIGN:
             [_connection send_RESIGN:_tableId];
@@ -420,6 +423,7 @@
     _tableListController.viewOnly =
         ( _tableId
          && ([_username isEqualToString:_redId] || [_username isEqualToString:_blackId]));
+    _tableListController.selectedTableId = _tableId;
 }
 
 - (void) _dismissLoginView
@@ -571,13 +575,12 @@
 
 - (void) _handleNetworkEvent_LIST:(NSString*)event
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     [self _showListTableView:event];
 }
 
 - (void) _handleNetworkEvent_I_TABLE:(NSString*)event
 {
-    TableInfo* table = [TableInfo allocTableFromString:event];
+    TableInfo* table = [[TableInfo allocTableFromString:event] autorelease];
 
     if (_tableId && ![_tableId isEqualToString:table.tableId]) {
         [self _resetAndClearTable];
@@ -609,7 +612,7 @@
     self._redId = ([table.redId length] == 0 ? nil : table.redId);
     self._blackId = ([table.blackId length] == 0 ? nil : table.blackId);
     _isGameOver = NO;
-    [table release];
+    _actionButton.enabled = YES;
 }
 
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event
