@@ -57,7 +57,8 @@ enum LoginButtonEnum
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [_activity stopAnimating];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -92,6 +93,7 @@ enum LoginButtonEnum
     if (errorStr) {
         _error.text = errorStr;
         _clickedButton = BUTTON_NONE;
+        [_activity stopAnimating];
     }
 }
 
@@ -103,6 +105,8 @@ enum LoginButtonEnum
         return;
     }
     _clickedButton = BUTTON_LOGIN;
+    [_activity setHidden:NO];
+    [_activity startAnimating];
     [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
 }
 
@@ -110,6 +114,8 @@ enum LoginButtonEnum
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     _clickedButton = BUTTON_GUEST;
+    [_activity setHidden:NO];
+    [_activity startAnimating];
     [delegate handleLoginRequest:@"guest" username:@"" password:@""];
 }
 

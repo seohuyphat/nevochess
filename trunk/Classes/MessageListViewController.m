@@ -76,6 +76,11 @@
     self.navigationItem.rightBarButtonItem = addButton;
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
 - (void)viewDidAppear:(BOOL)animated 
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
