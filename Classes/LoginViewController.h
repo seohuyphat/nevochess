@@ -30,6 +30,7 @@
     IBOutlet UITextField* _username;
     IBOutlet UITextField* _password;
     IBOutlet UILabel*     _error;
+    IBOutlet UIActivityIndicatorView* _activity;
 
     id <LoginDelegate> delegate;
     int                _clickedButton;

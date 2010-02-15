@@ -86,7 +86,6 @@
         _messageListController.delegate = self;
 
         self._connection = nil;
-        [self _connectToNetwork];
     }
     
     return self;
@@ -117,9 +116,7 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewWillAppear:animated];
 
-    NSLog(@"%s: Hide the navigation-bar.", __FUNCTION__);
-    self.navigationController.navigationBarHidden = YES;
-
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
     _messagesButton.title = @"0";
 }
 
@@ -163,7 +160,7 @@
 - (IBAction)homePressed:(id)sender
 {
     NSString* title = nil;
-    if (_username) {
+    if (_loginAuthenticated && _username) {
         title = [NSString stringWithFormat:@"%@ (%@)", _username, _rating];
     }
     NSString* state = @"logout";
@@ -271,7 +268,6 @@
 - (IBAction)messagesPressed:(id)sender
 {
     [self.navigationController pushViewController:_messageListController animated:YES];
-    self.navigationController.navigationBarHidden = NO;
     [_messageListController setTableId:_tableId];
 }
 
@@ -370,7 +366,7 @@
 - (void) _connectToNetwork
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    if (self._connection == nil) {
+    if (!_connection) {
         NSLog(@"%s: Connecting to network...", __FUNCTION__);
         [activity setHidden:NO];
         [activity startAnimating];
@@ -393,7 +389,6 @@
     UIViewController* topController = [self.navigationController topViewController];
     if (topController != _loginController) {
         [self.navigationController pushViewController:_loginController animated:YES];
-        self.navigationController.navigationBarHidden = NO;
     }
 
     // Load the existing Login info, if available, the 1st time.
@@ -419,7 +414,6 @@
 
     UIViewController* topController = [self.navigationController topViewController];
     if (topController != _tableListController) {
-        self.navigationController.navigationBarHidden = NO;
         [self.navigationController pushViewController:_tableListController animated:YES];
     }
 
@@ -512,6 +506,7 @@
         case NC_CONN_EVENT_END:
         {
             NSLog(@"%s: Got NC_CONN_EVENT_END.", __FUNCTION__);
+            _loginAuthenticated = NO;
             self._connection = nil;
             if (_logoutPending) {
                 [self goBackToHomeMenu];
@@ -523,6 +518,7 @@
         case NC_CONN_EVENT_ERROR:
         {
             NSLog(@"%s: Got NC_CONN_EVENT_ERROR.", __FUNCTION__);
+            _loginAuthenticated = NO;
             [_connection disconnect];
             self._connection = nil;
             [self _showLoginView:@"Connection error"];

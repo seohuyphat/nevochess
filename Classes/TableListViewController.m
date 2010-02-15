@@ -77,8 +77,10 @@
 {
     [self _parseTablesStr:tablesStr];
     [self.listView reloadData];
-    [self.listView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
-                         atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if ([_tables count]) {
+        [self.listView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]
+                             atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }
     [_activity stopAnimating];
 }
 
@@ -97,6 +99,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [_activity setHidden:NO];
     [_activity startAnimating];
 }
