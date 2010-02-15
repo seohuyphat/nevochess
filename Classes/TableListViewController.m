@@ -19,6 +19,13 @@
 
 #import "TableListViewController.h"
 
+// Tags for elements in a Table-Cell.
+enum CellLabelEnum {
+    LABEL_TAG_ID = 1,  // Have to be non-zero!
+    LABEL_TAG_MAIN,
+    LABEL_TAG_SUB
+};
+
 //------------------------------------------------
 @implementation TableInfo
 
@@ -63,12 +70,14 @@
 @synthesize listView;
 @synthesize _delegate;
 @synthesize viewOnly=_viewOnly;
+@synthesize selectedTableId=_selectedTableId;
 
 - (id)initWithDelegate:(id<TableListDelegate>)delegate
 {
     if (self = [self initWithNibName:@"TableListView" bundle:nil]) {
         _tables = [[NSMutableArray alloc] init];
         self._delegate = delegate;
+        self.selectedTableId = nil;
     }
     return self;
 }
@@ -149,18 +158,45 @@
     return [_tables count];
 }
 
-
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"TableCell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UILabel* idLabel = nil;
+    UILabel* mainLabel = nil;
+    UILabel* subLabel = nil;
+
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
-        cell.textLabel.font = [UIFont systemFontOfSize:12];
-        cell.detailTextLabel.font = [UIFont systemFontOfSize:10];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+
+        idLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0.0, 5.0, 30.0, 30.0)] autorelease];
+        idLabel.tag = LABEL_TAG_ID;
+        idLabel.font = [UIFont systemFontOfSize:14.0];
+        idLabel.textAlignment = UITextAlignmentCenter;
+        idLabel.textColor = [UIColor blueColor];
+        //idLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
+        [cell.contentView addSubview:idLabel];
+
+        mainLabel = [[[UILabel alloc] initWithFrame:CGRectMake(30.0, 5.0, 250.0, 15.0)] autorelease];
+        mainLabel.tag = LABEL_TAG_MAIN;
+        mainLabel.font = [UIFont systemFontOfSize:12.0];
+        mainLabel.textAlignment = UITextAlignmentLeft;
+        mainLabel.textColor = [UIColor blackColor];
+        [cell.contentView addSubview:mainLabel];
+
+        subLabel = [[[UILabel alloc] initWithFrame:CGRectMake(30.0, 25.0, 250.0, 15.0)] autorelease];
+        subLabel.tag = LABEL_TAG_SUB;
+        subLabel.font = [UIFont systemFontOfSize:10.0];
+        subLabel.textAlignment = UITextAlignmentLeft;
+        subLabel.textColor = [UIColor darkGrayColor];
+        [cell.contentView addSubview:subLabel];
+    } else  {
+        idLabel = (UILabel *)[cell.contentView viewWithTag:LABEL_TAG_ID];
+        mainLabel = (UILabel *)[cell.contentView viewWithTag:LABEL_TAG_MAIN];
+        subLabel = (UILabel *)[cell.contentView viewWithTag:LABEL_TAG_SUB];
     }
     
     // Set up the cell...
@@ -169,22 +205,35 @@
                          : [NSString stringWithFormat:@"%@(%@)", table.redId, table.redRating]);
     NSString* blackInfo = ([table.blackId length] == 0 ? @"*"
                          : [NSString stringWithFormat:@"%@(%@)", table.blackId, table.blackRating]); 
-    cell.textLabel.text = [NSString stringWithFormat:@"#%@: %@ vs. %@", table.tableId, redInfo, blackInfo];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%@  %@", table.rated ? @"Rated" : @"Nonrated", table.itimes];
-    cell.accessoryType = (_viewOnly ? UITableViewCellAccessoryNone
-                                    : UITableViewCellAccessoryDetailDisclosureButton);
-	
+
+    idLabel.text = table.tableId;
+    mainLabel.text = [NSString stringWithFormat:@"%@ vs. %@", redInfo, blackInfo];
+    subLabel.text = [NSString stringWithFormat:@"%@  %@", table.rated ? @"Rated" : @"Nonrated", table.itimes];
+
+    if ([table.tableId isEqualToString:_selectedTableId]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = (_viewOnly ? UITableViewCellAccessoryNone
+                              : UITableViewCellAccessoryDetailDisclosureButton);
+    }
+
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
+    [self tableView:tableView didSelectRowAtIndexPath:indexPath];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
-    if (_viewOnly) {
-        return;
-    }
     TableInfo* table = [_tables objectAtIndex:indexPath.row];
 
+    if (_viewOnly || [table.tableId isEqualToString:_selectedTableId]) {
+        return;
+    }
     NSString* joinColor = @"None"; // Default: an observer.
     if ([table.redId length] == 0) { joinColor = @"Red"; }
     else if ([table.blackId length] == 0) { joinColor = @"Black"; }
@@ -197,6 +246,7 @@
     self.listView = nil;
     [_tables release];
     self._delegate = nil;
+    [_selectedTableId release];
     [super dealloc];
 }
 
