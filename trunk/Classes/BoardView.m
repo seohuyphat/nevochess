@@ -55,7 +55,6 @@
  ***************************************************************************/
 
 #import "BoardView.h"
-#import "Bit.h"
 #import "BitHolder.h"
 #import "QuartzUtils.h"
 #import "NevoChessAppDelegate.h"

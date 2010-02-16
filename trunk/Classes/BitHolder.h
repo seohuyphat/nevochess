@@ -64,18 +64,6 @@
 /** BitHolders will be highlighted while the target of a drag operation */
 @property (nonatomic, setter=setHighlighted:) BOOL _highlighted;
 
-/** Cancels a pending drag (begun by -canDragBit:). */
-- (void) cancelDragBit: (Bit*)bit;
-
-/** Called after a drag finishes. */
-- (void) draggedBit: (Bit*)bit to: (id<BitHolder>)dst;
-
-/** Cancels a pending drop (after -canDropBit:atPoint: was already called.) */
-- (void) willNotDropBit: (Bit*)bit;
-
-/** Finishes a drop. */
-- (BOOL) dropBit: (Bit*)bit atPoint: (CGPoint)point;
-
 @end
 
 

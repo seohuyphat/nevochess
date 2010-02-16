@@ -60,8 +60,6 @@
 #import "CChessGame.h"
 #import "AudioHelper.h"
 
-@class Bit, Card, Grid;
-@protocol BitHolder;
 @class TimeInfo;
 
 

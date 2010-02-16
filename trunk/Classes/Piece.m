@@ -52,56 +52,126 @@
 #import "QuartzUtils.h"
 
 
+@implementation Bit
+
+@synthesize holder;
+
+- (void) dealloc
+{
+    [holder release];
+    [super dealloc];
+}
+
+- (NSString*) description
+{
+    return [NSString stringWithFormat:@"%@[(%g,%g)]", self.class,self.position.x,self.position.y];
+}
+
+- (CGFloat) scale
+{
+    NSNumber *scale = [self valueForKeyPath:@"transform.scale"];
+    return scale.floatValue;
+}
+
+- (void) setScale: (CGFloat)scale
+{
+    [self setValue:[NSNumber numberWithFloat:scale] forKeyPath:@"transform.scale"];
+}
+
+- (int) rotation
+{
+    NSNumber *rot = [self valueForKeyPath:@"transform.rotation"];
+    return round( rot.doubleValue * 180.0 / M_PI );
+}
+
+- (void) setRotation: (int)rotation
+{
+    [self setValue:[NSNumber numberWithDouble:rotation*M_PI/180.0]
+        forKeyPath:@"transform.rotation"];
+}
+
+- (BOOL) pickedUp
+{
+    return self.zPosition >= kPickedUpZ;
+}
+
+- (void) setPickedUp: (BOOL)up
+{
+    if( up != self.pickedUp ) {
+        CGFloat opacity, z, scale;
+        if( up ) {
+            opacity = 0.9;
+            scale = 1.2;
+            z = kPickedUpZ;
+            _restingZ = self.zPosition;
+        } else {
+            opacity = 1.0;
+            scale = 1.0/1.2;
+            z = _restingZ;
+        }
+        
+        self.zPosition = z;
+        self.opacity = opacity;
+        self.scale *= scale;
+    }
+}
+
+- (BOOL) containsPoint:(CGPoint)p
+{
+    // Make picked-up pieces invisible to hit-testing.
+    // Otherwise, while dragging a Bit, hit-testing the cursor position would always return
+    // that Bit, since it's directly under the cursor...
+    return (self.pickedUp ? NO : [super containsPoint:p]);
+}
+
+- (void) destroy
+{
+    // "Pop" the Bit by expanding it 5x as it fades away:
+    self.scale = 5;
+    self.opacity = 0.0;
+    // Removing the view from its superlayer right now would cancel the animations.
+    // Instead, defer the removal until sometime shortly after the animations finish:
+    [self performSelector: @selector(removeFromSuperlayer) withObject: nil afterDelay: 1.0];
+}
+
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    Piece
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#pragma mark -
 @implementation Piece
 
 @synthesize color=_color;
 @synthesize _imageName;
 
-- (void)dealloc
+- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale
 {
-    [_imageName release];
-    [super dealloc];
-}
-
-- (id) initWithImageNamed: (NSString*)imageName
-                    scale: (CGFloat)scale
-{
-    self = [super init];
-    if (self != nil) {
+    if (self = [super init]) {
         _imageName = imageName;
-        [self setImage: GetCGImageNamed(imageName) scale: scale];
+        [self setImage:GetCGImageNamed(imageName) scale: scale];
         self.zPosition = kPieceZ;
     }
     return self;
 }
 
-
-- (id) initWithCoder: (NSCoder*)decoder
+- (void) dealloc
 {
-    self = [super init];
-    if( self ) {
-        _imageName = [decoder decodeObjectForKey: @"imageName"];
-        // (actual image (self.contents) was already restord by superclass)
-    }
-    return self;
+    [_imageName release];
+    [super dealloc];
 }
-
-- (void) encodeWithCoder: (NSCoder*)coder
-{
-    [super init];
-    [coder encodeObject: _imageName forKey: @"imageName"];
-}
-
 
 - (NSString*) description
 {
-    return [NSString stringWithFormat: @"%@[%@]", 
-            [self class],
+    return [NSString stringWithFormat:@"%@[%@]", [self class],
             _imageName.lastPathComponent.stringByDeletingPathExtension];
 }
 
-
-- (void) setImage: (CGImageRef)image scale: (CGFloat)scale
+- (void) setImage:(CGImageRef)image scale:(CGFloat)scale
 {
     self.contents = (id) image;
     self.contentsGravity = kCAGravityResizeAspect;
@@ -109,50 +179,23 @@
     int width = CGImageGetWidth(image), height = CGImageGetHeight(image);
     if( scale > 0 ) {
         if( scale >= 4.0 )
-            scale /= MAX(width,height);             // interpret scale as target dimensions
+            scale /= MAX(width,height); // interpret scale as target dimensions
         width = ceil( width * scale);
         height= ceil( height* scale);
     }
     self.bounds = CGRectMake(0,0,width,height);
-    _imageName = nil;
 }
 
-- (void) setImage: (CGImageRef)image
+- (void) setImage:(CGImageRef)image
 {
     CGSize size = self.bounds.size;
-    [self setImage: image scale: MAX(size.width,size.height)];
+    [self setImage:image scale:MAX(size.width,size.height)];
 }
 
-- (void) setImageNamed: (NSString*)name
+- (void) setImageNamed:(NSString*)name
 {
-    [self setImage: GetCGImageNamed(name)];
+    [self setImage:GetCGImageNamed(name)];
     _imageName = name;
 }
-
-
-//- (BOOL)containsPoint:(CGPoint)p
-//{
-//    // Overrides CGLayer's implementation,
-//    // returning YES only for pixels at which this layer's alpha is at least 0.5.
-//    // This takes into account the opacity, bg color, and background image's alpha channel.
-//    if( ! [super containsPoint: p] )
-//        return NO;
-//    float opacity = self.opacity;
-//    if( opacity < 0.5 )
-//        return NO;
-//    float thresholdAlpha = 0.5 / self.opacity;
-//    
-//    CGColorRef bg = self.backgroundColor;
-//    float alpha = bg ?CGColorGetAlpha(bg) :0.0;
-//    if( alpha < thresholdAlpha ) {
-//        CGImageRef image = (CGImageRef)self.contents;
-//        if( image ) {
-//            // Note: This makes the convenient assumption that the image entirely fills the bounds.
-//            alpha = MAX(alpha, GetPixelAlpha(image, self.bounds.size, p));
-//        }
-//    }
-//    return alpha >= thresholdAlpha;
-//}
-
 
 @end

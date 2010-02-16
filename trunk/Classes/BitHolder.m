@@ -49,7 +49,7 @@
  */
 
 #import "BitHolder.h"
-#import "Bit.h"
+#import "Piece.h"
 #import "QuartzUtils.h"
 
 @implementation BitHolder
@@ -80,16 +80,6 @@
     }
 }
 
-- (BOOL) isEmpty    {return self._bit==nil;}
-
-- (void) cancelDragBit: (Bit*)bit                       { }
-- (void) draggedBit: (Bit*)bit to: (id<BitHolder>)dst   {self._bit = nil;}
-- (void) willNotDropBit: (Bit*)bit                      { }
-
-- (BOOL) dropBit: (Bit*)bit atPoint: (CGPoint)point
-{
-    self._bit = bit;
-    return YES;
-}
+- (BOOL) isEmpty { return self._bit == nil; }
 
 @end

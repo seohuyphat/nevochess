@@ -49,7 +49,7 @@
  */
 
 #import "Grid.h"
-#import "Bit.h"
+#import "Piece.h"
 #import "QuartzUtils.h"
 
 @implementation Grid
