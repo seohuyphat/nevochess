@@ -50,7 +50,6 @@
 
 #import "Grid.h"
 #import "Bit.h"
-#import "Game.h"
 #import "QuartzUtils.h"
 
 @implementation Grid

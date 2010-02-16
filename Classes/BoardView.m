@@ -585,7 +585,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     if (piece) {
         // Generate moves for the selected piece.
         holder = (GridCell*)piece.holder;
-        if (!_selectedPiece || (_selectedPiece._owner == piece._owner)) {
+        if (!_selectedPiece || (_selectedPiece.color == piece.color)) {
             //*******************
             int row = holder._row;
             int col = holder._column;

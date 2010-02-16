@@ -49,19 +49,16 @@
  */
 
 #import "Bit.h"
-#import "Game.h"
 #import "QuartzUtils.h"
 
 
 
 @implementation Bit
 
-@synthesize _owner;
 @synthesize holder;
 
 - (void)dealloc
 {
-    [_owner release];
     [holder release];
     [super dealloc];
 }
@@ -81,7 +78,6 @@
     clone.backgroundColor = bg;
     CGColorRelease(bg);
 
-    clone._owner = _owner;             // _owner is not archived
     clone.holder = holder;
 
     // HUY PHAN: Just "retain" to make Xcode "Build and Analyze" happy!
@@ -96,9 +92,6 @@
 {
     return [NSString stringWithFormat: @"%@[(%g,%g)]", self.class,self.position.x,self.position.y];
 }
-
-- (BOOL) isFriendly         {return _owner.friendly;}
-- (BOOL) isUnfriendly       {return _owner.unfriendly;}
 
 
 - (CGFloat) scale

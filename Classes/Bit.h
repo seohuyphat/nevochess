@@ -48,13 +48,9 @@
  
  */
 
-
 #import <QuartzCore/QuartzCore.h>
 
-
-@class Game, Player;
 @class BitHolder;
-
 
 /** Standard Z positions */
 enum {
@@ -71,11 +67,8 @@ enum {
 @interface Bit : CALayer <NSCopying>
 {
     int _restingZ;      // Original z position, saved while pickedUp
-    Player *_owner;     // Player that owns this Bit
     
     BitHolder *holder;
-    
-    
 }
 
 /** Conveniences for getting/setting the layer's scale and rotation */
@@ -87,13 +80,6 @@ enum {
 
 /** Current holder (or nil) */
 @property (nonatomic, retain) BitHolder *holder;
-
-/** Ownership of this Bit */
-@property (nonatomic, retain) Player *_owner;
-
-/** Conveniences for owner.friendly, owner.unfriendly */
-@property (readonly, getter=isFriendly)   BOOL friendly;
-@property (readonly, getter=isUnfriendly) BOOL unfriendly;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroy;
