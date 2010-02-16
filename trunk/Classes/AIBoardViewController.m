@@ -113,6 +113,8 @@ enum AlertViewEnum
     [newItems removeLastObject];
     [newItems removeLastObject];
     nav_toolbar.items = newItems;
+
+    [activity stopAnimating];
 }
 
 - (void)dealloc

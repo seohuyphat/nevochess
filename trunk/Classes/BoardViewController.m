@@ -132,8 +132,6 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
-
-    [activity stopAnimating];
 }
 
 - (void)didReceiveMemoryWarning
