@@ -19,24 +19,9 @@
 
 #import "AboutViewController.h"
 #import "NevoChessVersion.h"
-#import "NevoChessAppDelegate.h"
-#import "QuartzUtils.h"
 
 @implementation AboutViewController
-@synthesize webview;
 
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
-
-
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -50,23 +35,8 @@
     NSString *releaseVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *about_page = [NSString stringWithFormat:NSLocalizedString(@"About_NevoChess_Key", @""),
                                                                         releaseVersion, buildInfo];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:NO animated:NO];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [webview loadHTMLString:about_page baseURL:baseURL];
-}
-
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
-
-- (void)viewWillDisappear:(BOOL)animated 
-{
-    [super viewWillDisappear:animated];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:YES animated:NO];
 }
 
 - (void)didReceiveMemoryWarning
@@ -83,8 +53,8 @@
 	// e.g. self.myOutlet = nil;
 }
 
-
-- (void)dealloc {
+- (void)dealloc
+{
     [webview release];
     [super dealloc];
 }
@@ -99,7 +69,6 @@
         return NO;
     }
     return YES;
-    
 }
 
 

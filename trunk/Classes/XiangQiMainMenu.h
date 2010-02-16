@@ -19,18 +19,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface XiangQiMainMenu : UIViewController {
+@interface XiangQiMainMenu : UIViewController
+{
     IBOutlet UIButton *new_game;
     IBOutlet UIButton *about;
     IBOutlet UIButton *setting;
     
     IBOutlet UIImageView *bg_view;
 }
-
-@property(nonatomic,retain) IBOutlet UIButton *new_game;
-@property(nonatomic,retain) IBOutlet UIButton *about;
-@property(nonatomic,retain) IBOutlet UIButton *setting;
-@property(nonatomic,retain) IBOutlet UIImageView *bg_view;
 
 - (IBAction)newGamePressed:(id)sender;
 - (IBAction)networkGamePressed:(id)sender;
