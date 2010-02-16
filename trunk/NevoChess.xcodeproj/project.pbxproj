@@ -23,7 +23,6 @@
 		4BBB5F28103303D500243E55 /* Bit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F0F103303D500243E55 /* Bit.m */; };
 		4BBB5F29103303D500243E55 /* BitHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F11103303D500243E55 /* BitHolder.m */; };
 		4BBB5F2A103303D500243E55 /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F13103303D500243E55 /* BoardView.m */; };
-		4BBB5F2E103303D500243E55 /* Game.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1B103303D500243E55 /* Game.m */; };
 		4BBB5F2F103303D500243E55 /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1D103303D500243E55 /* Grid.m */; };
 		4BBB5F30103303D500243E55 /* Piece.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1F103303D500243E55 /* Piece.m */; };
 		4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F21103303D500243E55 /* QuartzUtils.m */; };
@@ -108,8 +107,6 @@
 		4BBB5F12103303D500243E55 /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
 		4BBB5F13103303D500243E55 /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
 		4BBB5F14103303D500243E55 /* CChessGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CChessGame.h; sourceTree = "<group>"; };
-		4BBB5F1A103303D500243E55 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
-		4BBB5F1B103303D500243E55 /* Game.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Game.m; sourceTree = "<group>"; };
 		4BBB5F1C103303D500243E55 /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Grid.h; sourceTree = "<group>"; };
 		4BBB5F1D103303D500243E55 /* Grid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Grid.m; sourceTree = "<group>"; };
 		4BBB5F1E103303D500243E55 /* Piece.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Piece.h; sourceTree = "<group>"; };
@@ -329,8 +326,6 @@
 				4BBB5F11103303D500243E55 /* BitHolder.m */,
 				4BBB5F12103303D500243E55 /* BoardView.h */,
 				4BBB5F13103303D500243E55 /* BoardView.m */,
-				4BBB5F1A103303D500243E55 /* Game.h */,
-				4BBB5F1B103303D500243E55 /* Game.m */,
 				4BBB5F1C103303D500243E55 /* Grid.h */,
 				4BBB5F1D103303D500243E55 /* Grid.m */,
 				4BBB5F1E103303D500243E55 /* Piece.h */,
@@ -541,7 +536,6 @@
 				4BBB5F28103303D500243E55 /* Bit.m in Sources */,
 				4BBB5F29103303D500243E55 /* BitHolder.m in Sources */,
 				4BBB5F2A103303D500243E55 /* BoardView.m in Sources */,
-				4BBB5F2E103303D500243E55 /* Game.m in Sources */,
 				4BBB5F2F103303D500243E55 /* Grid.m in Sources */,
 				4BBB5F30103303D500243E55 /* Piece.m in Sources */,
 				4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */,

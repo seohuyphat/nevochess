@@ -54,6 +54,7 @@
 
 @implementation Piece
 
+@synthesize color=_color;
 @synthesize _imageName;
 
 - (void)dealloc

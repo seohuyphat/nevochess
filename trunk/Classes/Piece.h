@@ -50,11 +50,13 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 
 #import "Bit.h"
-
+#import "Enums.h"
 
 /** A playing piece. A concrete subclass of Bit that displays an image. */
 @interface Piece : Bit
 {
+    ColorEnum _color;
+
     @private
     NSString *_imageName;
 }
@@ -71,6 +73,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 - (void) setImage: (CGImageRef)image;
 - (void) setImageNamed: (NSString*)name;
 
+@property (nonatomic)         ColorEnum color;
 @property (nonatomic, retain) NSString* _imageName;
 
 @end

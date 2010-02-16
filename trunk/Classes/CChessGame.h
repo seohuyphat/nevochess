@@ -19,7 +19,6 @@
 
 #import "Enums.h"
 #import "Grid.h"
-#import "Game.h"
 #import "Referee.h"
 
 #define INVALID_MOVE         (-1)
@@ -55,8 +54,10 @@ enum {
 
 @class Piece;
 
-@interface CChessGame : Game
+@interface CChessGame : NSObject
 {
+    CALayer*        _board;
+
     Grid*           _grid;
     NSMutableArray* _pieceBox;
     BOOL            _blackAtTopSide;
@@ -65,6 +66,7 @@ enum {
     int             _gameResult;
 }
 
+- (id) initWithBoard: (CALayer*)board;
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
@@ -80,6 +82,7 @@ enum {
 - (void) resetGame;
 - (void) reverseView;
 
+@property (nonatomic, retain) CALayer* _board;
 @property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) int gameResult;

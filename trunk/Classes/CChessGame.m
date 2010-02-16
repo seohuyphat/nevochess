@@ -36,7 +36,7 @@
 
 - (void) _setupPieces;
 - (void) _resetPieces;
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col forPlayer:(unsigned)playerNo;
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color;
 - (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 
 @end
@@ -53,11 +53,12 @@
 
 @implementation CChessGame
 
+@synthesize _board;
 @synthesize _grid;
 @synthesize gameResult=_gameResult;
 @synthesize blackAtTopSide=_blackAtTopSide;
 
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col forPlayer:(unsigned)playerNo
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
 {
     GridCell *s = [_grid cellAtRow:row column:col]; 
     CGRect frame = s.frame;
@@ -71,7 +72,7 @@
                                            inDirectory:(toggleWestern ? @"pieces/alfaerie_31x31" : @"pieces/xqwizard_31x31")];
 
     Piece *piece = [[Piece alloc] initWithImageNamed: imageName scale: pieceSize];
-    piece._owner = [self._players objectAtIndex: playerNo];
+    piece.color = color;
     piece.holder = [_grid cellAtRow:row column:col];
     [_board addSublayer:piece];
     position = [s.superlayer convertPoint:position toLayer:_board];
@@ -146,14 +147,15 @@
     [_grid release];
     [_pieceBox release];
     [_referee release];
+    [_board release];
     [super dealloc];
 }
 
 - (id) initWithBoard: (CALayer*)board
 {
-    if (self = [super initWithBoard: board]) {
-        [self setNumberOfPlayers: 2];
-        
+    if (self = [super init]) {
+        self._board = board;
+
         CGSize size = board.bounds.size;
         board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
         _grid = [[Grid alloc] initWithRows: 10 columns: 9
@@ -335,50 +337,50 @@
 - (void) _setupPieces
 {
     // chariot      
-    [self _createPiece:@"bchariot.png" row:0 col:0 forPlayer:0];
-    [self _createPiece:@"bchariot.png" row:0 col:8 forPlayer:0];         
-    [self _createPiece:@"rchariot.png" row:9 col:0 forPlayer:1];     
-    [self _createPiece:@"rchariot.png" row:9 col:8 forPlayer:1];  
+    [self _createPiece:@"bchariot.png" row:0 col:0 color:NC_COLOR_BLACK];
+    [self _createPiece:@"bchariot.png" row:0 col:8 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"rchariot.png" row:9 col:0 color:NC_COLOR_RED];     
+    [self _createPiece:@"rchariot.png" row:9 col:8 color:NC_COLOR_RED];  
 
     // horse    
-    [self _createPiece:@"bhorse.png" row:0 col:1 forPlayer:0];        
-    [self _createPiece:@"bhorse.png" row:0 col:7 forPlayer:0];         
-    [self _createPiece:@"rhorse.png" row:9 col:1 forPlayer:1];      
-    [self _createPiece:@"rhorse.png" row:9 col:7 forPlayer:1];
+    [self _createPiece:@"bhorse.png" row:0 col:1 color:NC_COLOR_BLACK];        
+    [self _createPiece:@"bhorse.png" row:0 col:7 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"rhorse.png" row:9 col:1 color:NC_COLOR_RED];      
+    [self _createPiece:@"rhorse.png" row:9 col:7 color:NC_COLOR_RED];
     
     // elephant      
-    [self _createPiece:@"belephant.png" row:0 col:2 forPlayer:0];        
-    [self _createPiece:@"belephant.png" row:0 col:6 forPlayer:0];        
-    [self _createPiece:@"relephant.png" row:9 col:2 forPlayer:1];     
-    [self _createPiece:@"relephant.png" row:9 col:6 forPlayer:1]; 
+    [self _createPiece:@"belephant.png" row:0 col:2 color:NC_COLOR_BLACK];        
+    [self _createPiece:@"belephant.png" row:0 col:6 color:NC_COLOR_BLACK];        
+    [self _createPiece:@"relephant.png" row:9 col:2 color:NC_COLOR_RED];     
+    [self _createPiece:@"relephant.png" row:9 col:6 color:NC_COLOR_RED]; 
     
     // advisor      
-    [self _createPiece:@"badvisor.png" row:0 col:3 forPlayer:0];         
-    [self _createPiece:@"badvisor.png" row:0 col:5 forPlayer:0];         
-    [self _createPiece:@"radvisor.png" row:9 col:3 forPlayer:1];        
-    [self _createPiece:@"radvisor.png" row:9 col:5 forPlayer:1];
+    [self _createPiece:@"badvisor.png" row:0 col:3 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"badvisor.png" row:0 col:5 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"radvisor.png" row:9 col:3 color:NC_COLOR_RED];        
+    [self _createPiece:@"radvisor.png" row:9 col:5 color:NC_COLOR_RED];
     
     // king       
-    [self _createPiece:@"bking.png" row:0 col:4 forPlayer:0];       
-    [self _createPiece:@"rking.png" row:9 col:4 forPlayer:1];
+    [self _createPiece:@"bking.png" row:0 col:4 color:NC_COLOR_BLACK];       
+    [self _createPiece:@"rking.png" row:9 col:4 color:NC_COLOR_RED];
     
     // cannon     
-    [self _createPiece:@"bcannon.png" row:2 col:1 forPlayer:0];       
-    [self _createPiece:@"bcannon.png" row:2 col:7 forPlayer:0];          
-    [self _createPiece:@"rcannon.png" row:7 col:1 forPlayer:1];        
-    [self _createPiece:@"rcannon.png" row:7 col:7 forPlayer:1];
+    [self _createPiece:@"bcannon.png" row:2 col:1 color:NC_COLOR_BLACK];       
+    [self _createPiece:@"bcannon.png" row:2 col:7 color:NC_COLOR_BLACK];          
+    [self _createPiece:@"rcannon.png" row:7 col:1 color:NC_COLOR_RED];        
+    [self _createPiece:@"rcannon.png" row:7 col:7 color:NC_COLOR_RED];
 
     // pawn       
-    [self _createPiece:@"bpawn.png" row:3 col:0 forPlayer:0];         
-    [self _createPiece:@"bpawn.png" row:3 col:2 forPlayer:0];         
-    [self _createPiece:@"bpawn.png" row:3 col:4 forPlayer:0];        
-    [self _createPiece:@"bpawn.png" row:3 col:6 forPlayer:0];      
-    [self _createPiece:@"bpawn.png" row:3 col:8 forPlayer:0];     
-    [self _createPiece:@"rpawn.png" row:6 col:0 forPlayer:1];      
-    [self _createPiece:@"rpawn.png" row:6 col:2 forPlayer:1];         
-    [self _createPiece:@"rpawn.png" row:6 col:4 forPlayer:1];       
-    [self _createPiece:@"rpawn.png" row:6 col:6 forPlayer:1];      
-    [self _createPiece:@"rpawn.png" row:6 col:8 forPlayer:1];
+    [self _createPiece:@"bpawn.png" row:3 col:0 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"bpawn.png" row:3 col:2 color:NC_COLOR_BLACK];         
+    [self _createPiece:@"bpawn.png" row:3 col:4 color:NC_COLOR_BLACK];        
+    [self _createPiece:@"bpawn.png" row:3 col:6 color:NC_COLOR_BLACK];      
+    [self _createPiece:@"bpawn.png" row:3 col:8 color:NC_COLOR_BLACK];     
+    [self _createPiece:@"rpawn.png" row:6 col:0 color:NC_COLOR_RED];      
+    [self _createPiece:@"rpawn.png" row:6 col:2 color:NC_COLOR_RED];         
+    [self _createPiece:@"rpawn.png" row:6 col:4 color:NC_COLOR_RED];       
+    [self _createPiece:@"rpawn.png" row:6 col:6 color:NC_COLOR_RED];      
+    [self _createPiece:@"rpawn.png" row:6 col:8 color:NC_COLOR_RED];
 }
 
 @end
