@@ -30,9 +30,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define POC_AI_DIFFICULTY_DEFAULT 5     /* Valid range [1, 10]                */
-#define POC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
-#define POC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
+#define NC_AI_DIFFICULTY_DEFAULT 5     /* Valid range [1, 10]                */
+#define NC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
+#define NC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,5 +72,14 @@ typedef enum
 
 } ColorEnum;
 
+/**
+ * Possible AI engines.
+ */
+typedef enum
+{
+    NC_AI_XQWLight,
+    NC_AI_HaQiKiD,
+    NC_AI_XQWLight_ObjC
+} AIEnum;
 
 ////////////////////// END OF FILE ////////////////////////////////////////////

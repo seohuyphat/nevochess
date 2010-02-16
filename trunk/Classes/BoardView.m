@@ -210,7 +210,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     _black_label.text = @"";
     _game_over_msg.hidden = YES;
 
-    _moves = [[NSMutableArray alloc] initWithCapacity:POC_MAX_MOVES_PER_GAME];
+    _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
     _nthMove = HISTORY_INDEX_END;
 
     _hl_nMoves = 0;

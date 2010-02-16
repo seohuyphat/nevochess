@@ -124,11 +124,11 @@
 #pragma mark button event
 - (IBAction)defaultSettingPressed:(id)sender
 {
-    [[NSUserDefaults standardUserDefaults] setInteger:POC_AI_DIFFICULTY_DEFAULT forKey:@"difficulty_setting"];
-    [[NSUserDefaults standardUserDefaults] setInteger:POC_GAME_TIME_DEFAULT forKey:@"time_setting"];
+    [[NSUserDefaults standardUserDefaults] setInteger:NC_AI_DIFFICULTY_DEFAULT forKey:@"difficulty_setting"];
+    [[NSUserDefaults standardUserDefaults] setInteger:NC_GAME_TIME_DEFAULT forKey:@"time_setting"];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"toggle_sound"];
-    difficulty_setting.value = (float) POC_AI_DIFFICULTY_DEFAULT;
-    time_setting.value = (float) POC_GAME_TIME_DEFAULT;
+    difficulty_setting.value = (float) NC_AI_DIFFICULTY_DEFAULT;
+    time_setting.value = (float) NC_GAME_TIME_DEFAULT;
     sound_switch.on = YES;
     piece_style.selectedSegmentIndex = 0;
 }
