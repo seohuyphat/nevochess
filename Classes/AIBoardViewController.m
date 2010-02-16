@@ -66,13 +66,13 @@ enum AlertViewEnum
         _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
         int aiType = [self _convertStringToAIType:_aiName];
         switch (aiType) {
-            case kNevoChess_AI_xqwlight:
+            case NC_AI_XQWLight:
                 _aiEngine = [[AI_XQWLight alloc] init];
                 break;
-            case kNevoChess_AI_haqikid:
+            case NC_AI_HaQiKiD:
                 _aiEngine = [[AI_HaQiKiD alloc] init];
                 break;
-            case kNevoChess_AI_xqwlight_objc:
+            case NC_AI_XQWLight_ObjC:
                 // NOTE: The Objective-c AI is still in experimental stage.
                 _aiEngine = [[AI_XQWLightObjC alloc] init];
                 break;
@@ -398,13 +398,13 @@ enum AlertViewEnum
 - (int) _convertStringToAIType:(NSString *)aiSelection
 {
     if ([aiSelection isEqualToString:@"XQWLight"]) {
-        return kNevoChess_AI_xqwlight;
+        return NC_AI_XQWLight;
     } else if ([aiSelection isEqualToString:@"HaQiKiD"]) {
-        return kNevoChess_AI_haqikid;
+        return NC_AI_HaQiKiD;
     } else if ([aiSelection isEqualToString:@"XQWLightObjc"]) {
-        return kNevoChess_AI_xqwlight_objc;
+        return NC_AI_XQWLight_ObjC;
     }
-    return kNevoChess_AI_xqwlight; // Default!
+    return NC_AI_XQWLight; // Default!
 }
 
 #pragma mark NSMachPort message handle 

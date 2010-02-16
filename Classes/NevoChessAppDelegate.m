@@ -38,11 +38,11 @@
     //set default preferences
     int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
     if (nDifficulty < 1 || nDifficulty > 10) {
-        [[NSUserDefaults standardUserDefaults] setInteger:POC_AI_DIFFICULTY_DEFAULT forKey:@"difficulty_setting"];
+        [[NSUserDefaults standardUserDefaults] setInteger:NC_AI_DIFFICULTY_DEFAULT forKey:@"difficulty_setting"];
     }
     int nGameTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
     if (nGameTime < 5 || nGameTime > 90) {
-        [[NSUserDefaults standardUserDefaults] setInteger:POC_GAME_TIME_DEFAULT forKey:@"time_setting"];
+        [[NSUserDefaults standardUserDefaults] setInteger:NC_GAME_TIME_DEFAULT forKey:@"time_setting"];
         //this might be the first time run
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"toggle_sound"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"toggle_western"];

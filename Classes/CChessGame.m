@@ -239,7 +239,7 @@
                 nGameResult = nRepVal > WIN_VALUE ? kXiangQi_ComputerWin 
                     : (nRepVal < -WIN_VALUE ? kXiangQi_YouWin : kXiangQi_Draw);
             }
-        } else if ([_referee get_nMoveNum] > POC_MAX_MOVES_PER_GAME) {
+        } else if ([_referee get_nMoveNum] > NC_MAX_MOVES_PER_GAME) {
             nGameResult = kXiangQi_OverMoves; // Too many moves
         }
     }
