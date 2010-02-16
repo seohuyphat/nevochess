@@ -24,6 +24,4 @@
     IBOutlet UIWebView *webview;
 }
 
-@property(nonatomic,retain) IBOutlet UIWebView *webview;
-
 @end

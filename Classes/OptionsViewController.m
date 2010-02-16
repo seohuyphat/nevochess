@@ -18,33 +18,18 @@
  ***************************************************************************/
 
 #import "OptionsViewController.h"
-#import "NevoChessAppDelegate.h"
 #import "QuartzUtils.h"
 #import "GenericSettingViewController.h"
 #import "AISelectionViewController.h"
 
 @implementation OptionsViewController
 
-/*
-- (id)initWithStyle:(UITableViewStyle)style {
-    // Override initWithStyle: if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-    if (self = [super initWithStyle:style]) {
-    }
-    return self;
-}
-*/
-
-
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     self.title = NSLocalizedString(@"Settings", @"");
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
-
-
 
 - (void)viewWillAppear:(BOOL)animated 
 {
@@ -54,36 +39,8 @@
         UITableViewCell *cell = [cells objectAtIndex:1];
         cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
     }
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:NO animated:NO];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
-
-/*
-- (void)viewDidAppear:(BOOL)animated 
-{
-    [super viewDidAppear:animated];
-    
-}
-*/ 
-
-- (void)viewWillDisappear:(BOOL)animated 
-{
-	[super viewWillDisappear:animated];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:YES animated:NO];
-}
-
-/*
-- (void)viewDidDisappear:(BOOL)animated {
-	[super viewDidDisappear:animated];
-}
-*/
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning 
 {
@@ -107,107 +64,55 @@
     return 1;
 }
 
-
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
     return 2;
 }
 
-
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
-    UITableViewCell *cell = nil;
-    // section 0
+    UITableViewCell* cell = nil;
+
     if (indexPath.row == 0) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
         if(!cell) {
             cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"generic_setting"] autorelease];
+            cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
-        cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
         cell.textLabel.text = NSLocalizedString(@"General", @"");
-        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
-        return cell;
     }
-    
-    if (indexPath.row == 1) {
+    else if (indexPath.row == 1) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"ai_setting"];
         if(!cell) {
             cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_setting"] autorelease];
+            cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
-        cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
         cell.textLabel.text = NSLocalizedString(@"AI_Setting_Key", @"");
-        cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
         cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
-        return cell;
     }
+
     return cell;
 }
 
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
 {
-    // Navigation logic may go here. Create and push another view controller.
-	// AnotherViewController *anotherViewController = [[AnotherViewController alloc] initWithNibName:@"AnotherView" bundle:nil];
-	// [self.navigationController pushViewController:anotherViewController];
-	// [anotherViewController release];
+    UITableViewController* subController = nil;
+
     if (indexPath.row == 0) {
-        //generic settings
-        SettingViewController *genericController = [[SettingViewController alloc] initWithNibName:@"GenericSettingViewController" bundle:nil];
-        [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:genericController animated:YES];
-        [genericController release];  
+        subController = [[SettingViewController alloc] initWithNibName:@"GenericSettingViewController" bundle:nil];
     }
-    
-    if (indexPath.row == 1) {
-        //AI selection
-        AISelectionViewController *aiController = [[AISelectionViewController alloc] initWithNibName:@"AISelectionView" bundle:nil];
-        [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController pushViewController:aiController animated:YES];
-        [aiController release]; 
+    else if (indexPath.row == 1) {
         
+        subController = [[AISelectionViewController alloc] initWithNibName:@"AISelectionView" bundle:nil];
     }
+
+    [self.navigationController pushViewController:subController animated:YES];
+    [subController release];
 }
-
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
 
 - (void)dealloc 
 {

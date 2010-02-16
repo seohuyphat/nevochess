@@ -25,19 +25,19 @@
 
 @implementation XiangQiMainMenu
 
-@synthesize new_game;
-@synthesize setting;
-@synthesize about;
-@synthesize bg_view;
-
-
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     self.title = NSLocalizedString(@"Home", @"");
     [new_game setTitle:NSLocalizedString(@"Home_Play", @"") forState:UIControlStateNormal];
     [about setTitle:NSLocalizedString(@"Home_About", @"") forState:UIControlStateNormal];
     [setting setTitle:NSLocalizedString(@"Home_Settings", @"") forState:UIControlStateNormal];
+}
+
+- (void)viewWillAppear:(BOOL)animated 
+{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -52,8 +52,8 @@
 	// e.g. self.myOutlet = nil;
 }
 
-
-- (void)dealloc {
+- (void)dealloc
+{
     [new_game release];
     [setting release];
     [about release];
