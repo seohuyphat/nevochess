@@ -26,22 +26,9 @@
 
 @synthesize difficulty_setting;
 @synthesize time_setting;
-@synthesize default_setting;
 @synthesize piece_style;
 @synthesize sound_switch;
 
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
-
-
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad 
 {
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
@@ -70,15 +57,6 @@
     self.title = NSLocalizedString(@"General", @"");
     [super viewDidLoad];
 }
-
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning 
 {
@@ -115,7 +93,6 @@
 {
     [time_setting release];
     [difficulty_setting release];
-    [default_setting release];
     [piece_style release];
     [sound_switch release];
     [super dealloc];
@@ -145,120 +122,103 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
     switch (section) {
-        case 0:
-            //difficulty
-            return 1;
-            break;
-        case 1:
-            //time
-            return 1;
-            break;
-        case 2:
-            //others
-            return 2;
-            break;
+        case 0: return 1; //difficulty
+        case 1: return 1; //time
+        case 2: return 2; //others
     }
-    return 1;
+    return 0;
 }
 
 
 // Customize the appearance of table view cells.
+enum MinMaxLabelEnum { // Tags for elements in a Table-Cell.
+    LABEL_TAG_MIN = 10,  // Have to be non-zero!
+    LABEL_TAG_MAX = 11
+};
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     CGRect f;
-    UILabel *_min;
-    UILabel *_max;
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"slide_setting"];
-    if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"slide_setting"] autorelease];
-        _min = [[[UILabel alloc] initWithFrame:CGRectMake(10, 26, 60, 21)] autorelease];
-        _min.tag = 10;
-        _min.opaque = NO;
-        _min.font = [UIFont systemFontOfSize:16.0f];
-        _min.textAlignment = UITextAlignmentLeft;
-        _min.textColor = [UIColor blackColor];
-        //_min.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
-        _max = [[[UILabel alloc] initWithFrame:CGRectMake(240, 26, 60, 21)] autorelease];
-        _max.tag = 11;
-        _max.opaque = NO;
-        _max.font = [UIFont systemFontOfSize:16.0f];
-        _max.textAlignment = UITextAlignmentLeft;
-        _max.textColor = [UIColor blackColor];
-        //_max.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleHeight;       
+    UILabel* minLabel = nil;
+    UILabel* maxLabel = nil;    
+    UITableViewCell* cell = nil;
 
-        [cell.contentView addSubview:_min];
-        [cell.contentView addSubview:_max];
+    if (indexPath.section == 0 || indexPath.section == 1) // difficulty or time?
+    {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"slide_setting"];
+        if (!cell) {
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"slide_setting"] autorelease];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+
+            minLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 30, 60, 21)] autorelease];
+            minLabel.tag = LABEL_TAG_MIN;
+            minLabel.opaque = NO;
+            minLabel.font = [UIFont systemFontOfSize:14.0f];
+            minLabel.textAlignment = UITextAlignmentLeft;
+            minLabel.textColor = [UIColor blackColor];
+            [cell.contentView addSubview:minLabel];
+            maxLabel = [[[UILabel alloc] initWithFrame:CGRectMake(230, 30, 60, 21)] autorelease];
+            maxLabel.tag = LABEL_TAG_MAX;
+            maxLabel.opaque = NO;
+            maxLabel.font = [UIFont systemFontOfSize:14.0f];
+            maxLabel.textAlignment = UITextAlignmentRight;
+            maxLabel.textColor = [UIColor blackColor];       
+            [cell.contentView addSubview:maxLabel];
+        } else {
+            minLabel = (UILabel*)[cell.contentView viewWithTag:LABEL_TAG_MIN];
+            maxLabel = (UILabel*)[cell.contentView viewWithTag:LABEL_TAG_MAX];
+        }
     }
-    switch (indexPath.section) {
-        case 0:
-            // difficulty
+
+    switch (indexPath.section)
+    {
+        case 0: // difficulty
+        {
             difficulty_setting.frame = CGRectMake(9.0, 9.0, 284, 23);
             [cell.contentView addSubview:difficulty_setting];
-            _min = (UILabel*)[cell.contentView viewWithTag:10];
-            _max = (UILabel*)[cell.contentView viewWithTag:11];
-            _min.text = NSLocalizedString(@"Easy_Key", @"");
-            _max.text = NSLocalizedString(@"Hard_Key", @"");
-            return cell;
+            minLabel.text = NSLocalizedString(@"Easy_Key", @"");
+            maxLabel.text = NSLocalizedString(@"Hard_Key", @"");
             break;
-        case 1:
-            // time
-            _min = (UILabel*)[cell.contentView viewWithTag:10];
-            _max = (UILabel*)[cell.contentView viewWithTag:11];
+        }
+        case 1: // time
+        {
             time_setting.frame = CGRectMake(9.0, 9.0, 284, 23);
-            _max.frame = CGRectMake(270, 26, 30, 21);
             [cell.contentView addSubview:time_setting];
-            _min.text = @"5";
-            _max.text = @"90";
-            return cell;
+            minLabel.text = @"5";
+            maxLabel.text = @"90";
             break;
-        case 2:
-            // sound/pieces setting
+        }
+        case 2: // sound/pieces setting
         {
             cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
             if(!cell) {
                 cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"generic_setting"] autorelease];
                 f = cell.frame;
                 cell.frame = CGRectMake(f.origin.x, f.origin.y, 320, 58);
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
             }
             switch (indexPath.row) {
-                case 0:
-                    //sound
+                case 0: //sound
+                {
                     f = sound_switch.frame;
                     sound_switch.frame = CGRectMake(130, f.origin.y + 16, f.size.width, f.size.height);
                     cell.textLabel.text = NSLocalizedString(@"Sound_Key", @"");
                     [cell.contentView addSubview:sound_switch];
                     break;
-                case 1:
-                    //time setting
+                }
+                case 1: //time setting
+                {
                     f = piece_style.frame;
                     piece_style.frame = CGRectMake(120, f.origin.y + 8, f.size.width, f.size.height);
                     cell.textLabel.text = NSLocalizedString(@"PieceStyle_Key", @"");
                     [cell.contentView addSubview:piece_style];
                     break;
+                }
             }
-            return cell;
-            
-        }
             break;
-
+        }
     }
-    return nil;
-}
 
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
-{
-    
-}
-
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return YES;
-}
-
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return NO;
+    return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -266,13 +226,10 @@
 	switch (section) {
         case 0:
             return [NSString stringWithString:NSLocalizedString(@"Difficulty_Key", @"")];
-            break;
         case 1:
             return [NSString stringWithString:NSLocalizedString(@"Time_Key", @"")];
-            break;
         case 2:
             return [NSString stringWithString:NSLocalizedString(@"General", @"")];
-            break;
     }
     return [NSString stringWithString:@"Undefined"];
 }
