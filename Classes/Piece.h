@@ -48,17 +48,50 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 */
 
-
-#import "Bit.h"
+#import <QuartzCore/QuartzCore.h>
 #import "Enums.h"
+
+@class BitHolder;
+
+/** Standard Z positions */
+enum {
+    kBoardZ = 1,
+    kCardZ  = 2,
+    kPieceZ = 3,
+    
+    kPickedUpZ = 100
+};
+
+
+/** A moveable item in a card/board game.
+ Abstract superclass of Card and Piece. */
+@interface Bit : CALayer
+{
+    int         _restingZ;  // Original z position, saved while pickedUp
+    BitHolder*  holder;
+}
+
+/** Conveniences for getting/setting the layer's scale and rotation */
+@property CGFloat scale;
+@property int rotation;         // in degrees! Positive = clockwise
+
+/** "Picking up" a Bit makes it larger, translucent, and in front of everything else */
+@property BOOL pickedUp;
+
+/** Current holder (or nil) */
+@property (nonatomic, retain) BitHolder *holder;
+
+/** Removes this Bit while running a explosion/fade-out animation */
+- (void) destroy;
+
+@end
+
 
 /** A playing piece. A concrete subclass of Bit that displays an image. */
 @interface Piece : Bit
 {
-    ColorEnum _color;
-
-    @private
-    NSString *_imageName;
+    ColorEnum  _color;
+    NSString*  _imageName;
 }
 
 /** Initialize a Piece from an image file.
@@ -66,12 +99,11 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
     If scale is 0.0, the image's natural size will be used.
     If 0.0 < scale < 4.0, the image will be scaled by that factor.
     If scale >= 4.0, it will be used as the size to scale the maximum dimension to. */
-- (id) initWithImageNamed: (NSString*)imageName
-                    scale: (CGFloat)scale;
+- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale;
 
-- (void) setImage: (CGImageRef)image scale: (CGFloat)scale;
-- (void) setImage: (CGImageRef)image;
-- (void) setImageNamed: (NSString*)name;
+- (void) setImage:(CGImageRef)image scale:(CGFloat)scale;
+- (void) setImage:(CGImageRef)image;
+- (void) setImageNamed:(NSString*)name;
 
 @property (nonatomic)         ColorEnum color;
 @property (nonatomic, retain) NSString* _imageName;
