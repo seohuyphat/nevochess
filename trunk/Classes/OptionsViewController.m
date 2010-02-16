@@ -78,7 +78,7 @@
     if (indexPath.row == 0) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
         if(!cell) {
-            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"generic_setting"] autorelease];
+            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"generic_setting"] autorelease];
             cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
