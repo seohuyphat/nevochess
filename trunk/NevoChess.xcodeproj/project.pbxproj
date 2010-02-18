@@ -220,6 +220,7 @@
 				DE3A5C0E11033C4D006D3CD3 /* Models */,
 				AF07E8A8107A302B00FE19B7 /* Referee */,
 				AF75F8D91065B6CD002A371B /* AI */,
+				AF4C8CEE112DA68D00212667 /* Settings */,
 				4BBB5ECA1032FAFD00243E55 /* xiangqi */,
 				AFF89D0F106FEF2B00E2136D /* Enums.h */,
 				1D3623240D0F684500981E51 /* NevoChessAppDelegate.h */,
@@ -321,22 +322,14 @@
 				AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */,
 				4BBB5F24103303D500243E55 /* XiangQiMainMenu.h */,
 				4BBB5F25103303D500243E55 /* XiangQiMainMenu.m */,
-				4BE40D93106B5AFB006154CC /* OptionsViewController.h */,
-				4BE40D94106B5AFB006154CC /* OptionsViewController.m */,
-				4BD8E8B21039AB250021A5ED /* GenericSettingViewController.h */,
-				4BD8E8B31039AB250021A5ED /* GenericSettingViewController.m */,
-				4BE40E41106C8BA2006154CC /* AISelectionViewController.h */,
-				4BE40E42106C8BA2006154CC /* AISelectionViewController.m */,
-				AFB0380C112C5E5D000A9AC1 /* NetworkSettingController.h */,
-				AFB0380D112C5E5D000A9AC1 /* NetworkSettingController.m */,
 				4BA901E1103AE37A0039C307 /* AboutViewController.h */,
 				4BA901E2103AE37A0039C307 /* AboutViewController.m */,
 				4BBB5F14103303D500243E55 /* CChessGame.h */,
 				4B673389104259F5009DA9E7 /* CChessGame.m */,
-				4BBB5F10103303D500243E55 /* BitHolder.h */,
-				4BBB5F11103303D500243E55 /* BitHolder.m */,
 				4BBB5F12103303D500243E55 /* BoardView.h */,
 				4BBB5F13103303D500243E55 /* BoardView.m */,
+				4BBB5F10103303D500243E55 /* BitHolder.h */,
+				4BBB5F11103303D500243E55 /* BitHolder.m */,
 				4BBB5F1C103303D500243E55 /* Grid.h */,
 				4BBB5F1D103303D500243E55 /* Grid.m */,
 				4BBB5F1E103303D500243E55 /* Piece.h */,
@@ -357,6 +350,21 @@
 				AF07E7EF107A272200FE19B7 /* XQWLight_Referee.cpp */,
 			);
 			name = Referee;
+			sourceTree = "<group>";
+		};
+		AF4C8CEE112DA68D00212667 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				4BE40D93106B5AFB006154CC /* OptionsViewController.h */,
+				4BE40D94106B5AFB006154CC /* OptionsViewController.m */,
+				4BD8E8B21039AB250021A5ED /* GenericSettingViewController.h */,
+				4BD8E8B31039AB250021A5ED /* GenericSettingViewController.m */,
+				4BE40E41106C8BA2006154CC /* AISelectionViewController.h */,
+				4BE40E42106C8BA2006154CC /* AISelectionViewController.m */,
+				AFB0380C112C5E5D000A9AC1 /* NetworkSettingController.h */,
+				AFB0380D112C5E5D000A9AC1 /* NetworkSettingController.m */,
+			);
+			name = Settings;
 			sourceTree = "<group>";
 		};
 		AF75F8D91065B6CD002A371B /* AI */ = {
