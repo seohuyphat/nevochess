@@ -23,11 +23,6 @@
 
 @implementation SettingViewController
 
-@synthesize difficulty_setting;
-@synthesize time_setting;
-@synthesize piece_style;
-@synthesize sound_switch;
-
 - (void)viewDidLoad 
 {
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
@@ -110,8 +105,6 @@
     return 3;
 }
 
-
-// Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
     switch (section) {
@@ -122,8 +115,6 @@
     return 0;
 }
 
-
-// Customize the appearance of table view cells.
 enum MinMaxLabelEnum { // Tags for elements in a Table-Cell.
     LABEL_TAG_MIN = 10,  // Have to be non-zero!
     LABEL_TAG_MAX = 11
@@ -217,14 +208,11 @@ enum MinMaxLabelEnum { // Tags for elements in a Table-Cell.
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
 	switch (section) {
-        case 0:
-            return [NSString stringWithString:NSLocalizedString(@"Difficulty_Key", @"")];
-        case 1:
-            return [NSString stringWithString:NSLocalizedString(@"Time_Key", @"")];
-        case 2:
-            return [NSString stringWithString:NSLocalizedString(@"General", @"")];
+        case 0: return NSLocalizedString(@"Difficulty_Key", @"");
+        case 1: return NSLocalizedString(@"Time_Key", @"");
+        //case 2: return NSLocalizedString(@"General", @"");
     }
-    return [NSString stringWithString:@"Undefined"];
+    return nil;
 }
 
 

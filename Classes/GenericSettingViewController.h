@@ -19,18 +19,13 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface SettingViewController : UITableViewController {
-    IBOutlet UISlider *difficulty_setting;
-    IBOutlet UISlider *time_setting;
-    IBOutlet UISegmentedControl *piece_style;
-    IBOutlet UISwitch *sound_switch;
+@interface SettingViewController : UITableViewController
+{
+    IBOutlet UISlider*           difficulty_setting;
+    IBOutlet UISlider*           time_setting;
+    IBOutlet UISegmentedControl* piece_style;
+    IBOutlet UISwitch*           sound_switch;
 }
-
-@property(nonatomic,retain) IBOutlet UISlider *difficulty_setting;
-@property(nonatomic,retain) IBOutlet UISlider *time_setting;
-@property(nonatomic,retain) IBOutlet UISegmentedControl *piece_style;
-@property(nonatomic,retain) IBOutlet UISwitch *sound_switch;
 
 - (IBAction)defaultSettingPressed:(id)sender;
 
