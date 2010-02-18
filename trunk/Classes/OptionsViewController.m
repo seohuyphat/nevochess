@@ -21,6 +21,7 @@
 #import "QuartzUtils.h"
 #import "GenericSettingViewController.h"
 #import "AISelectionViewController.h"
+#import "NetworkSettingController.h"
 
 @implementation OptionsViewController
 
@@ -67,7 +68,7 @@
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-    return 2;
+    return 3;
 }
 
 // Customize the appearance of table view cells.
@@ -75,24 +76,42 @@
 {
     UITableViewCell* cell = nil;
 
-    if (indexPath.row == 0) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
-        if(!cell) {
-            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"generic_setting"] autorelease];
-            cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    switch (indexPath.row)
+    {
+        case 0:
+        {
+            cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
+            if(!cell) {
+                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"generic_setting"] autorelease];
+                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
+            cell.textLabel.text = NSLocalizedString(@"General", @"");
+            break;
         }
-        cell.textLabel.text = NSLocalizedString(@"General", @"");
-    }
-    else if (indexPath.row == 1) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"ai_setting"];
-        if(!cell) {
-            cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_setting"] autorelease];
-            cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        case 1:
+        {
+            cell = [tableView dequeueReusableCellWithIdentifier:@"ai_setting"];
+            if(!cell) {
+                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_setting"] autorelease];
+                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
+            cell.textLabel.text = NSLocalizedString(@"AI_Setting_Key", @"");
+            cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
+            break;
         }
-        cell.textLabel.text = NSLocalizedString(@"AI_Setting_Key", @"");
-        cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
+        case 2:
+        {
+            cell = [tableView dequeueReusableCellWithIdentifier:@"network_setting"];
+            if(!cell) {
+                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"network_setting"] autorelease];
+                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
+            cell.textLabel.text = NSLocalizedString(@"Network", @"");
+            break;
+        }
     }
 
     return cell;
@@ -102,12 +121,17 @@
 {
     UITableViewController* subController = nil;
 
-    if (indexPath.row == 0) {
-        subController = [[SettingViewController alloc] initWithNibName:@"GenericSettingViewController" bundle:nil];
-    }
-    else if (indexPath.row == 1) {
-        
-        subController = [[AISelectionViewController alloc] initWithNibName:@"AISelectionView" bundle:nil];
+    switch (indexPath.row)
+    {
+        case 0:
+            subController = [[SettingViewController alloc] initWithNibName:@"GenericSettingViewController" bundle:nil];
+            break;
+        case 1:
+            subController = [[AISelectionViewController alloc] initWithNibName:@"AISelectionView" bundle:nil];
+            break;
+        case 2:
+            subController = [[NetworkSettingController alloc] initWithNibName:@"NetworkSettingView" bundle:nil];
+            break;
     }
 
     [self.navigationController pushViewController:subController animated:YES];
