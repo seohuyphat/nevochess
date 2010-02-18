@@ -43,7 +43,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"AI"];
     }
 
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"]) {
+    if ([[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"] == nil) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];
     }
 

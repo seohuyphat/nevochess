@@ -45,6 +45,15 @@ enum LoginButtonEnum
     [super viewDidLoad];
     self.title = NSLocalizedString(@"Login", @"");
     _error.text = @"";
+
+    // Load the existing Login info, if available, the 1st time.
+    NSString* username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
+    if (username && [username length]) {
+        NSString* password = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
+        NSLog(@"%s: Load existing LOGIN [%@, %@].", __FUNCTION__, username, password);
+        [self setInitialLogin:username password:password];
+    }
+
     [_username becomeFirstResponder]; // to have the first keyboard focus
 }
 
