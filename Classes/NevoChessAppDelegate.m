@@ -17,12 +17,6 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-
-//
-//  NevoChessAppDelegate.m
-//  NevoChess
-//
-
 #import "NevoChessAppDelegate.h"
 #import "Enums.h"
 #import "AIBoardViewController.h"
@@ -47,9 +41,12 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"toggle_sound"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"toggle_western"];
         [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"AI"];
+    }
+
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"]) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];
     }
-    
+
     [window addSubview:[navigationController view]];
     navigationController.navigationBarHidden = YES;
     [window makeKeyAndVisible];

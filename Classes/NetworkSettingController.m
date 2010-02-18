@@ -107,6 +107,9 @@
 
 - (void)dealloc
 {
+    [_usernameText release];
+    [_passwordText release];
+    [_autoConnectSwitch release];
     [super dealloc];
 }
 
@@ -123,6 +126,9 @@
 
 - (IBAction) autoConnectValueChanged:(id)sender
 {
+    if ([_usernameText isFirstResponder]) { [_usernameText resignFirstResponder]; }
+    if ([_passwordText isFirstResponder]) { [_passwordText resignFirstResponder]; }
+
     [[NSUserDefaults standardUserDefaults] setBool:_autoConnectSwitch.on forKey:@"network_autoConnect"];
 }
 

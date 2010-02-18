@@ -19,7 +19,7 @@
 
 #import "AISelectionViewController.h"
 #import "QuartzUtils.h"
-#import "NevoChessAppDelegate.h"
+
 //#define ENABLE_XQWLIGHT_OBJC
 
 static char* ai_selections[] = {
@@ -37,17 +37,6 @@ static char* ai_selections[] = {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     self.title = NSLocalizedString(@"AI", @"");
-}
-
-- (void)viewWillAppear:(BOOL)animated 
-{
-    [super viewWillAppear:animated];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:NO animated:YES];
-}
-
-- (void)viewWillDisappear:(BOOL)animated 
-{
-	[super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning 
