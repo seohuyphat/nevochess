@@ -20,7 +20,6 @@
 #import "GenericSettingViewController.h"
 #import "Enums.h"
 #import "QuartzUtils.h"
-#import "NevoChessAppDelegate.h"
 
 @implementation SettingViewController
 
@@ -70,12 +69,6 @@
 {
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
-}
-
-- (void)viewWillAppear:(BOOL)animated 
-{
-    [super viewWillAppear:animated];
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated 
