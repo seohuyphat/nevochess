@@ -47,6 +47,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"toggle_sound"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"toggle_western"];
         [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"AI"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];
     }
     
     [window addSubview:[navigationController view]];
