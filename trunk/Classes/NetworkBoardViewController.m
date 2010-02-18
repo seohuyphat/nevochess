@@ -23,6 +23,7 @@
 
 - (void) _handleCommandLogout;
 - (void) _connectToNetwork;
+- (void) _sendLoginInfo:(NSString*)username password:(NSString*)password;
 - (void) _showLoginView:(NSString*)errorStr;
 - (void) _showListTableView:(NSString*)event;
 - (void) _dismissLoginView;
@@ -129,8 +130,17 @@
 
     if (!_loginAuthenticated && !_loginCanceled)
     {
-        NSLog(@"%s: Show the Login view...", __FUNCTION__);
-        [self _showLoginView:@""];
+        BOOL autoConnect = [[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"];
+        NSString* username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
+        if (autoConnect && username && [username length]) {
+            NSString* password = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
+            NSLog(@"%s: Auto-Connect with LOGIN [%@, %@].", __FUNCTION__, username, password);
+            [self _sendLoginInfo:username password:password];
+        }
+        else {
+            NSLog(@"%s: Show the Login view...", __FUNCTION__);
+            [self _showLoginView:@""];
+        }
     }
 }
 
@@ -314,11 +324,7 @@
         name = [self _generateGuestUserName];
         NSLog(@"%s: Generated a Guest username: [%@].", __FUNCTION__, name);
     }
-    self._username = name;
-    self._password = passwd;
-    [self _connectToNetwork]; // Connect if needed.
-    [_connection setLoginInfo:_username password:_password];
-    [_connection send_LOGIN];
+    [self _sendLoginInfo:name password:passwd];
 }
 
 - (void) handeNewFromList
@@ -379,6 +385,15 @@
     }
 }
 
+- (void) _sendLoginInfo:(NSString*)username password:(NSString*)password
+{
+    self._username = username;
+    self._password = password;
+    [self _connectToNetwork]; // Connect if needed.
+    [_connection setLoginInfo:_username password:_password];
+    [_connection send_LOGIN];
+}
+
 - (void) _showLoginView:(NSString*)errorStr
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
@@ -394,15 +409,7 @@
         [self.navigationController pushViewController:_loginController animated:YES];
     }
 
-    // Load the existing Login info, if available, the 1st time.
-    if (!_username) {
-        NSString* username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
-        if (username && [username length]) {
-            NSString* password = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
-            NSLog(@"%s: Load existing LOGIN [%@, %@].", __FUNCTION__, username, password);
-            [_loginController setInitialLogin:username password:password];
-        }
-    }
+    _loginCanceled = NO;
 }
 
 - (void) _showListTableView:(NSString*)event
