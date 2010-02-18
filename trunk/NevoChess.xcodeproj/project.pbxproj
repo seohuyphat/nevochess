@@ -181,7 +181,7 @@
 		AFA63FEE106FAC8F00D7B220 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
 		AFB0380C112C5E5D000A9AC1 /* NetworkSettingController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkSettingController.h; sourceTree = "<group>"; };
 		AFB0380D112C5E5D000A9AC1 /* NetworkSettingController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkSettingController.m; sourceTree = "<group>"; };
-		AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = NetworkSettingView.xib; path = Classes/NetworkSettingView.xib; sourceTree = "<group>"; };
+		AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NetworkSettingView.xib; sourceTree = "<group>"; };
 		AFB08A13106A663E00038488 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; wrapsLines = 1; };
 		AFB08A15106A665300038488 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
