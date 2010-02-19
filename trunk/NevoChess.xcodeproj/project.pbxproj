@@ -25,7 +25,7 @@
 		4BBB5F30103303D500243E55 /* Piece.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1F103303D500243E55 /* Piece.m */; };
 		4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F21103303D500243E55 /* QuartzUtils.m */; };
 		4BBB5F32103303D500243E55 /* XiangQi.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F23103303D500243E55 /* XiangQi.m */; };
-		4BBB5F33103303D500243E55 /* XiangQiMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F25103303D500243E55 /* XiangQiMainMenu.m */; };
+		4BBB5F33103303D500243E55 /* MainMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F25103303D500243E55 /* MainMenuController.m */; };
 		4BBB5F34103303D500243E55 /* ZobristHashGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F27103303D500243E55 /* ZobristHashGenerator.m */; };
 		4BBB5F66103304F000243E55 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BBB5F64103304F000243E55 /* CoreGraphics.framework */; };
 		4BBB5F67103304F000243E55 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BBB5F65103304F000243E55 /* QuartzCore.framework */; };
@@ -65,7 +65,7 @@
 		AF8CABE71042F7FC002D6594 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = AF8CABE61042F7FC002D6594 /* Entitlements.plist */; };
 		AF8CF6681073154E0071CAE2 /* XQWLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF8CF6661073154E0071CAE2 /* XQWLight.cpp */; };
 		AF8CF66B107315E50071CAE2 /* AI_XQWLight.m in Sources */ = {isa = PBXBuildFile; fileRef = AF8CF66A107315E50071CAE2 /* AI_XQWLight.m */; };
-		AF943D1E10855C6100677DF9 /* XiangQiMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB5F891033069500243E55 /* XiangQiMainMenu.xib */; };
+		AF943D1E10855C6100677DF9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB5F891033069500243E55 /* MainMenu.xib */; };
 		AF957A431085897500589D4A /* AboutViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF9F2B7C106A71D400D919B1 /* AboutViewController.xib */; };
 		AFA46640106FB2C60006DAFE /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA4663F106FB2C60006DAFE /* Icon.png */; };
 		AFA63FE5106FABD700D7B220 /* background_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA63FE4106FABD700D7B220 /* background_320x480.png */; };
@@ -111,14 +111,14 @@
 		4BBB5F21103303D500243E55 /* QuartzUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuartzUtils.m; sourceTree = "<group>"; };
 		4BBB5F22103303D500243E55 /* XiangQi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XiangQi.h; sourceTree = "<group>"; };
 		4BBB5F23103303D500243E55 /* XiangQi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XiangQi.m; sourceTree = "<group>"; };
-		4BBB5F24103303D500243E55 /* XiangQiMainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XiangQiMainMenu.h; sourceTree = "<group>"; };
-		4BBB5F25103303D500243E55 /* XiangQiMainMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XiangQiMainMenu.m; sourceTree = "<group>"; };
+		4BBB5F24103303D500243E55 /* MainMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenuController.h; sourceTree = "<group>"; };
+		4BBB5F25103303D500243E55 /* MainMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainMenuController.m; sourceTree = "<group>"; };
 		4BBB5F26103303D500243E55 /* ZobristHashGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZobristHashGenerator.h; sourceTree = "<group>"; };
 		4BBB5F27103303D500243E55 /* ZobristHashGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZobristHashGenerator.m; sourceTree = "<group>"; };
 		4BBB5F64103304F000243E55 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		4BBB5F65103304F000243E55 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4BBB5F881033069500243E55 /* ChessBoardViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChessBoardViewController.xib; sourceTree = "<group>"; };
-		4BBB5F891033069500243E55 /* XiangQiMainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = XiangQiMainMenu.xib; sourceTree = "<group>"; };
+		4BBB5F891033069500243E55 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		4BBB67121035027D004D6412 /* Sort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sort.h; sourceTree = "<group>"; };
 		4BBB67131035027D004D6412 /* Sort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Sort.m; sourceTree = "<group>"; };
 		4BD8E8B21039AB250021A5ED /* GenericSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericSettingViewController.h; sourceTree = "<group>"; };
@@ -269,7 +269,7 @@
 				4BBB5F881033069500243E55 /* ChessBoardViewController.xib */,
 				DE964FCB1082511E00980CF6 /* GenericSettingViewController.xib */,
 				DE964FCC1082511E00980CF6 /* OptionsView.xib */,
-				4BBB5F891033069500243E55 /* XiangQiMainMenu.xib */,
+				4BBB5F891033069500243E55 /* MainMenu.xib */,
 				4BE40E44106C8C0F006154CC /* AISelectionView.xib */,
 				AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
@@ -317,8 +317,8 @@
 				AF4E2ADB111D99A2009E2EC8 /* ItemInputViewController.m */,
 				AF28B5DA1111D1CC00B3EAD8 /* NetworkConnection.h */,
 				AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */,
-				4BBB5F24103303D500243E55 /* XiangQiMainMenu.h */,
-				4BBB5F25103303D500243E55 /* XiangQiMainMenu.m */,
+				4BBB5F24103303D500243E55 /* MainMenuController.h */,
+				4BBB5F25103303D500243E55 /* MainMenuController.m */,
 				4BA901E1103AE37A0039C307 /* AboutViewController.h */,
 				4BA901E2103AE37A0039C307 /* AboutViewController.m */,
 				4BBB5F14103303D500243E55 /* CChessGame.h */,
@@ -483,7 +483,7 @@
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				AF624878108013F60019D2E9 /* ChessBoardViewController.xib in Resources */,
-				AF943D1E10855C6100677DF9 /* XiangQiMainMenu.xib in Resources */,
+				AF943D1E10855C6100677DF9 /* MainMenu.xib in Resources */,
 				4BEB36CB103A4A7000B545FE /* Settings.bundle in Resources */,
 				4B67333210423930009DA9E7 /* pieces in Resources */,
 				4B3454D81054EAFF00362ED5 /* sounds in Resources */,
@@ -545,7 +545,7 @@
 				4BBB5F30103303D500243E55 /* Piece.m in Sources */,
 				4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */,
 				4BBB5F32103303D500243E55 /* XiangQi.m in Sources */,
-				4BBB5F33103303D500243E55 /* XiangQiMainMenu.m in Sources */,
+				4BBB5F33103303D500243E55 /* MainMenuController.m in Sources */,
 				4BBB5F34103303D500243E55 /* ZobristHashGenerator.m in Sources */,
 				4BBB67141035027D004D6412 /* Sort.m in Sources */,
 				4BD8E8B51039AB250021A5ED /* GenericSettingViewController.m in Sources */,

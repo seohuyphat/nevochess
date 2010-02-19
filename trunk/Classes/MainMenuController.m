@@ -17,13 +17,13 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "XiangQiMainMenu.h"
+#import "MainMenuController.h"
 #import "AIBoardViewController.h"
 #import "NetworkBoardViewController.h"
 #import "AboutViewController.h"
 #import "OptionsViewController.h"
 
-@implementation XiangQiMainMenu
+@implementation MainMenuController
 
 - (void)viewDidLoad
 {
