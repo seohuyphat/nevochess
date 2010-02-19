@@ -54,6 +54,7 @@ enum{
 }
 
 - (id) initWithBoard: (CALayer*)board;
+- (void) showBoard:(BOOL)visible;
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;

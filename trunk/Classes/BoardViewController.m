@@ -206,16 +206,6 @@
     [_board rescheduleTimer];
 }
 
-- (void) resetBoard
-{
-    [_board resetBoard];
-}
-
-- (void) displayEmptyBoard
-{
-    [_board displayEmptyBoard];
-}
-
 - (BOOL) isMyTurnNext
 {
     return ([_game getNextColor] == _myColor);

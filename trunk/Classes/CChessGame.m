@@ -199,6 +199,11 @@
     return self;
 }
 
+- (void) showBoard:(BOOL)visible
+{
+    _board.hidden = !visible;
+}
+
 - (int) doMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
 {
     int sqSrc = TOSQUARE(row1, col1);

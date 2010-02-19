@@ -82,7 +82,9 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
     AudioHelper*          _audioHelper;
 
     id <BoardOwner>       _boardOwner;
-    
+
+    IBOutlet UIButton*    _red_seat;
+    IBOutlet UIButton*    _black_seat;
     IBOutlet UILabel*     _red_label;
     IBOutlet UILabel*     _black_label;
     IBOutlet UILabel*     _red_time;

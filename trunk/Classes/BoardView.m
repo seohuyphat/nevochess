@@ -183,7 +183,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
     _gameboard = [[CALayer alloc] init];
     _gameboard.frame = [self _gameBoardFrame];
-    self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
+    //self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
     [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
 
     _game = [[CChessGame alloc] initWithBoard:_gameboard];
@@ -414,6 +414,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) onGameOver
 {
+    _game_over_msg.text = NSLocalizedString(@"Game Over", @"");
     _game_over_msg.hidden = NO;
 }
 
@@ -563,10 +564,12 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     CGPoint p = [touch locationInView:self];
     NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
     
-    BoardView *view = self;//(BoardView*) self.view;
+    BoardView *view = self;
     Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
-     if (!piece && p.y > 382) {
+     if (   !piece && p.y > 382
+         && (_gameboard.superlayer != nil)) // Visible?
+     {
          _preview_prev.hidden = NO;
          _preview_next.hidden = NO;
          self._previewLastTouched = [NSDate date]; // now.
@@ -643,6 +646,18 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) resetBoard
 {
+    [_game showBoard:YES];
+    [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
+
+    _red_seat.hidden = NO;
+    _black_seat.hidden = NO;
+    _red_label.hidden = NO;
+    _black_label.hidden = NO;
+    _red_time.hidden = NO;
+    _red_move_time.hidden = NO;
+    _black_time.hidden = NO;
+    _black_move_time.hidden = NO;
+
     [self _setHighlightCells:NO];
     [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
     _selectedPiece = nil;
@@ -663,13 +678,26 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 
 - (void) displayEmptyBoard
 {
-    [self resetBoard];
-    [self setRedLabel:@""];
-    [self setBlackLabel:@""];
-    if (!_game.blackAtTopSide )
-    {
-        [self reverseBoardView];
-    }
+    [_game showBoard:NO];
+    [_gameboard removeFromSuperlayer];
+
+    _red_seat.hidden = YES;
+    _black_seat.hidden = YES;
+    _red_label.hidden = YES;
+    _black_label.hidden = YES;
+    _red_time.hidden = YES;
+    _red_move_time.hidden = YES;
+    _black_time.hidden = YES;
+    _black_move_time.hidden = YES;
+
+    _game_over_msg.text = NSLocalizedString(@"Select a Table to join", @"");
+    _game_over_msg.hidden = NO;
+
+    _preview_prev.hidden = YES;
+    _preview_next.hidden = YES;
+
+    [_moves removeAllObjects];
+    _nthMove = HISTORY_INDEX_END;
 }
 
 - (void) reverseBoardView

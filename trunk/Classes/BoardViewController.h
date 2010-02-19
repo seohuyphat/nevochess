@@ -55,8 +55,6 @@ enum ActionIndexEnum
 {
     
     IBOutlet UIToolbar*   nav_toolbar;
-    IBOutlet UIButton*    red_seat;
-    IBOutlet UIButton*    black_seat;
     IBOutlet UIActivityIndicatorView *activity;
 
     BoardView*            _board;
@@ -84,8 +82,6 @@ enum ActionIndexEnum
 
 - (void) saveGame;
 - (void) rescheduleTimer;
-- (void) resetBoard;
-- (void) displayEmptyBoard;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
 - (void) reverseBoardView;

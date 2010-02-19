@@ -71,6 +71,9 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+
+        [_board displayEmptyBoard];
+
         self._username = nil;
         self._password = nil;
         self._rating = nil;
@@ -148,10 +151,10 @@
 {
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
+
 	// Release any cached data, images, etc that aren't in use.
+    self._loginController = nil;
     self._tableListController = nil;
-    self._messageListController = nil;
 }
 
 - (void)dealloc
@@ -236,7 +239,7 @@
             NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
-            [self displayEmptyBoard];
+            [_board displayEmptyBoard];
             _actionButton.enabled = NO;
             break;
         case ACTION_INDEX_RESIGN:
@@ -334,7 +337,7 @@
     if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
-        [self _resetAndClearTable];
+        [_board displayEmptyBoard];
     }
     [_connection send_NEW:@"900/180/20"];
 }
@@ -354,10 +357,12 @@
     if ([_tableId isEqualToString:table.tableId]) {
         NSLog(@"%s: Same table [%@]. Ignore request.", __FUNCTION__, table.tableId);
         return;
-    } else if (_tableId) {
+    }
+
+    if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
         self._tableId = nil; 
-        [self _resetAndClearTable];
+        [_board displayEmptyBoard];
     }
     [_connection send_JOIN:table.tableId color:joinColor];
 }
@@ -446,7 +451,7 @@
 
 - (void) _resetAndClearTable
 {
-    [self resetBoard];
+    [_board resetBoard];
     _isGameOver = NO;
 }
 
@@ -589,9 +594,7 @@
 {
     TableInfo* table = [[TableInfo allocTableFromString:event] autorelease];
 
-    if (_tableId && ![_tableId isEqualToString:table.tableId]) {
-        [self _resetAndClearTable];
-    }
+    [self _resetAndClearTable];
     self._tableId = table.tableId;
 
     ColorEnum myColor = NC_COLOR_NONE; // Default: an observer.
@@ -618,7 +621,6 @@
 
     self._redId = ([table.redId length] == 0 ? nil : table.redId);
     self._blackId = ([table.blackId length] == 0 ? nil : table.blackId);
-    _isGameOver = NO;
     _actionButton.enabled = YES;
 }
 

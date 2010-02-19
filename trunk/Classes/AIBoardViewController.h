@@ -37,5 +37,6 @@
 - (void) handleNewMove:(NSNumber *)pMove;
 - (void) onLocalMoveMade:(int)move;
 - (void) saveGame;
+- (void) resetBoard;
 
 @end
