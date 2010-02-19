@@ -55,7 +55,6 @@
  ***************************************************************************/
 
 #import "BoardView.h"
-#import "BitHolder.h"
 #import "QuartzUtils.h"
 #import "NevoChessAppDelegate.h"
 #import "Grid.h"
@@ -67,8 +66,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     HISTORY_INDEX_BEGIN = -1
 };
 
-BOOL layerIsBit( CALayer* layer )        {return [layer isKindOfClass: [Bit class]];}
-BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @protocol(BitHolder)];}
+BOOL layerIsBit( CALayer* layer )      { return [layer isKindOfClass: [Bit class]]; }
+BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell class]]; }
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -605,7 +604,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
             return;
         }
     } else {
-        holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsBitHolder offset:NULL];
+        holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsGridCell offset:NULL];
     }
     
     // Make a Move from the last selected cell to the current selected cell.

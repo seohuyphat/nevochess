@@ -55,13 +55,11 @@
 @implementation Grid
 
 
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-            spacing: (CGSize)spacing
-           position: (CGPoint)pos
+- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
+            spacing:(CGSize)spacing position:(CGPoint)pos
 {
     NSParameterAssert(nRows>0 && nColumns>0);
-    self = [super init];
-    if( self ) {
+    if( self = [super init] ) {
         _nRows = nRows;
         _nColumns = nColumns;
         _spacing = spacing;
@@ -95,8 +93,8 @@
 }
 
 
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-              frame: (CGRect)frame
+- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
+              frame:(CGRect)frame
 {
     CGFloat spacing = floor(MIN( (frame.size.width -2)/(CGFloat)nColumns,
                                (frame.size.height-2)/(CGFloat)nRows) );
@@ -105,7 +103,8 @@
                      position: frame.origin];
 }
 
-- (void)dealloc {
+- (void) dealloc
+{
     CGColorRelease(_lineColor);
     [_cells release];
     [_river release];
@@ -121,8 +120,8 @@
     }
 }
 
-- (CGColorRef) lineColor                     {return _lineColor;}
-- (void) setLineColor: (CGColorRef)lineColor {[self setcolor:&_lineColor withNewColor:lineColor];}
+- (CGColorRef) lineColor                    { return _lineColor; }
+- (void) setLineColor:(CGColorRef)lineColor { [self setcolor:&_lineColor withNewColor:lineColor]; }
 
 @synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
 @synthesize _river;
@@ -131,7 +130,7 @@
 #pragma mark GEOMETRY:
 
 
-- (GridCell*) cellAtRow: (unsigned)row column: (unsigned)col
+- (GridCell*) cellAtRow:(unsigned)row column:(unsigned)col
 {
     if( row < _nRows && col < _nColumns ) {
         id cell = [_cells objectAtIndex: row*_nColumns+col];
@@ -141,18 +140,7 @@
     return nil;
 }
 
-
-/** Subclasses can override this, to change the cell's class or frame. */
-- (GridCell*) allocCellAtRow: (unsigned)row column: (unsigned)col 
-               suggestedFrame: (CGRect)frame
-{
-    return [[GridCell alloc] initWithGrid: self 
-                                        row: row column: col
-                                      frame: frame];
-}
-
-
-- (GridCell*) addCellAtRow: (unsigned)row column: (unsigned)col
+- (GridCell*) addCellAtRow:(unsigned)row column:(unsigned)col
 {
     NSParameterAssert(row<_nRows);
     NSParameterAssert(col<_nColumns);
@@ -161,10 +149,10 @@
     if( (id)cell == [NSNull null] ) {
         CGRect frame = CGRectMake(col*_spacing.width, row*_spacing.height,
                                   _spacing.width,_spacing.height);
-        cell = [self allocCellAtRow: row column: col suggestedFrame: frame];
+        cell = [[GridCell alloc] initWithGrid:self row:row column:col frame:frame];
         if( cell ) {
-            [_cells replaceObjectAtIndex: index withObject: cell];
-            [self addSublayer: cell];
+            [_cells replaceObjectAtIndex:index withObject:cell];
+            [self addSublayer:cell];
             [self setNeedsDisplay];
         }
     }
@@ -187,7 +175,7 @@
 }
 
 
-- (void) removeCellAtRow: (unsigned)row column: (unsigned)col
+- (void) removeCellAtRow:(unsigned)row column:(unsigned)col
 {
     NSParameterAssert(row<_nRows);
     NSParameterAssert(col<_nColumns);
@@ -195,7 +183,6 @@
     id cell = [_cells objectAtIndex: index];
     if( cell != [NSNull null] )
         [cell removeFromSuperlayer];
-    // HUY PHAN: (not needed): [cell release];
     [_cells replaceObjectAtIndex: index withObject: [NSNull null]];
     [self setNeedsDisplay];
 }
@@ -205,7 +192,7 @@
 #pragma mark DRAWING:
 
 
-- (void) drawCellsInContext: (CGContextRef)ctx
+- (void) drawCellsInContext:(CGContextRef)ctx
 {
     // Subroutine of -drawInContext:. Draws all the cells, with or without a fill.
     for( unsigned row=0; row<_nRows; row++ )
@@ -216,7 +203,6 @@
         }
 }
 
-
 - (void)drawInContext:(CGContextRef)ctx
 {
     // Custom CALayer drawing implementation. Delegates to the cells to draw themselves
@@ -226,7 +212,6 @@
     [self drawCellsInContext:ctx];
 }
 
-
 @end
 
 
@@ -235,21 +220,15 @@
 
 @implementation GridCell
 
+@synthesize _highlighted;
+@synthesize _bit;
 @synthesize _grid, _row, _column;
 @synthesize dotted, cross;
 
-- (void)dealloc
+- (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
+              frame:(CGRect)frame
 {
-    [_grid release];
-    [super dealloc];
-}
-
-- (id) initWithGrid: (Grid*)grid 
-                row: (unsigned)row column: (unsigned)col
-              frame: (CGRect)frame
-{
-    self = [super init];
-    if (self != nil) {
+    if (self = [super init]) {
         _grid = grid;
         _row = row;
         _column = col;
@@ -264,6 +243,22 @@
     return self;
 }
 
+- (void) dealloc
+{
+    [_bit release];
+    [_grid release];
+    [super dealloc];
+}
+
+- (Bit*) bit
+{
+    if( _bit && _bit.superlayer != self && !_bit.pickedUp )
+        _bit = nil;
+    return _bit;
+}
+
+- (BOOL) isEmpty { return self._bit == nil; }
+
 - (NSString*) description
 {
     return [NSString stringWithFormat: @"%@(%u,%u)", [self class],_column,_row];
@@ -276,13 +271,12 @@
         if( bit ) {
             // Center it:
             CGSize size = self.bounds.size;
-            bit.position = CGPointMake(floor(size.width/2.0),
-                                       floor(size.height/2.0));
+            bit.position = CGPointMake(floor(size.width/2.0), floor(size.height/2.0));
         }
     }
 }
 
-- (void) drawInParentContext: (CGContextRef)ctx
+- (void) drawInParentContext:(CGContextRef)ctx
 {
     CGRect frame = self.frame;
     const CGFloat midx=floor(CGRectGetMidX(frame))+0.5, 
@@ -296,7 +290,6 @@
     if( ! self.w )  p[0].x = midx;
     if( ! self.e )  p[1].x = midx;
     CGContextStrokeLineSegments(ctx, p, 4);
-    
     
     if( dotted ) {
         
@@ -330,20 +323,20 @@
     }                                                                                                                                      
 }
 
-- (void) setHighlighted: (BOOL)highlighted
+- (void) setHighlighted:(BOOL)highlighted
 {
     _highlighted = highlighted;
     self.cornerRadius = ceil(_grid.spacing.width / 4);
     self.borderWidth = (highlighted ?3 :0);
 }
 
-- (GridCell*) nw     {return [_grid cellAtRow: _row+1 column: _column-1];}
-- (GridCell*) n      {return [_grid cellAtRow: _row+1 column: _column  ];}
-- (GridCell*) ne     {return [_grid cellAtRow: _row+1 column: _column+1];}
-- (GridCell*) e      {return [_grid cellAtRow: _row   column: _column+1];}
-- (GridCell*) se     {return [_grid cellAtRow: _row-1 column: _column+1];}
-- (GridCell*) s      {return [_grid cellAtRow: _row-1 column: _column  ];}
-- (GridCell*) sw     {return [_grid cellAtRow: _row-1 column: _column-1];}
-- (GridCell*) w      {return [_grid cellAtRow: _row   column: _column-1];}
+- (GridCell*) nw     { return [_grid cellAtRow: _row+1 column: _column-1]; }
+- (GridCell*) n      { return [_grid cellAtRow: _row+1 column: _column  ]; }
+- (GridCell*) ne     { return [_grid cellAtRow: _row+1 column: _column+1]; }
+- (GridCell*) e      { return [_grid cellAtRow: _row   column: _column+1]; }
+- (GridCell*) se     { return [_grid cellAtRow: _row-1 column: _column+1]; }
+- (GridCell*) s      { return [_grid cellAtRow: _row-1 column: _column  ]; }
+- (GridCell*) sw     { return [_grid cellAtRow: _row-1 column: _column-1]; }
+- (GridCell*) w      { return [_grid cellAtRow: _row   column: _column-1]; }
 
 @end

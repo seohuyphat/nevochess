@@ -51,7 +51,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 #import <QuartzCore/QuartzCore.h>
 #import "Enums.h"
 
-@class BitHolder;
+@class GridCell;
 
 /** Standard Z positions */
 enum {
@@ -68,7 +68,7 @@ enum {
 @interface Bit : CALayer
 {
     int         _restingZ;  // Original z position, saved while pickedUp
-    BitHolder*  holder;
+    GridCell*   holder;
 }
 
 /** Conveniences for getting/setting the layer's scale and rotation */
@@ -79,7 +79,7 @@ enum {
 @property BOOL pickedUp;
 
 /** Current holder (or nil) */
-@property (nonatomic, retain) BitHolder *holder;
+@property (nonatomic, retain) GridCell *holder;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroy;

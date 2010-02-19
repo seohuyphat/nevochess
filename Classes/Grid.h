@@ -48,8 +48,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 */
 
-
-#import "BitHolder.h"
+#import "Piece.h"
 @class GridCell;
 
 
@@ -67,15 +66,14 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 /** Initializes a new Grid with the given dimensions and cell size, and position in superview.
     Note that a new Grid has no cells! Either call -addAllCells, or -addCellAtRow:column:. */
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-            spacing: (CGSize)spacing
-           position: (CGPoint)pos;
+- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
+            spacing:(CGSize)spacing position:(CGPoint)pos;
 
 /** Initializes a new Grid with the given dimensions and frame in superview.
     The cell size will be computed by dividing frame size by dimensions.
     Note that a new Grid has no cells! Either call -addAllCells, or -addCellAtRow:column:. */
-- (id) initWithRows: (unsigned)nRows columns: (unsigned)nColumns
-              frame: (CGRect)frame;
+- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
+              frame:(CGRect)frame;
 
 @property (readonly) unsigned rows, columns;    // Dimensions of the grid
 @property (readonly) CGSize spacing;            // x,y spacing of GridCells
@@ -84,7 +82,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 /** Returns the GridCell at the given coordinates, or nil if there is no cell there.
     It's OK to call this with off-the-board coordinates; it will just return nil.*/
-- (GridCell*) cellAtRow: (unsigned)row column: (unsigned)col;
+- (GridCell*) cellAtRow:(unsigned)row column: (unsigned)col;
 
 /** Adds cells at all coordinates, creating a complete grid. */
 - (void) addAllCells;
@@ -92,31 +90,36 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 - (void) removeAllCells;
 
 /** Adds a GridCell at the given coordinates. */
-- (GridCell*) addCellAtRow: (unsigned)row column: (unsigned)col;
+- (GridCell*) addCellAtRow:(unsigned)row column:(unsigned)col;
 
 /** Removes a particular cell, leaving a blank space. */
-- (void) removeCellAtRow: (unsigned)row column: (unsigned)col;
-
-
-// protected:
-- (GridCell*) allocCellAtRow: (unsigned)row column: (unsigned)col 
-               suggestedFrame: (CGRect)frame;
+- (void) removeCellAtRow:(unsigned)row column:(unsigned)col;
 
 @end
 
 
 /** A single cell in a grid (customized for Xiangqi). */
-@interface GridCell : BitHolder
+@interface GridCell : CALayer
 {
-    Grid *_grid;
+    Bit*     _bit;
+    BOOL     _highlighted;
+    Grid*    _grid;
     unsigned _row, _column;
-    BOOL dotted;
-    BOOL cross;
+    BOOL     dotted;
+    BOOL     cross;
 }
 
-- (id) initWithGrid: (Grid*)grid 
-                row: (unsigned)row column: (unsigned)col
-              frame: (CGRect)frame;
+- (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
+              frame:(CGRect)frame;
+
+/** Current Bit, or nil if empty */
+@property (nonatomic, retain) Bit* _bit;
+
+/** Conveniences for comparing self.bit with nil */
+@property (nonatomic, readonly, getter=isEmpty) BOOL empty;
+
+/** BitHolders will be highlighted while the target of a drag operation */
+@property (nonatomic, setter=setHighlighted:) BOOL _highlighted;
 
 @property (nonatomic, retain) Grid* _grid;
 @property (nonatomic) unsigned _row, _column;
@@ -125,5 +128,5 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 @property (readonly) GridCell *nw, *n, *ne, *e, *se, *s, *sw, *w; // Absolute directions (n = increasing row#)
 
 // protected:
-- (void) drawInParentContext: (CGContextRef)ctx;
+- (void) drawInParentContext:(CGContextRef)ctx;
 @end

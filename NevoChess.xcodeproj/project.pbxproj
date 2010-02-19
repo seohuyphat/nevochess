@@ -20,7 +20,6 @@
 		4B67333210423930009DA9E7 /* pieces in Resources */ = {isa = PBXBuildFile; fileRef = 4B67330E10423930009DA9E7 /* pieces */; };
 		4B67338A104259F5009DA9E7 /* CChessGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B673389104259F5009DA9E7 /* CChessGame.m */; };
 		4BA901E4103AE37A0039C307 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA901E2103AE37A0039C307 /* AboutViewController.m */; };
-		4BBB5F29103303D500243E55 /* BitHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F11103303D500243E55 /* BitHolder.m */; };
 		4BBB5F2A103303D500243E55 /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F13103303D500243E55 /* BoardView.m */; };
 		4BBB5F2F103303D500243E55 /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1D103303D500243E55 /* Grid.m */; };
 		4BBB5F30103303D500243E55 /* Piece.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1F103303D500243E55 /* Piece.m */; };
@@ -101,8 +100,6 @@
 		4B673389104259F5009DA9E7 /* CChessGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CChessGame.m; sourceTree = "<group>"; };
 		4BA901E1103AE37A0039C307 /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
 		4BA901E2103AE37A0039C307 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
-		4BBB5F10103303D500243E55 /* BitHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitHolder.h; sourceTree = "<group>"; };
-		4BBB5F11103303D500243E55 /* BitHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BitHolder.m; sourceTree = "<group>"; };
 		4BBB5F12103303D500243E55 /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
 		4BBB5F13103303D500243E55 /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
 		4BBB5F14103303D500243E55 /* CChessGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CChessGame.h; sourceTree = "<group>"; };
@@ -328,8 +325,6 @@
 				4B673389104259F5009DA9E7 /* CChessGame.m */,
 				4BBB5F12103303D500243E55 /* BoardView.h */,
 				4BBB5F13103303D500243E55 /* BoardView.m */,
-				4BBB5F10103303D500243E55 /* BitHolder.h */,
-				4BBB5F11103303D500243E55 /* BitHolder.m */,
 				4BBB5F1C103303D500243E55 /* Grid.h */,
 				4BBB5F1D103303D500243E55 /* Grid.m */,
 				4BBB5F1E103303D500243E55 /* Piece.h */,
@@ -545,7 +540,6 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* NevoChessAppDelegate.m in Sources */,
-				4BBB5F29103303D500243E55 /* BitHolder.m in Sources */,
 				4BBB5F2A103303D500243E55 /* BoardView.m in Sources */,
 				4BBB5F2F103303D500243E55 /* Grid.m in Sources */,
 				4BBB5F30103303D500243E55 /* Piece.m in Sources */,
