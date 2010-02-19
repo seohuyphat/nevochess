@@ -19,7 +19,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface XiangQiMainMenu : UIViewController
+@interface MainMenuController : UIViewController
 {
     IBOutlet UIButton *new_game;
     IBOutlet UIButton *about;
