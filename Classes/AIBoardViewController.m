@@ -170,7 +170,7 @@ enum AlertViewEnum
 - (void) resetBoard
 {
     [_aiEngine initGame];
-    [super resetBoard];
+    [_board resetBoard];
 }
 
 //
