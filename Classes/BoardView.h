@@ -70,7 +70,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 @protocol BoardOwner <NSObject>
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
-- (void) onLocalMoveMade:(int)move;
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 @end
 
 /** UIView that hosts a game. */

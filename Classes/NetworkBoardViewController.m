@@ -287,7 +287,7 @@
     [_messageListController setTableId:_tableId];
 }
 
-- (void) onLocalMoveMade:(int)move
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
 {
     int sqSrc = SRC(move);
     int sqDst = DST(move);

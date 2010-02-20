@@ -632,9 +632,9 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
             [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
             
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            [self onNewMove:moveInfo inSetupMode:NO];
+            int nGameResult = [self onNewMove:moveInfo inSetupMode:NO];
             
-            [_boardOwner onLocalMoveMade:move];
+            [_boardOwner onLocalMoveMade:move gameResult:nGameResult];
         }
     } else {
         [self _setHighlightCells:NO];
