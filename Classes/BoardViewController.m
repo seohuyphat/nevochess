@@ -47,39 +47,39 @@
         drawIndex = 1;
         cancelIndex = 2;
         self = [super initWithTitle:title delegate:delegate
-                  cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:@"Resign"
-                  otherButtonTitles:@"Draw", nil];
+                  cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
+             destructiveButtonTitle:NSLocalizedString(@"Resign", @"")
+                  otherButtonTitles:NSLocalizedString(@"Draw", @""), nil];
     }
     else if ([state isEqualToString:@"ended"]) {
         closeIndex = 0;
         resetIndex = 1;
         cancelIndex = 2;
         self = [super initWithTitle:title delegate:delegate
-                  cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:@"Close Table"
-                  otherButtonTitles:@"Reset Table", nil];
+                  cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
+             destructiveButtonTitle:NSLocalizedString(@"Close Table", @"")
+                  otherButtonTitles:NSLocalizedString(@"Reset Table", @""), nil];
     }
     else if ([state isEqualToString:@"view"] || [state isEqualToString:@"ready"]) {
         closeIndex = 0;
         cancelIndex = 1;
         self = [super initWithTitle:title delegate:delegate
-                  cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:@"Close Table"
+                  cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
+             destructiveButtonTitle:NSLocalizedString(@"Close Table", @"")
                   otherButtonTitles:nil];
     }
     else if ([state isEqualToString:@"logout"]) {
         logoutIndex = 0;
         cancelIndex = 1;
         self = [super initWithTitle:title delegate:delegate
-                  cancelButtonTitle:@"Cancel"
-             destructiveButtonTitle:@"Logout"
+                  cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
+             destructiveButtonTitle:NSLocalizedString(@"Logout", @"")
                   otherButtonTitles:nil];
     }
     else {
         cancelIndex = 0;
         self = [super initWithTitle:title delegate:delegate
-                  cancelButtonTitle:@"Cancel"
+                  cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
              destructiveButtonTitle:nil
                   otherButtonTitles:nil];
     }

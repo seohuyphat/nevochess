@@ -12,14 +12,18 @@
 "RESET" = "重新开始";
 
 /* These HOME keys need a single space in the front to separate an icon. */
-"Home_Play" = " 开始游戏";
+"Home_Play" = " 实践";
+"Home_Online" = " 玩在线";
 "Home_Settings" = " 设置";
 "Home_About" = " 关于";
+"About" = "关于";
 
 "Settings" = "设置";
 "Default" = "默认";
 "General" = "一般设置";
 "AI" = "机器对战AI";
+"Network" = "网络";
+"You" = "您";
 "You win,congratulations!" = "祝贺您，您赢了！";
 "Computer wins. Don't give up, please try again!" = "机器AI获胜。不要放弃，请再试一次！";
 "You lose. You may try again!" = "您输了，您可以再试一次！";
@@ -29,6 +33,32 @@
 "New game?" = "是否开始新游戏?";
 "Yes" = "是";
 "No" = "否";
+"Required" = "必要";
+
+/* Login view */
+"Username" = "用户名";
+"Password" = "密码";
+"Guest" = "客人";
+"Login" = "注册";
+
+/* Menu keys */
+"Logout" = "注销";
+"Cancel" = "取消";
+"Resign" = "辞职";
+"Draw" = "凹道";
+"Close Table" = "退出桌子";
+"Reset Table" = "游戏重新设置";
+
+"Select a Table to join" = "选择一个表加入";
+"Game Over" = "游戏结束";
+"Tables" = "桌子";
+"Messages" = "谈话";
+"Table #%@" = "桌子 #%@";
+
+/* Network Settings */
+"Server" = "服务器";
+"Account" = "帐户";
+"Auto Connect" = "自动连接";
 
 /* Other keys */
 "AI_Setting_Key" = "AI设置";

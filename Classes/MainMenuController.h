@@ -21,11 +21,10 @@
 
 @interface MainMenuController : UIViewController
 {
-    IBOutlet UIButton *new_game;
-    IBOutlet UIButton *about;
-    IBOutlet UIButton *setting;
-    
-    IBOutlet UIImageView *bg_view;
+    IBOutlet UIButton* ai_game;
+    IBOutlet UIButton* online_game;
+    IBOutlet UIButton* about;
+    IBOutlet UIButton* setting;
 }
 
 - (IBAction)newGamePressed:(id)sender;

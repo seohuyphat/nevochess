@@ -44,6 +44,10 @@ enum LoginButtonEnum
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
     self.title = NSLocalizedString(@"Login", @"");
+    _username.placeholder = NSLocalizedString(@"Username", @"");
+    _password.placeholder = NSLocalizedString(@"Password", @"");
+    [_guestButton setTitle:NSLocalizedString(@"Guest", @"") forState:UIControlStateNormal];
+    [_loginButton setTitle:NSLocalizedString(@"Login", @"") forState:UIControlStateNormal];
     _error.text = @"";
 
     // Load the existing Login info, if available, the 1st time.
