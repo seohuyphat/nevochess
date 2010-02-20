@@ -61,6 +61,6 @@
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
 
-- (void) onLocalMoveMade:(int)move;
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 
 @end

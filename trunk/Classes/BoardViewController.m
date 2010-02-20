@@ -171,9 +171,9 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
 }
 
-- (void) onLocalMoveMade:(int)move
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
 {
-    NSLog(@"%s: ENTER. move = [%d -> %d]", __FUNCTION__, SRC(move), DST(move));
+    NSLog(@"%s: ENTER. move = [%d -> %d], result=[%d]", __FUNCTION__, SRC(move), DST(move), nGameResult);
 }
 
 - (void) goBackToHomeMenu

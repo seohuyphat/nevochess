@@ -35,7 +35,7 @@
 - (IBAction)resetPressed:(id)sender;
 
 - (void) handleNewMove:(NSNumber *)pMove;
-- (void) onLocalMoveMade:(int)move;
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 - (void) saveGame;
 - (void) resetBoard;
 

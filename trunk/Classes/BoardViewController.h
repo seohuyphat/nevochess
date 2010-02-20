@@ -73,7 +73,7 @@ enum ActionIndexEnum
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)messagesPressed:(id)sender;
 
-- (void) onLocalMoveMade:(int)move;
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 
 - (void) goBackToHomeMenu;
 - (void) setInitialTime:(NSString*)times;

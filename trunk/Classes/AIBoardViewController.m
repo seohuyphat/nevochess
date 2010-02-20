@@ -277,15 +277,18 @@ enum AlertViewEnum
     }
 }
 
-- (void) onLocalMoveMade:(int)move
+- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
 {
     // Inform the AI.
     int sqSrc = SRC(move);
     int sqDst = DST(move);
     [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    
-    // AI's turn.
-    if ( _game.gameResult == kXiangQi_InPlay ) {
+
+    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
+        [self _handleEndGameInUI];
+    }
+    else {
+        // AI's turn.
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }
