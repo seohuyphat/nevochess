@@ -74,15 +74,17 @@
 {
     
     UITableViewCell* cell = nil;
+    UILabel* theLabel = nil;
 
     switch (indexPath.section)
     {
         case 0:
             cell = _serverCell;
+            theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel.text  = NSLocalizedString(@"Server", @"");
             break;
         case 1:
         {
-            UILabel* theLabel = nil;
             if (indexPath.row == 0) {
                 cell = _usernameCell;
                 theLabel = (UILabel *)[cell viewWithTag:1];
@@ -98,6 +100,8 @@
         }
         case 2:
             cell = _autoConnectCell;
+            theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel.text  = NSLocalizedString(@"Auto Connect", @"");
             _autoConnectSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"];
             break;
     }

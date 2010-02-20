@@ -263,7 +263,7 @@
 
     if (_tableId)
     {
-        title = [NSString stringWithFormat:@"Table #%@", _tableId];
+        title = [NSString stringWithFormat:NSLocalizedString(@"Table #%@", @""), _tableId];
         if (_myColor == NC_COLOR_RED || _myColor == NC_COLOR_BLACK)
         {
             if (_isGameOver) {

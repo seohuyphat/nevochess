@@ -12,11 +12,11 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="21"/>
-			<integer value="11"/>
 			<integer value="10"/>
-			<integer value="9"/>
+			<integer value="11"/>
+			<integer value="21"/>
 			<integer value="4"/>
+			<integer value="9"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -222,6 +222,7 @@
 								<reference key="NSSuperview" ref="444290801"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
+								<int key="IBUITag">1</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="IBUIText">Auto Connect</string>
 								<reference key="IBUITextColor" ref="515081623"/>
@@ -276,6 +277,7 @@
 								<reference key="NSSuperview" ref="600045778"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
+								<int key="IBUITag">1</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="IBUIText">Server</string>
 								<reference key="IBUITextColor" ref="515081623"/>

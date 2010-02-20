@@ -89,7 +89,7 @@ enum AlertViewEnum
         [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
 
         _myColor = NC_COLOR_RED;
-        [_board setRedLabel:@"You"];
+        [_board setRedLabel:NSLocalizedString(@"You", @"")];
         [_board setBlackLabel:_aiName];
         
         // Restore pending game, if any.

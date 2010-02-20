@@ -29,7 +29,8 @@
 {
     [super viewDidLoad];
     self.title = NSLocalizedString(@"Home", @"");
-    [new_game setTitle:NSLocalizedString(@"Home_Play", @"") forState:UIControlStateNormal];
+    [ai_game setTitle:NSLocalizedString(@"Home_Play", @"") forState:UIControlStateNormal];
+    [online_game setTitle:NSLocalizedString(@"Home_Online", @"") forState:UIControlStateNormal];
     [about setTitle:NSLocalizedString(@"Home_About", @"") forState:UIControlStateNormal];
     [setting setTitle:NSLocalizedString(@"Home_Settings", @"") forState:UIControlStateNormal];
 }
@@ -54,10 +55,10 @@
 
 - (void)dealloc
 {
-    [new_game release];
+    [ai_game release];
+    [online_game release];
     [setting release];
     [about release];
-    [bg_view release];
     [super dealloc];
 }
 

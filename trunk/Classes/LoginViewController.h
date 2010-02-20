@@ -31,6 +31,8 @@
     IBOutlet UITextField* _password;
     IBOutlet UILabel*     _error;
     IBOutlet UIActivityIndicatorView* _activity;
+    IBOutlet UIButton*    _guestButton;
+    IBOutlet UIButton*    _loginButton;
 
     id <LoginDelegate> delegate;
     int                _clickedButton;

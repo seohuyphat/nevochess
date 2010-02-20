@@ -13,13 +13,17 @@
 
 /* These HOME keys need a single space in the front to separate an icon. */
 "Home_Play" = " Practice";
+"Home_Online" = " Play Online";
 "Home_Settings" = " Settings";
 "Home_About" = " About";
+"About" = "About";
 
 "Settings" = "Settings";
 "General" = "General";
 "Default" = "Default";
 "AI" = "AI";
+"Network" = "Network";
+"You" = "You";
 "You win,congratulations!" = "You win,congratulations!";
 "Computer wins. Don't give up, please try again!" = "Computer wins. Don't give up, please try again!";
 "You lose. You may try again!" = "You lose. You may try again!";
@@ -29,6 +33,32 @@
 "New game?" = "New game?";
 "Yes" = "Yes";
 "No" = "No";
+"Required" = "Required";
+
+/* Login view */
+"Username" = "Username";
+"Password" = "Password";
+"Guest" = "Guest";
+"Login" = "Login";
+
+/* Menu keys */
+"Logout" = "Logout";
+"Cancel" = "Cancel";
+"Resign" = "Resign";
+"Draw" = "Draw";
+"Close Table" = "Close Table";
+"Reset Table" = "Reset Table";
+
+"Select a Table to join" = "Select a Table to join";
+"Game Over" = "Game Over";
+"Tables" = "Tables";
+"Messages" = "Messages";
+"Table #%@" = "Table #%@";
+
+/* Network Settings */
+"Server" = "Server";
+"Account" = "Account";
+"Auto Connect" = "Auto Connect";
 
 /* Other keys */
 "HOME_Key" = "HOME";
@@ -43,9 +73,6 @@
 "PieceStyle_Key" = "Piece Style";
 "Chinese_Key" = "Chinese";
 "Western_Key" = "Western";
-"NewGame_Key" = "NEW GAME";
-"Options_Key" = "OPTIONS";
-"About_Key" = "ABOUT";
 
 /* Move review label (not used?) */
 "MOVE" = "move";
