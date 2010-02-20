@@ -19,9 +19,28 @@
 
 #import <UIKit/UIKit.h>
 
+@class SingleSelectionController;
 
-@interface AISelectionViewController : UITableViewController {
+// --------------------------------------
+@protocol SingleSelectionDelegate <NSObject>
+- (void) didSelect:(SingleSelectionController*)controller rowAtIndex:(NSUInteger)index;
+@end
 
+// --------------------------------------
+@interface SingleSelectionController : UITableViewController
+{
+    id<SingleSelectionDelegate> _delegate;
+    int                         _tag;
+
+    NSMutableArray*  _choices;
+    unsigned int     _selectionIndex;
+    //NSString*        _selectionName;
 }
+
+@property (nonatomic, retain) id<SingleSelectionDelegate> _delegate;
+@property (nonatomic)         int tag;
+@property (nonatomic)         unsigned int selectionIndex;
+
+- (id) initWithChoices:(NSArray*)choices delegate:(id<SingleSelectionDelegate>)delegate;
 
 @end

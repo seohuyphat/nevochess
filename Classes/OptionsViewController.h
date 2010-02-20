@@ -18,10 +18,29 @@
  ***************************************************************************/
 
 #import <UIKit/UIKit.h>
+#import "SingleSelectionController.h"
 
+@interface OptionsViewController : UITableViewController <SingleSelectionDelegate>
+{
+    IBOutlet UITableViewCell* _soundCell;
+    IBOutlet UISwitch*        _soundSwitch;
 
-@interface OptionsViewController : UITableViewController {
+    UITableViewCell*   _pieceCell;
+    UITableViewCell*   _aiLevelCell;
+    UITableViewCell*   _aiTypeCell;
 
+    // --- Piece Style.
+    NSArray*           _pieceChoices;
+    NSUInteger         _pieceType;
+
+    // --- AI Level and Type.
+    NSArray*           _aiLevelChoices;
+    NSUInteger         _aiLevel;
+
+    NSArray*           _aiTypeChoices;
+    NSUInteger         _aiType;
 }
+
+- (IBAction) autoConnectValueChanged:(id)sender;
 
 @end
