@@ -19,9 +19,15 @@
 
 #import "OptionsViewController.h"
 #import "QuartzUtils.h"
-#import "GenericSettingViewController.h"
-#import "AISelectionViewController.h"
 #import "NetworkSettingController.h"
+#import "SingleSelectionController.h"
+
+enum ViewTagEnum
+{
+    VIEW_TAG_PIECE_STYLE  = 1,  // Must be non-zero.
+    VIEW_TAG_AI_LEVEL     = 2,
+    VIEW_TAG_AI_TYPE      = 3
+};
 
 @implementation OptionsViewController
 
@@ -30,16 +36,43 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     self.title = NSLocalizedString(@"Settings", @"");
+
+    _soundSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"];
+
+    // --- Piece Type.
+    _pieceChoices = [[NSArray alloc] initWithObjects:
+                                        NSLocalizedString(@"Chinese", @""),
+                                        NSLocalizedString(@"Western", @""),
+                                        nil];
+    _pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
+    if (_pieceType >= [_pieceChoices count]) { _pieceType = 0; }
+
+    // --- AI Level
+    _aiLevelChoices = [[NSArray alloc] initWithObjects:
+                                        NSLocalizedString(@"Easy", @""),
+                                        NSLocalizedString(@"Normal", @""),
+                                        NSLocalizedString(@"Hard", @""),
+                                        NSLocalizedString(@"Master", @""),
+                                        nil];
+    _aiLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"ai_level"];
+    if (_aiLevel >= [_aiLevelChoices count]) { _aiLevel = 0; }
+
+    // --- AI Type
+    _aiTypeChoices = [[NSArray alloc] initWithObjects:
+                                        @"XQWLight",
+                                        @"HaQiKiD",
+#ifdef ENABLE_XQWLIGHT_OBJC
+                                        @"XQWLightObjc",
+#endif
+                                        nil];
+    NSString* aiStr = [[NSUserDefaults standardUserDefaults] objectForKey:@"ai_type"];
+    _aiType = [_aiTypeChoices indexOfObject:aiStr];
+    if (_aiType == NSNotFound) { _aiType = 0; }
 }
 
 - (void)viewWillAppear:(BOOL)animated 
 {
     [super viewWillAppear:animated];
-    NSArray *cells = [(UITableView*)self.view visibleCells];
-    if([cells count] > 0) {
-        UITableViewCell *cell = [cells objectAtIndex:1];
-        cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
-    }
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
@@ -62,51 +95,97 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
-    return 1;
-}
-
-// Customize the number of rows in the table view.
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
-{
     return 3;
 }
 
-// Customize the appearance of table view cells.
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return nil;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
+{
+    switch (section) {
+        case 0: return 2;
+        case 1: return 2;
+        case 2: return 1;
+    }
+    return 0;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     UITableViewCell* cell = nil;
-
-    switch (indexPath.row)
+    UILabel*         theLabel = nil;
+    UIFont*          defaultFont = [UIFont systemFontOfSize:18.0];
+    
+    switch (indexPath.section)
     {
-        case 0:
+        case 0: // ----- General
         {
-            cell = [tableView dequeueReusableCellWithIdentifier:@"generic_setting"];
-            if(!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"generic_setting"] autorelease];
-                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            switch (indexPath.row)
+            {
+                case 0:
+                {
+                    cell = _soundCell;
+                    theLabel = (UILabel *)[cell viewWithTag:1];
+                    theLabel.font = defaultFont;
+                    theLabel.text  = NSLocalizedString(@"Sound", @"");
+                    break;
+                }
+                case 1:
+                {
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"piece_cell"];
+                    if(!cell) {
+                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"piece_cell"] autorelease];
+                        cell.textLabel.font = defaultFont;
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
+                    _pieceCell = cell;
+                    cell.textLabel.text = NSLocalizedString(@"Piece Style", @"");
+                    cell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
+                    break;
+                }
             }
-            cell.textLabel.text = NSLocalizedString(@"General", @"");
             break;
         }
-        case 1:
+        case 1:  // ----- AI
         {
-            cell = [tableView dequeueReusableCellWithIdentifier:@"ai_setting"];
-            if(!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_setting"] autorelease];
-                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            switch (indexPath.row)
+            {
+                case 0:
+                {
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"ai_level_cell"];
+                    if(!cell) {
+                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_level_cell"] autorelease];
+                        cell.textLabel.font = defaultFont;
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
+                    cell.textLabel.text = NSLocalizedString(@"AI Level", @"");
+                    cell.detailTextLabel.text = [_aiLevelChoices objectAtIndex:_aiLevel];
+                    _aiLevelCell = cell;
+                    break;
+                }
+                case 1:
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"ai_type_cell"];
+                    if(!cell) {
+                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_type_cell"] autorelease];
+                        cell.textLabel.font = defaultFont;
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
+                    cell.textLabel.text = NSLocalizedString(@"AI Type", @"");
+                    cell.detailTextLabel.text = [_aiTypeChoices objectAtIndex:_aiType];
+                    _aiTypeCell = cell;
+                    break;
             }
-            cell.textLabel.text = NSLocalizedString(@"AI_Setting_Key", @"");
-            cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"AI"];
             break;
         }
-        case 2:
+        case 2: // ----- Network
         {
-            cell = [tableView dequeueReusableCellWithIdentifier:@"network_setting"];
+            cell = [tableView dequeueReusableCellWithIdentifier:@"network_setting_cell"];
             if(!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"network_setting"] autorelease];
-                cell.textLabel.font = [UIFont systemFontOfSize:20.0f];
+                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"network_setting_cell"] autorelease];
+                cell.textLabel.font = defaultFont;
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
             cell.textLabel.text = NSLocalizedString(@"Network", @"");
@@ -121,28 +200,116 @@
 {
     UITableViewController* subController = nil;
 
-    switch (indexPath.row)
+    switch (indexPath.section)
     {
         case 0:
-            subController = [[SettingViewController alloc] initWithNibName:@"GenericSettingViewController" bundle:nil];
+        {
+            switch (indexPath.row)
+            {
+                case 1:
+                {
+                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_pieceChoices delegate:self];
+                    subController = controller;
+                    controller.title = _pieceCell.textLabel.text;
+                    controller.selectionIndex = _pieceType;
+                    controller.tag = VIEW_TAG_PIECE_STYLE;
+                    break;
+                }
+            }
             break;
+        }
         case 1:
-            subController = [[AISelectionViewController alloc] initWithNibName:@"AISelectionView" bundle:nil];
+        {
+            switch (indexPath.row)
+            {
+                case 0:
+                {
+                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices delegate:self];
+                    subController = controller;
+                    controller.title = _aiLevelCell.textLabel.text;
+                    controller.selectionIndex = _aiLevel;
+                    controller.tag = VIEW_TAG_AI_LEVEL;
+                    break;
+                }
+                case 1:
+                {
+                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_aiTypeChoices delegate:self];
+                    subController = controller;
+                    controller.title = _aiTypeCell.textLabel.text;
+                    controller.selectionIndex = _aiType;
+                    controller.tag = VIEW_TAG_AI_TYPE;
+                    break;
+                }
+            }
             break;
+        }
         case 2:
+        {
             subController = [[NetworkSettingController alloc] initWithNibName:@"NetworkSettingView" bundle:nil];
             break;
+        }
     }
 
-    [self.navigationController pushViewController:subController animated:YES];
-    [subController release];
+    if (subController) {
+        [self.navigationController pushViewController:subController animated:YES];
+        [subController release];
+    }
 }
 
 - (void)dealloc 
 {
+    [_pieceChoices release];
+    [_aiLevelChoices release];
+    [_aiTypeChoices release];
     [super dealloc];
 }
 
+#pragma mark -
+#pragma mark SingleSelectionDelegate methods
+
+- (void) didSelect:(SingleSelectionController*)controller rowAtIndex:(NSUInteger)index
+{
+    switch (controller.tag)
+    {
+        case VIEW_TAG_PIECE_STYLE:
+        {
+            if (_pieceType != index)
+            {
+                _pieceType = index;
+                _pieceCell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
+                [[NSUserDefaults standardUserDefaults] setInteger:_pieceType forKey:@"piece_type"];
+            }
+            break;
+        }
+        case VIEW_TAG_AI_LEVEL:
+        {
+            if (_aiLevel != index)
+            {
+                _aiLevel = index;
+                _aiLevelCell.detailTextLabel.text = [_aiLevelChoices objectAtIndex:_aiLevel];
+                [[NSUserDefaults standardUserDefaults] setInteger:_aiLevel forKey:@"ai_level"];
+            }
+            break;
+        }
+        case VIEW_TAG_AI_TYPE:
+        {
+            if (_aiType != index)
+            {
+                _aiType = index;
+                _aiTypeCell.detailTextLabel.text = [_aiTypeChoices objectAtIndex:_aiType];
+                [[NSUserDefaults standardUserDefaults] setObject:[_aiTypeChoices objectAtIndex:_aiType] forKey:@"ai_type"];
+            }
+            break;
+        }
+    }
+}
+
+#pragma mark Event handlers
+
+- (IBAction) autoConnectValueChanged:(id)sender
+{    
+    [[NSUserDefaults standardUserDefaults] setBool:_soundSwitch.on forKey:@"sound_on"];
+}
 
 @end
 

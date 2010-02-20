@@ -26,24 +26,18 @@
 @synthesize window;
 @synthesize navigationController;
 
-- (void)applicationDidFinishLaunching:(UIApplication *)application {    
-
-    // Override point for customization after application launch
-    //set default preferences
-    int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
-    if (nDifficulty < 1 || nDifficulty > 10) {
-        [[NSUserDefaults standardUserDefaults] setInteger:NC_AI_DIFFICULTY_DEFAULT forKey:@"difficulty_setting"];
-    }
-    int nGameTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
-    if (nGameTime < 5 || nGameTime > 90) {
-        [[NSUserDefaults standardUserDefaults] setInteger:NC_GAME_TIME_DEFAULT forKey:@"time_setting"];
-        //this might be the first time run
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"toggle_sound"];
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"toggle_western"];
-        [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"AI"];
-    }
-
-    if ([[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"] == nil) {
+- (void)applicationDidFinishLaunching:(UIApplication *)application
+{
+    int settingsVersion = [[NSUserDefaults standardUserDefaults] integerForKey:@"settings_version"];
+    if (settingsVersion == 0) // Not set?
+    {
+        // This is the first time this App runs.
+        // So, we need to set the default values.
+        [[NSUserDefaults standardUserDefaults] setInteger:NC_SETTINGS_VERSION forKey:@"settings_version"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sound_on"];
+        [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"piece_type"];
+        [[NSUserDefaults standardUserDefaults] setInteger:NC_AI_DIFFICULTY_DEFAULT forKey:@"ai_level"];
+        [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"ai_type"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];
     }
 

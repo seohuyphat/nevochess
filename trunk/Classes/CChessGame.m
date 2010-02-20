@@ -66,10 +66,10 @@
     position.x = CGRectGetMidX(frame);
     position.y = CGRectGetMidY(frame); 
     CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
-    // western or Chinese?
-    BOOL toggleWestern = [[NSUserDefaults standardUserDefaults] boolForKey:@"toggle_western"];
+    // Western or Chinese?
+    NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:(toggleWestern ? @"pieces/alfaerie_31x31" : @"pieces/xqwizard_31x31")];
+                                           inDirectory:(pieceType == 1 ? @"pieces/alfaerie_31x31" : @"pieces/xqwizard_31x31")];
 
     Piece *piece = [[Piece alloc] initWithImageNamed: imageName scale: pieceSize];
     piece.color = color;

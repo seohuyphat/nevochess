@@ -99,8 +99,7 @@ static void playbackCallback (
 
 - (id)initWithSoundFile:(NSString*)path
 {
-    self = [super init];
-    if(self) {
+    if ([super init]) {
         CFURLRef url = CFURLCreateFromFileSystemRepresentation(NULL, (UInt8*)[path UTF8String], [path length], FALSE);
         if (url) {
             [self prepareAudioData:url];
@@ -162,7 +161,7 @@ static void playbackCallback (
 
 - (void)play
 {
-    BOOL toggle_sound = [[NSUserDefaults standardUserDefaults] boolForKey:@"toggle_sound"];
+    BOOL toggle_sound = [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"];
     if(toggle_sound)
         AudioQueueStart (
                          mQueue,

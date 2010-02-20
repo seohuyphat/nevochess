@@ -72,7 +72,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
     UITableViewCell* cell = nil;
     UILabel* theLabel = nil;
 

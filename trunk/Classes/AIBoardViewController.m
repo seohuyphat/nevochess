@@ -63,7 +63,7 @@ enum AlertViewEnum
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
         // Determine the type of AI.
-        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"AI"];
+        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"ai_type"];
         int aiType = [self _convertStringToAIType:_aiName];
         switch (aiType) {
             case NC_AI_XQWLight:
@@ -80,7 +80,14 @@ enum AlertViewEnum
                 _aiEngine = nil;
         }
         [_aiEngine initGame];
-        int nDifficulty = [[NSUserDefaults standardUserDefaults] integerForKey:@"difficulty_setting"];
+        int aiLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"ai_level"];
+        int nDifficulty = 1;
+        switch (aiLevel) {
+            case 0: nDifficulty = 1; break;
+            case 1: nDifficulty = 3; break;
+            case 2: nDifficulty = 6; break;
+            case 3: nDifficulty = 9; break;
+        }
         [_aiEngine setDifficultyLevel:nDifficulty];
 
         // Robot

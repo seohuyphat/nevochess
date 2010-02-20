@@ -30,8 +30,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define NC_AI_DIFFICULTY_DEFAULT 5     /* Valid range [1, 10]                */
-#define NC_GAME_TIME_DEFAULT     30    /* Game time (in minutes)             */
+#define NC_SETTINGS_VERSION      1     /* The Settings version               */
+#define NC_AI_DIFFICULTY_DEFAULT 1     /* Valid range [0, 3]                 */
 #define NC_MAX_MOVES_PER_GAME    200   /* Maximum number of moves per game   */
 
 
