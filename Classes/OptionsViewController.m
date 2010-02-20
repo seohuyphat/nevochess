@@ -43,6 +43,7 @@ enum ViewTagEnum
     _pieceChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Chinese", @""),
                                         NSLocalizedString(@"Western", @""),
+                                        @"iXiangQi",
                                         nil];
     _pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     if (_pieceType >= [_pieceChoices count]) { _pieceType = 0; }

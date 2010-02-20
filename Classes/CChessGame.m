@@ -68,8 +68,14 @@
     CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
     // Western or Chinese?
     NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
+    NSString* pieceFolder = nil;
+    switch (pieceType) {
+        case 0: pieceFolder = @"pieces/xqwizard_31x31"; break;
+        case 1: pieceFolder = @"pieces/alfaerie_31x31"; break;
+        default: pieceFolder = @"pieces/iXiangQi"; break;
+    }
     imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:(pieceType == 1 ? @"pieces/alfaerie_31x31" : @"pieces/xqwizard_31x31")];
+                                           inDirectory:pieceFolder];
 
     Piece *piece = [[Piece alloc] initWithImageNamed: imageName scale: pieceSize];
     piece.color = color;
