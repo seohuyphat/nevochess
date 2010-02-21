@@ -57,9 +57,11 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
  */
 @interface Grid : CALayer
 {
-    unsigned _nRows, _nColumns;
+    unsigned        _nRows, _nColumns;
     CGSize          _spacing;                                                                       
     CGColorRef      _lineColor;
+    CGColorRef      _highlightColor;
+    CGPoint         _cellOffset;
     NSMutableArray* _cells; // Really a 2D array, in row-major order.
     GridCell*       _river;
 }
@@ -67,17 +69,14 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 /** Initializes a new Grid with the given dimensions and cell size, and position in superview.
     Note that a new Grid has no cells! Either call -addAllCells, or -addCellAtRow:column:. */
 - (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
-            spacing:(CGSize)spacing position:(CGPoint)pos;
-
-/** Initializes a new Grid with the given dimensions and frame in superview.
-    The cell size will be computed by dividing frame size by dimensions.
-    Note that a new Grid has no cells! Either call -addAllCells, or -addCellAtRow:column:. */
-- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
-              frame:(CGRect)frame;
+            spacing:(CGSize)spacing position:(CGPoint)pos
+         cellOffset:(CGPoint)cellOffset
+    backgroundColor:(CGColorRef)backgroundColor;
 
 @property (readonly) unsigned rows, columns;    // Dimensions of the grid
 @property (readonly) CGSize spacing;            // x,y spacing of GridCells
 @property CGColorRef lineColor;      // Cell background color, line color (or nil)
+@property CGColorRef highlightColor; // Cell highlight color
 @property (nonatomic, retain) GridCell* _river;
 
 /** Returns the GridCell at the given coordinates, or nil if there is no cell there.

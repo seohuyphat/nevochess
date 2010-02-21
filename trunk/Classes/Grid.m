@@ -54,18 +54,26 @@
 
 @implementation Grid
 
+@synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
+@synthesize _river;
 
 - (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
             spacing:(CGSize)spacing position:(CGPoint)pos
+         cellOffset:(CGPoint)cellOffset
+    backgroundColor:(CGColorRef)backgroundColor
 {
     NSParameterAssert(nRows>0 && nColumns>0);
     if( self = [super init] ) {
         _nRows = nRows;
         _nColumns = nColumns;
         _spacing = spacing;
-        _lineColor = CGColorRetain(kRedColor);
-
-        self.bounds = CGRectMake(-1, -1, nColumns*spacing.width+2, nRows*spacing.height+2);
+        _lineColor = CGColorRetain(kRedColor); // Default setting.
+        _highlightColor = nil;
+        _cellOffset = cellOffset;
+        if (backgroundColor) {
+            self.backgroundColor = CGColorRetain(backgroundColor);
+        }
+        self.bounds = CGRectMake(-1, -1, nColumns*_spacing.width+10, nRows*_spacing.height+11);
         self.position = pos;
         self.anchorPoint = CGPointMake(0,0);
         self.zPosition = kBoardZ;
@@ -77,35 +85,29 @@
         while( n-- > 0 ) { [_cells addObject:null]; }
         [self setNeedsDisplay];
         
-        // Create the River.
-        CGRect frame;
-        frame.origin.x = spacing.width/2;
-        frame.origin.y = 4 * spacing.height + spacing.height/2;
-        frame.size.height = spacing.height;
-        frame.size.width = spacing.width * 8;
-        _river = [[GridCell alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
-        [self addSublayer:_river];
-        _river.backgroundColor =  GetCGPatternNamed(@"board_320x480.png");
-        _river.borderColor = kRedColor;
-        _river.borderWidth = 1.0;
+        // Create the River if required.
+        if (!self.backgroundColor)
+        {
+            CGRect frame;
+            frame.origin.x = _cellOffset.x + _spacing.width/2;
+            frame.origin.y = _cellOffset.y + 4 * _spacing.height + _spacing.height/2;
+            frame.size.height = _spacing.height;
+            frame.size.width = _spacing.width * 8;
+            _river = [[GridCell alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
+            [self addSublayer:_river];
+            _river.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
+            _river.borderColor = kRedColor;
+            _river.borderWidth = 1.0;
+        }
+         
     }
     return self;
-}
-
-
-- (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
-              frame:(CGRect)frame
-{
-    CGFloat spacing = floor(MIN( (frame.size.width -2)/(CGFloat)nColumns,
-                               (frame.size.height-2)/(CGFloat)nRows) );
-    return [self initWithRows: nRows columns: nColumns
-                      spacing: CGSizeMake(spacing,spacing)
-                     position: frame.origin];
 }
 
 - (void) dealloc
 {
     CGColorRelease(_lineColor);
+    CGColorRelease(_highlightColor);
     [_cells release];
     [_river release];
     [super dealloc];
@@ -123,8 +125,8 @@
 - (CGColorRef) lineColor                    { return _lineColor; }
 - (void) setLineColor:(CGColorRef)lineColor { [self setcolor:&_lineColor withNewColor:lineColor]; }
 
-@synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
-@synthesize _river;
+- (CGColorRef) highlightColor                { return _highlightColor; }
+- (void) setHighlightColor:(CGColorRef)color { [self setcolor:&_highlightColor withNewColor:color]; }
 
 #pragma mark -
 #pragma mark GEOMETRY:
@@ -147,7 +149,7 @@
     unsigned index = row*_nColumns+col;
     GridCell *cell = [_cells objectAtIndex: index];
     if( (id)cell == [NSNull null] ) {
-        CGRect frame = CGRectMake(col*_spacing.width, row*_spacing.height,
+        CGRect frame = CGRectMake(_cellOffset.x + col*_spacing.width, _cellOffset.y + row*_spacing.height,
                                   _spacing.width,_spacing.height);
         cell = [[GridCell alloc] initWithGrid:self row:row column:col frame:frame];
         if( cell ) {
@@ -207,9 +209,11 @@
 {
     // Custom CALayer drawing implementation. Delegates to the cells to draw themselves
     // in me; this is more efficient than having each cell have its own drawing.
-    CGContextSetStrokeColorWithColor(ctx,_lineColor);
-    CGContextSetLineWidth(ctx, 1.5);
-    [self drawCellsInContext:ctx];
+    if (!self.backgroundColor) {
+        CGContextSetStrokeColorWithColor(ctx, _lineColor);
+        CGContextSetLineWidth(ctx, 1.5);
+        [self drawCellsInContext:ctx];
+    }
 }
 
 @end
@@ -238,7 +242,7 @@
         bounds.origin.y -= floor(bounds.origin.y);
         self.bounds = bounds;
         self.anchorPoint = CGPointMake(0,0);
-        self.borderColor = kHighlightColor;         // Used when highlighting (see -setHighlighted:)
+        self.borderColor = _grid.highlightColor; // Used when highlighting (see -setHighlighted:)
     }
     return self;
 }
