@@ -17,20 +17,13 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-
 #import "AudioHelper.h"
 
-#define DEFAULT_WAV_SOUND_PATH "sounds/xqwizard-wave"
-
 // playback callback
-static void playbackCallback (
-							  void					*inUserData,
-							  AudioQueueRef			inAudioQueue,
-							  AudioQueueBufferRef		bufferReference
-) 
-
+static void playbackCallback(void*               inUserData,
+                             AudioQueueRef       inAudioQueue,
+                             AudioQueueBufferRef bufferReference)
 {
-	
 	// This callback, being outside the implementation block, needs a reference to the AudioPlayer object
 	AudioData *player = (AudioData *) inUserData;
 	UInt32 numBytes;
@@ -38,33 +31,25 @@ static void playbackCallback (
 	
 	// This callback is called when the playback audio queue object has an audio queue buffer
 	// available for filling with more data from the file being played
-	AudioFileReadPackets (
-						  [player audioFileID],
+	AudioFileReadPackets( [player audioFileID],
 						  NO,
 						  &numBytes,
 						  bufferReference->mPacketDescriptions,
 						  [player startingPacketNumber],
 						  &numPackets, 
-						  bufferReference->mAudioData
-						  );
+						  bufferReference->mAudioData );
 	
 	if (numPackets > 0) {
-		
+
 		bufferReference->mAudioDataByteSize			= numBytes;		
 		bufferReference->mPacketDescriptionCount	= numPackets;
 		
-		AudioQueueEnqueueBuffer (
-								 inAudioQueue,
-								 bufferReference,
-								 0,
-								 NULL
-								 );
+		AudioQueueEnqueueBuffer(inAudioQueue, bufferReference, 0, NULL);
 		player.startingPacketNumber = player.startingPacketNumber +  numPackets;
 		
 	} else {
         AudioQueueStop(inAudioQueue, NO);
-        // always rewind to the start
-        player.startingPacketNumber = 0;
+        player.startingPacketNumber = 0; // always rewind to the start
         playbackCallback(inUserData, inAudioQueue, bufferReference);
 	}
 }
@@ -72,11 +57,8 @@ static void playbackCallback (
 @implementation AudioData
 @synthesize bufferByteSize;    // the number of bytes to use in each audio queue buffer
 @synthesize numPacketsToRead;  // the number of audio data packets to read into each audio queue buffer
-
 @synthesize gain;			   // the gain (relative audio level) for the playback audio queue
-
 @synthesize mQueue;  
-
 @synthesize audioFileID;	   // the identifier for the audio file to play
 @synthesize audioFormat;
 @synthesize audioLevels;
@@ -84,16 +66,9 @@ static void playbackCallback (
 
 - (void)dealloc
 {
- 	AudioQueueStop (
-					mQueue,
-					YES
-					);
-	
-	AudioFileClose (audioFileID);
-    AudioQueueDispose (
-					   mQueue, 
-					   YES
-					   );
+ 	AudioQueueStop(mQueue, YES);
+	AudioFileClose(audioFileID);
+    AudioQueueDispose(mQueue, YES);
     [super dealloc];
 }
 
@@ -111,47 +86,37 @@ static void playbackCallback (
 
 - (void)prepareAudioData:(CFURLRef)url
 {
-    AudioFileOpenURL (
-					  url,
-					  0x01,  //fsRdPerm (read only)
+    AudioFileOpenURL( url,
+					  0x01, // fsRdPerm (read only)
                       kAudioFileWAVEType,
-					  //kAudioFileCAFType,
-					  &audioFileID
-					  );
+					  &audioFileID );
 
-	UInt32 s = sizeof ([self audioFormat]);
-	
+	UInt32 s = sizeof([self audioFormat]);
+
 	// get the AudioStreamBasicDescription format for the playback file
-	AudioFileGetProperty (
-						  [self audioFileID], 
+	AudioFileGetProperty( [self audioFileID], 
 						  kAudioFilePropertyDataFormat,
 						  &s,
-						  &audioFormat
-						  );
+						  &audioFormat );
     
     // create the playback audio queue object
-	AudioQueueNewOutput (
-						 &audioFormat,
+	AudioQueueNewOutput( &audioFormat,
 						 playbackCallback,
 						 self, 
 						 CFRunLoopGetCurrent (),
 						 kCFRunLoopCommonModes,
 						 0,  // run loop flags
-						 &mQueue
-						 );
+						 &mQueue );
 	
 	// set the volume of the playback audio queue
 	[self setGain: 1.0];
 	
-	AudioQueueSetParameter (
-							mQueue,
+	AudioQueueSetParameter( mQueue,
 							kAudioQueueParam_Volume,
-							gain
-							);
+							gain );
 	
 	[self enableLevelMetering];
-    // adjust buffer size to 0.5 seconds before starting
-    [self calculateSizesFor:0.5f];
+    [self calculateSizesFor:0.5f]; // adjust to 0.5 seconds before starting
     // prime the queue with some data before starting
     for (int i = 0; i < kNumberBuffers; ++i) {
         AudioQueueAllocateBuffer(mQueue, bufferByteSize, &mBuffers[i]);
@@ -161,12 +126,7 @@ static void playbackCallback (
 
 - (void)play
 {
-    BOOL toggle_sound = [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"];
-    if(toggle_sound)
-        AudioQueueStart (
-                         mQueue,
-                         NULL  // start time. NULL means ASAP.
-                         );
+    AudioQueueStart( mQueue, NULL /* start time. NULL means ASAP */ );
 }
 
 // an audio queue object doesn't provide audio level information unless you 
@@ -178,12 +138,10 @@ static void playbackCallback (
     
 	UInt32 trueValue = YES;
     
-	AudioQueueSetProperty (
-                           mQueue,
+	AudioQueueSetProperty( mQueue,
                            kAudioQueueProperty_EnableLevelMetering,
                            &trueValue,
-                           sizeof (UInt32)
-                           );
+                           sizeof (UInt32) );
 }
 
 - (void) calculateSizesFor: (Float64) seconds {
@@ -191,12 +149,10 @@ static void playbackCallback (
 	UInt32 maxPacketSize;
 	UInt32 propertySize = sizeof (maxPacketSize);
 	
-	AudioFileGetProperty (
-						  audioFileID, 
+	AudioFileGetProperty( audioFileID, 
 						  kAudioFilePropertyPacketSizeUpperBound,
 						  &propertySize,
-						  &maxPacketSize
-						  );
+						  &maxPacketSize );
 	
 	static const int maxBufferSize = 0x10000;  // limit maximum size to 64K
 	static const int minBufferSize = 0x4000;   // limit minimum size to 16K
@@ -226,33 +182,41 @@ static void playbackCallback (
 
 @end
 
+// ----------------------------------------------------------------------------
+#pragma mark -
 
 @implementation AudioHelper
 
-- (id)init
+@synthesize soundPath=_soundPath;
+
+- (id) initWithPath:(NSString*)soundPath
 {
-    loaded_sounds = [[NSMutableDictionary alloc] init];
-    return [super init];
+    if (self = [super init]) {
+        self.soundPath = soundPath;
+        _loadedSounds = [[NSMutableDictionary alloc] init];
+    }
+    return self;
 }
 
-- (void)dealloc
+- (void) dealloc
 {
-    [loaded_sounds release];
+    [_soundPath release];
+    [_loadedSounds release];
     [super dealloc];
 }
 
-- (void)load_wav_sound:(NSString*)sound
+- (void) loadSound:(NSString*)sound
 {
     NSString *path = [[NSBundle  mainBundle] pathForResource:sound ofType:@"WAV"
-                                                 inDirectory:[NSString stringWithUTF8String:DEFAULT_WAV_SOUND_PATH]];
+                                                 inDirectory:_soundPath];
     AudioData *snd = [[AudioData alloc] initWithSoundFile:path];
-    [loaded_sounds setObject:snd forKey:sound];
+    [_loadedSounds setObject:snd forKey:sound];
     [snd release];
 }
 
-- (void)play_wav_sound:(NSString*)sound
+- (void) playSound:(NSString*)sound
 {
-    AudioData *snd = [loaded_sounds objectForKey:sound];
+    AudioData* snd = [_loadedSounds objectForKey:sound];
     [snd play];
 }
 

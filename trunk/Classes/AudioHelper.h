@@ -23,6 +23,7 @@
 
 #define kNumberBuffers 3
 
+// ---------------------------------------------------
 @interface AudioData : NSObject {
     UInt32                          bufferByteSize; // the number of bytes to use in each audio queue buffer
 	UInt32                          numPacketsToRead; // the number of audio data packets to read into each audio queue buffer
@@ -59,10 +60,16 @@
 
 @end
 
-@interface AudioHelper : NSObject {
-    NSMutableDictionary *loaded_sounds;
+// ---------------------------------------------------
+@interface AudioHelper : NSObject
+{
+    NSString*            _soundPath;
+    NSMutableDictionary* _loadedSounds;
 }
 
-- (void)load_wav_sound:(NSString*)sound;
-- (void)play_wav_sound:(NSString*)sound;
+@property (nonatomic, retain) NSString* soundPath;
+
+- (id) initWithPath:(NSString*)soundPath;
+- (void) loadSound:(NSString*)sound;
+- (void) playSound:(NSString*)sound;
 @end

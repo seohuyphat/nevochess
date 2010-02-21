@@ -157,7 +157,7 @@
     [super dealloc];
 }
 
-- (id) initWithBoard:(CALayer*)board
+- (id) initWithBoard:(CALayer*)board boardType:(int)boardType
 {
     if (self = [super init])
     {
@@ -170,10 +170,8 @@
 
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kHighlightColor;
-        
-        int boardProfile = 0;  // Fixed to the default.
 
-        switch (boardProfile)
+        switch (boardType)
         {
             case 1:  // SKELETON background.
             {

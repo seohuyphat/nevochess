@@ -36,6 +36,7 @@
         [[NSUserDefaults standardUserDefaults] setInteger:NC_SETTINGS_VERSION forKey:@"settings_version"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sound_on"];
         [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"piece_type"];
+        [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"board_type"];
         [[NSUserDefaults standardUserDefaults] setInteger:NC_AI_DIFFICULTY_DEFAULT forKey:@"ai_level"];
         [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"ai_type"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];

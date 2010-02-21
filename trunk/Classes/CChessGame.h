@@ -53,7 +53,7 @@ enum{
     int             _gameResult;
 }
 
-- (id) initWithBoard: (CALayer*)board;
+- (id) initWithBoard:(CALayer*)board boardType:(int)boardType;
 - (void) showBoard:(BOOL)visible;
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
