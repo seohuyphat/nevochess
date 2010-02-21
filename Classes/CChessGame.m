@@ -163,11 +163,7 @@
     {
         self._board = board;
 
-        CGFloat cellSize = 33;                   // NOTE: Fixed size.
-        CGPoint cellOffset = CGPointMake(2, 3);  // NOTE: Fixed point.
-        CGSize spacing = CGSizeMake(cellSize, cellSize);
-        CGPoint pos = CGPointMake(board.bounds.origin.x + 5, board.bounds.origin.y + 35);
-
+        CGFloat    cellSize = 33;
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kHighlightColor;
 
@@ -187,9 +183,14 @@
             default: // The custom-drawn background.
             {
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
+                cellSize = 34;
                 break;
             }
         }
+
+        CGPoint cellOffset = CGPointMake(2, 3);  // NOTE: Fixed point.
+        CGSize spacing = CGSizeMake(cellSize, cellSize);
+        CGPoint pos = CGPointMake(board.bounds.origin.x + 5, board.bounds.origin.y + 32);
 
         _grid = [[Grid alloc] initWithRows:10 columns:9
                                    spacing:spacing position:pos
