@@ -157,22 +157,53 @@
     [super dealloc];
 }
 
-- (id) initWithBoard: (CALayer*)board
+- (id) initWithBoard:(CALayer*)board
 {
-    if (self = [super init]) {
+    if (self = [super init])
+    {
         self._board = board;
 
-        CGSize size = board.bounds.size;
-        board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-        _grid = [[Grid alloc] initWithRows: 10 columns: 9
-                                     frame: CGRectMake(board.bounds.origin.x + 2, board.bounds.origin.y + 35,
-                                                       size.width-4,size.height-4)];
-        //_grid.backgroundColor = GetCGPatternNamed(@"board.png");
+        CGFloat cellSize = 33;                   // NOTE: Fixed size.
+        CGPoint cellOffset = CGPointMake(2, 3);  // NOTE: Fixed point.
+        CGSize spacing = CGSizeMake(cellSize, cellSize);
+        CGPoint pos = CGPointMake(board.bounds.origin.x + 5, board.bounds.origin.y + 35);
+
+        CGColorRef backgroundColor = nil;
+        CGColorRef highlightColor  = kHighlightColor;
+        
+        int boardProfile = 0;  // Fixed to the default.
+
+        switch (boardProfile)
+        {
+            case 1:  // SKELETON background.
+            {
+                backgroundColor = GetCGPatternNamed(@"SKELETON.png");
+                highlightColor = kTranslucentLightGrayColor;
+                break;
+            }
+            case 2:  // WOOD background.
+            {
+                backgroundColor = GetCGPatternNamed(@"WOOD.png");
+                break;
+            }
+            default: // The custom-drawn background.
+            {
+                _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
+                break;
+            }
+        }
+
+        _grid = [[Grid alloc] initWithRows:10 columns:9
+                                   spacing:spacing position:pos
+                                cellOffset:cellOffset
+                           backgroundColor:backgroundColor];
+        _grid.highlightColor = highlightColor;
+
         //_grid.borderColor = kTranslucentLightGrayColor;
         //_grid.borderWidth = 2;
-        _grid.lineColor = kRedColor;
+
         [_grid addAllCells];
-        [board addSublayer: _grid];
+        [_board addSublayer:_grid];
         
         _pieceBox = [[NSMutableArray alloc] initWithCapacity:32];
         [self _setupPieces];
