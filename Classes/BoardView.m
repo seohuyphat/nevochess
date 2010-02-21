@@ -159,7 +159,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 //
 @interface BoardView (PrivateMethods)
 - (CGRect) _gameBoardFrame;
-- (id) _initSoundSystem;
+- (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _showHighlightOfMove:(int)move;
 - (void) _ticked:(NSTimer*)timer;
@@ -182,16 +182,17 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
     _gameboard = [[CALayer alloc] init];
     _gameboard.frame = [self _gameBoardFrame];
-    //self.layer.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
     [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
 
-    _game = [[CChessGame alloc] initWithBoard:_gameboard];
+    int boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
+    _game = [[CChessGame alloc] initWithBoard:_gameboard boardType:boardType];
 
-    _audioHelper = [self _initSoundSystem];
+    _audioHelper = ( [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"]
+                    ? [self _initSoundSystem:NC_SOUND_PATH]
+                    : nil );    
     _boardOwner = nil;
 
-    // TODO: _initialTime = [[NSUserDefaults standardUserDefaults] integerForKey:@"time_setting"];
-    self._initialTime = [TimeInfo allocTimeFromString:@"900/180/20"];
+    self._initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
     self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
     self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
     _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
@@ -228,6 +229,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [_timer release];
     [_moves release];
     [_previewLastTouched release];
+    [_audioHelper release];
     [super dealloc];
 }
 
@@ -244,16 +246,16 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     return bounds;
 }
 
-- (id) _initSoundSystem
+- (id) _initSoundSystem:(NSString*)soundPath
 {
-    AudioHelper* audioHelper = [[AudioHelper alloc] init];
+    AudioHelper* audioHelper = [[AudioHelper alloc] initWithPath:soundPath];
 
     NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
                           @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
                           @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
                           nil];
     for (NSString* sound in soundList) {
-        [audioHelper load_wav_sound:sound];
+        [audioHelper loadSound:sound];
     }
     return audioHelper;
 }
@@ -398,7 +400,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         sound = (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2" );
     }
 
-    [_audioHelper play_wav_sound:sound];
+    [_audioHelper playSound:sound];
 
     [_game movePiece:piece toRow:row2 toCol:col2];
     [self _showHighlightOfMove:move];
@@ -462,7 +464,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void) playSound:(NSString*)sound
 {
-    [_audioHelper play_wav_sound:sound];
+    [_audioHelper playSound:sound];
 }
 
 - (NSMutableArray*) getMoves
@@ -490,7 +492,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     int move = [(NSNumber*)pMove.move intValue];
     int sqSrc = SRC(move);
     int sqDst = DST(move);
-    [_audioHelper play_wav_sound:@"MOVE"]; // TODO: mono-type "move" sound
+    [_audioHelper playSound:@"MOVE"]; // TODO: mono-type "move" sound
     
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
@@ -537,7 +539,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     int sqDst = DST(move);
     int row2 = ROW(sqDst);
     int col2 = COLUMN(sqDst);
-    [_audioHelper play_wav_sound:@"MOVE"];  // TODO: mono-type "move" sound
+    [_audioHelper playSound:@"MOVE"];  // TODO: mono-type "move" sound
     Piece *capture = [_game getPieceAtRow:row2 col:col2];
     if (capture) {
         [capture removeFromSuperlayer];

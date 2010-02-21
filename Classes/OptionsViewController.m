@@ -25,8 +25,9 @@
 enum ViewTagEnum
 {
     VIEW_TAG_PIECE_STYLE  = 1,  // Must be non-zero.
-    VIEW_TAG_AI_LEVEL     = 2,
-    VIEW_TAG_AI_TYPE      = 3
+    VIEW_TAG_BOARD_STYLE  = 2,
+    VIEW_TAG_AI_LEVEL     = 3,
+    VIEW_TAG_AI_TYPE      = 4
 };
 
 @implementation OptionsViewController
@@ -47,6 +48,15 @@ enum ViewTagEnum
                                         nil];
     _pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     if (_pieceType >= [_pieceChoices count]) { _pieceType = 0; }
+
+    // --- Board Type.
+    _boardChoices = [[NSArray alloc] initWithObjects:
+                                        NSLocalizedString(@"Default", @""),
+                                        NSLocalizedString(@"Skeleton", @""),
+                                        NSLocalizedString(@"Wood", @""),
+                                        nil];
+    _boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
+    if (_boardType >= [_boardChoices count]) { _boardType = 0; }
 
     // --- AI Level
     _aiLevelChoices = [[NSArray alloc] initWithObjects:
@@ -107,7 +117,7 @@ enum ViewTagEnum
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
     switch (section) {
-        case 0: return 2;
+        case 0: return 3;
         case 1: return 2;
         case 2: return 1;
     }
@@ -134,7 +144,7 @@ enum ViewTagEnum
                     theLabel.text  = NSLocalizedString(@"Sound", @"");
                     break;
                 }
-                case 1:
+                case 1:  // - Piece
                 {
                     cell = [tableView dequeueReusableCellWithIdentifier:@"piece_cell"];
                     if(!cell) {
@@ -145,6 +155,19 @@ enum ViewTagEnum
                     _pieceCell = cell;
                     cell.textLabel.text = NSLocalizedString(@"Piece Style", @"");
                     cell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
+                    break;
+                }
+                case 2:   // - Board
+                {
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"board_cell"];
+                    if(!cell) {
+                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"board_cell"] autorelease];
+                        cell.textLabel.font = defaultFont;
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
+                    _boardCell = cell;
+                    cell.textLabel.text = NSLocalizedString(@"Board Style", @"");
+                    cell.detailTextLabel.text = [_boardChoices objectAtIndex:_boardType];
                     break;
                 }
             }
@@ -207,13 +230,22 @@ enum ViewTagEnum
         {
             switch (indexPath.row)
             {
-                case 1:
+                case 1:  // - Piece
                 {
                     SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_pieceChoices delegate:self];
                     subController = controller;
                     controller.title = _pieceCell.textLabel.text;
                     controller.selectionIndex = _pieceType;
                     controller.tag = VIEW_TAG_PIECE_STYLE;
+                    break;
+                }
+                case 2:  // - Board
+                {
+                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_boardChoices delegate:self];
+                    subController = controller;
+                    controller.title = _boardCell.textLabel.text;
+                    controller.selectionIndex = _boardType;
+                    controller.tag = VIEW_TAG_BOARD_STYLE;
                     break;
                 }
             }
@@ -260,6 +292,7 @@ enum ViewTagEnum
 - (void)dealloc 
 {
     [_pieceChoices release];
+    [_boardChoices release];
     [_aiLevelChoices release];
     [_aiTypeChoices release];
     [super dealloc];
@@ -279,6 +312,16 @@ enum ViewTagEnum
                 _pieceType = index;
                 _pieceCell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
                 [[NSUserDefaults standardUserDefaults] setInteger:_pieceType forKey:@"piece_type"];
+            }
+            break;
+        }
+        case VIEW_TAG_BOARD_STYLE:
+        {
+            if (_boardType != index)
+            {
+                _boardType = index;
+                _boardCell.detailTextLabel.text = [_boardChoices objectAtIndex:_boardType];
+                [[NSUserDefaults standardUserDefaults] setInteger:_boardType forKey:@"board_type"];
             }
             break;
         }

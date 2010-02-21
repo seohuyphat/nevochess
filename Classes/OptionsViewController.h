@@ -26,12 +26,17 @@
     IBOutlet UISwitch*        _soundSwitch;
 
     UITableViewCell*   _pieceCell;
+    UITableViewCell*   _boardCell;
     UITableViewCell*   _aiLevelCell;
     UITableViewCell*   _aiTypeCell;
 
     // --- Piece Style.
     NSArray*           _pieceChoices;
     NSUInteger         _pieceType;
+
+    // --- Board Style.
+    NSArray*           _boardChoices;
+    NSUInteger         _boardType;
 
     // --- AI Level and Type.
     NSArray*           _aiLevelChoices;
