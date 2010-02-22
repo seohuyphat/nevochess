@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #import "SingleSelectionController.h"
-#import "QuartzUtils.h"
 
 @implementation SingleSelectionController
 
@@ -26,11 +25,15 @@
 @synthesize tag=_tag;
 @synthesize selectionIndex=_selectionIndex;
 
-- (id) initWithChoices:(NSArray*)choices delegate:(id<SingleSelectionDelegate>)delegate
+- (id) initWithChoices:(NSArray*)choices imageNames:(NSArray*)imageNames
+              delegate:(id<SingleSelectionDelegate>)delegate
 {
-    if (self = [self initWithNibName:@"SingleSelectionView" bundle:nil]) {
+    if (self = [self initWithNibName:@"SingleSelectionView" bundle:nil])
+    {
         self._delegate = delegate;
-        _choices = [[NSMutableArray alloc] initWithArray:choices];
+        _choices = [[NSArray alloc] initWithArray:choices];
+        _imageNames = (imageNames ? [[NSArray alloc] initWithArray:imageNames]
+                                  : nil);
         _selectionIndex = 0;
     }
     return self;
@@ -43,40 +46,15 @@
     }
 }
 
+- (void) setRowHeight:(CGFloat)height
+{
+    self.tableView.rowHeight = height;
+}
+
 - (void) viewDidLoad
 {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
 }
-
-/*
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-}
-*/
-/*
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-*/
-/*
-- (void)viewWillDisappear:(BOOL)animated {
-	[super viewWillDisappear:animated];
-}
-*/
-/*
-- (void)viewDidDisappear:(BOOL)animated {
-	[super viewDidDisappear:animated];
-}
-*/
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -113,6 +91,12 @@
     cell.accessoryType = (indexPath.row == _selectionIndex ? UITableViewCellAccessoryCheckmark
                                                            : UITableViewCellAccessoryNone);
 
+    if (_imageNames) {
+        NSString* imageName = [_imageNames objectAtIndex:indexPath.row];
+        UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
+        cell.imageView.image = theImage;
+    }
+
     return cell;
 }
 
@@ -133,6 +117,7 @@
 - (void)dealloc
 {
     [_choices release];
+    [_imageNames release];
     [_delegate release];
     [super dealloc];
 }

@@ -32,15 +32,18 @@
     id<SingleSelectionDelegate> _delegate;
     int                         _tag;
 
-    NSMutableArray*  _choices;
+    NSArray*         _choices;
+    NSArray*         _imageNames;
     unsigned int     _selectionIndex;
-    //NSString*        _selectionName;
 }
 
 @property (nonatomic, retain) id<SingleSelectionDelegate> _delegate;
 @property (nonatomic)         int tag;
 @property (nonatomic)         unsigned int selectionIndex;
 
-- (id) initWithChoices:(NSArray*)choices delegate:(id<SingleSelectionDelegate>)delegate;
+- (id) initWithChoices:(NSArray*)choices imageNames:(NSArray*)imageNames
+              delegate:(id<SingleSelectionDelegate>)delegate;
+
+- (void) setRowHeight:(CGFloat)height;
 
 @end

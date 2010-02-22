@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #import "OptionsViewController.h"
-#import "QuartzUtils.h"
 #import "NetworkSettingController.h"
 #import "SingleSelectionController.h"
 
@@ -35,7 +34,6 @@ enum ViewTagEnum
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     self.title = NSLocalizedString(@"Settings", @"");
 
     _soundSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"];
@@ -232,7 +230,24 @@ enum ViewTagEnum
             {
                 case 1:  // - Piece
                 {
-                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_pieceChoices delegate:self];
+                    NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
+                                            @"pieces/alfaerie_31x31", @"pieces/iXiangQi",
+                                            nil];
+                    NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[piecePaths count]];
+                    for (NSString* subPath in piecePaths)
+                    {
+                        NSString* path = [[NSBundle mainBundle] pathForResource:@"rking"
+                                                                         ofType:@"png"
+                                                                    inDirectory:subPath];
+                        [imageNames addObject:path];
+                    }
+
+                    SingleSelectionController* controller =
+                        [[SingleSelectionController alloc] initWithChoices:_pieceChoices
+                                                                imageNames:imageNames
+                                                                  delegate:self];
+                    [imageNames release];
+                    [controller setRowHeight:50];
                     subController = controller;
                     controller.title = _pieceCell.textLabel.text;
                     controller.selectionIndex = _pieceType;
@@ -241,7 +256,23 @@ enum ViewTagEnum
                 }
                 case 2:  // - Board
                 {
-                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_boardChoices delegate:self];
+                    NSArray* boards = [NSArray arrayWithObjects:@"board_60px",
+                                        @"SKELETON_60px", @"WOOD_60px", nil];
+                    NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[boards count]];
+                    for (NSString* name in boards)
+                    {
+                        NSString* path = [[NSBundle mainBundle] pathForResource:name
+                                                                         ofType:@"png"
+                                                                    inDirectory:nil];
+                        [imageNames addObject:path];
+                    }
+
+                    SingleSelectionController* controller =
+                        [[SingleSelectionController alloc] initWithChoices:_boardChoices
+                                                                imageNames:imageNames
+                                                                  delegate:self];
+                    [imageNames release];
+                    [controller setRowHeight:80];
                     subController = controller;
                     controller.title = _boardCell.textLabel.text;
                     controller.selectionIndex = _boardType;
@@ -257,7 +288,10 @@ enum ViewTagEnum
             {
                 case 0:
                 {
-                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices delegate:self];
+                    SingleSelectionController* controller =
+                        [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices
+                                                                imageNames:nil
+                                                                  delegate:self];
                     subController = controller;
                     controller.title = _aiLevelCell.textLabel.text;
                     controller.selectionIndex = _aiLevel;
@@ -266,7 +300,10 @@ enum ViewTagEnum
                 }
                 case 1:
                 {
-                    SingleSelectionController* controller = [[SingleSelectionController alloc] initWithChoices:_aiTypeChoices delegate:self];
+                    SingleSelectionController* controller =
+                        [[SingleSelectionController alloc] initWithChoices:_aiTypeChoices
+                                                                imageNames:nil
+                                                                  delegate:self];
                     subController = controller;
                     controller.title = _aiTypeCell.textLabel.text;
                     controller.selectionIndex = _aiType;
