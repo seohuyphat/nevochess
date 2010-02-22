@@ -32,9 +32,9 @@
     [super dealloc];
 }
 
-+ (DataManager*)getDataManager
++ (DataManager*)sharedDataManager
 {
-    NSAssert(YES, @"Unexpected getDataManager called, please implement this function in DataManager sub-class!");
+    NSAssert(YES, @"Unexpected sharedDataManager called, please implement this function in DataManager sub-class!");
     return nil;
 }
 

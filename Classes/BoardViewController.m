@@ -442,7 +442,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
 {
     NSError *error;
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    BOOL ret = [[[GameDataManager getDataManager] managedObjectContext] save:&error];
+    BOOL ret = [[[GameDataManager sharedDataManager] managedObjectContext] save:&error];
     if (!ret) {
         NSLog(@"failed to save current game data %@", [error localizedDescription]);
     }
@@ -501,7 +501,7 @@ BOOL layerIsBitHolder( CALayer* layer )  {return [layer conformsToProtocol: @pro
     [_sid release];
     _sid = [[UUIDGenerator GetUUID] retain];
     NSLog(@"initialize game data session %@", _sid);
-    PlayRecord *record = (PlayRecord*)[[GameDataManager getDataManager] prepareAndAddEntityForName:@"PlayRecord"];
+    PlayRecord *record = (PlayRecord*)[[GameDataManager sharedDataManager] prepareAndAddEntityForName:@"PlayRecord"];
     record.sid = _sid;
     record.date = [NSDate date];
 }

@@ -181,7 +181,7 @@ static GameDataManager *gameDataManager;
 //
 // return singleton game data manager
 //
-+ (DataManager*)getDataManager
++ (DataManager*)sharedDataManager
 {
     if(gameDataManager == nil)
         gameDataManager = [[GameDataManager alloc] init];
