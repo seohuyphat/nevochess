@@ -26,11 +26,20 @@
 #import "AI_XQWLight.h"
 #import "XiangQi.h"  // XQWLight Objective-C based AI
 
+
+#define ACTION_BUTTON_INDEX 4
+
 enum AlertViewEnum
 {
-    POC_ALERT_END_GAME,
-    POC_ALERT_RESUME_GAME,
-    POC_ALERT_RESET_GAME
+    NC_ALERT_END_GAME,
+    NC_ALERT_RESUME_GAME,
+    NC_ALERT_RESET_GAME
+};
+
+enum ActionSheetEnum
+{
+    NC_ACTION_SHEET_CANCEL = 1, // Must be non-zero.
+    NC_ACTION_SHEET_UNDO   = 2
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,6 +54,7 @@ enum AlertViewEnum
 - (void) _handleEndGameInUI;
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
+- (void) _undoLastMove;
 - (int) _convertStringToAIType:(NSString *)aiSelection;
 
 @end
@@ -113,13 +123,16 @@ enum AlertViewEnum
 {
     [super viewDidLoad];
     
-    // Remove the Actions button.
-    NSArray *items = nav_toolbar.items;    
-    NSMutableArray *newItems = [NSMutableArray arrayWithArray:items];
-    [newItems removeLastObject];
-    [newItems removeLastObject];
-    [newItems removeLastObject];
+    // Remove the Messages button.  
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+    [newItems removeLastObject];  // ... Messages button
+    [newItems removeLastObject];  // ... Messages separator
     nav_toolbar.items = newItems;
+
+    _actionButton = [(UIBarButtonItem*)[newItems objectAtIndex:ACTION_BUTTON_INDEX] retain];
+    _aiThinkingActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    _aiThinkingActivity.hidden = YES;
+    _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
     [activity stopAnimating];
 }
@@ -128,6 +141,9 @@ enum AlertViewEnum
 {
     [_aiEngine release];
     [_robotPort release];
+    [_actionButton release];
+    [_aiThinkingActivity release];
+    [_aiThinkingButton release];
     [super dealloc];
 }
 
@@ -185,10 +201,10 @@ enum AlertViewEnum
 //
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
-    if ( alertView.tag == POC_ALERT_END_GAME ) {
+    if ( alertView.tag == NC_ALERT_END_GAME ) {
         [self resetBoard];
     }
-    else if (    alertView.tag == POC_ALERT_RESUME_GAME
+    else if (    alertView.tag == NC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
     {
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
@@ -196,7 +212,7 @@ enum AlertViewEnum
             [self _loadPendingGame:sPendingGame];
         }
     }
-    else if (    alertView.tag == POC_ALERT_RESET_GAME
+    else if (    alertView.tag == NC_ALERT_RESET_GAME
              && buttonIndex != [alertView cancelButtonIndex] )
     {
         [activity setHidden:NO];
@@ -240,18 +256,67 @@ enum AlertViewEnum
                                   delegate:self 
                          cancelButtonTitle:NSLocalizedString(@"No", @"")
                          otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = POC_ALERT_RESET_GAME;
+    alert.tag = NC_ALERT_RESET_GAME;
     [alert show];
     [alert release];
 }
 
-//
-// Handle AI's move.
-//
+- (IBAction)actionPressed:(id)sender
+{
+    NSUInteger moveCount = [[_board getMoves] count];
+    if (moveCount == 0) {
+        return;  // Do nothing.
+    }
+
+    UIActionSheet* actionSheet = nil;
+
+    if (moveCount % 2) // Robot is thinking?
+    {
+        actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                  delegate:self
+                                         cancelButtonTitle:NSLocalizedString(@"AI thinking...", @"")
+                                    destructiveButtonTitle:nil
+                                         otherButtonTitles:nil];
+        actionSheet.tag = NC_ACTION_SHEET_CANCEL;
+    }
+    else
+    {
+        actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                  delegate:self
+                                         cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
+                                    destructiveButtonTitle:NSLocalizedString(@"Undo Move", @"")
+                                         otherButtonTitles:nil];
+        actionSheet.tag = NC_ACTION_SHEET_UNDO;
+        
+    }
+
+    actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
+    [actionSheet showInView:self.view];
+    [actionSheet release];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (actionSheet.tag == NC_ACTION_SHEET_CANCEL) {
+        return;
+    }
+
+    switch (buttonIndex)
+    {
+        case 0:  // Undo Move
+            [self _undoLastMove];
+            break;
+    }
+}
+
 - (void)_AIMove
 {
     int row1 = 0, col1 = 0, row2 = 0, col2 = 0;
+
+    NSDate* startTime = [NSDate date];
     [_aiEngine generateMove:&row1 fromCol:&col1 toRow:&row2 toCol:&col2];
+    NSTimeInterval timeInterval = - [startTime timeIntervalSinceNow]; // in seconds.
+    NSLog(@"%s: AI took [%.02f] seconds.", __FUNCTION__, timeInterval);
 
     int sqSrc = TOSQUARE(row1, col1);
     int sqDst = TOSQUARE(row2, col2);
@@ -271,6 +336,10 @@ enum AlertViewEnum
 
 - (void) handleNewMove:(NSNumber *)moveInfo
 {
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+    [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
+    nav_toolbar.items = newItems;
+    
     int nGameResult = [_board onNewMove:moveInfo inSetupMode:NO];
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
         [self _handleEndGameInUI];
@@ -288,6 +357,12 @@ enum AlertViewEnum
         [self _handleEndGameInUI];
     }
     else {
+        _aiThinkingActivity.hidden = NO;
+        [_aiThinkingActivity startAnimating];
+        NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+        [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
+        nav_toolbar.items = newItems;
+
         // AI's turn.
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
@@ -342,7 +417,7 @@ enum AlertViewEnum
                                                    delegate:self 
                                           cancelButtonTitle:nil
                                           otherButtonTitles:@"OK", nil];
-    alert.tag = POC_ALERT_END_GAME;
+    alert.tag = NC_ALERT_END_GAME;
     [alert show];
     [alert release];
 }
@@ -355,7 +430,7 @@ enum AlertViewEnum
                                   delegate:self 
                          cancelButtonTitle:NSLocalizedString(@"No", @"")
                          otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = POC_ALERT_RESUME_GAME;
+    alert.tag = NC_ALERT_RESUME_GAME;
     [alert show];
     [alert release];
 }
@@ -404,6 +479,49 @@ enum AlertViewEnum
     // If it is AI's turn after the game is loaded, then inform the AI.
     if ( bAIturn && _game.gameResult == kXiangQi_InPlay ) {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+    }
+}
+
+- (void) _undoLastMove
+{
+    NSArray* moves = [[[NSArray alloc] initWithArray:[_board getMoves]] autorelease]; // Make a copy
+    NSUInteger moveCount = [moves count];
+    if (moveCount == 0) return;
+
+    // Determine the index of my last Move.
+    int myLastMoveIndex = (_myColor == NC_COLOR_RED
+                           ? ( (moveCount % 2) ? moveCount-1 : moveCount-2 )
+                           : ( (moveCount % 2) ? moveCount-2 : moveCount-1 ));
+
+    // NOTE: We know that at this time AI is not thinking.
+    //       Therefore, we directly reset the Game to avoid race conditions.
+    //
+    [activity setHidden:NO];
+    [activity startAnimating];
+    [self rescheduleTimer];
+    [self resetBoard];
+    [activity stopAnimating];
+
+    // Re-load the moves before my last Move.
+    MoveAtom* pMove = nil;
+    int move = 0;
+    int sqSrc = 0;
+    int sqDst = 0;
+
+    for (int i = 0; i < myLastMoveIndex; ++i)
+    {
+        pMove = [moves objectAtIndex:i]; 
+        move = [pMove.move integerValue];
+        sqSrc = SRC(move);
+        sqDst = DST(move);
+
+        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+
+        NSNumber* moveInfo = [NSNumber numberWithInteger:move];
+        [self handleNewMove:moveInfo];
     }
 }
 
