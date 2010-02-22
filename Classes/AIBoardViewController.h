@@ -21,7 +21,7 @@
 #import "BoardViewController.h"
 #import "AIEngine.h"
 
-@interface AIBoardViewController : BoardViewController
+@interface AIBoardViewController : BoardViewController <UIActionSheetDelegate>
 {
     NSString*       _aiName;
     AIEngine*       _aiEngine;
@@ -29,6 +29,10 @@
     NSThread*     robot;
     NSPort*      _robotPort; // the port is used to instruct the robot to do works
     CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
+
+    UIBarButtonItem*         _actionButton;
+    UIActivityIndicatorView* _aiThinkingActivity;
+    UIBarButtonItem*         _aiThinkingButton;
 }
 
 - (IBAction)homePressed:(id)sender;
