@@ -26,6 +26,6 @@
 
 }
 
-+ (DataManager*)getDataManager;
++ (DataManager*)sharedDataManager;
 
 @end

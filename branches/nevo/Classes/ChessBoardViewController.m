@@ -354,7 +354,7 @@
     NSLog(@"Save current game session %@", _sid);
     if ( _game.game_result == kXiangQi_InPlay ) {
         for (MoveAtom *pMove in _moves) {
-            Move *move = [[GameDataManager getDataManager] prepareAndAddEntityForName:@"Move"];
+            Move *move = [[GameDataManager sharedDataManager] prepareAndAddEntityForName:@"Move"];
             move.sid = _sid;
             move.move = pMove.move;
         }
@@ -377,7 +377,7 @@
     PlayRecord *last = [sessions objectAtIndex:1];
     NSLog(@"the last session is %@", last.sid);
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
-    BOOL hasPendingGame = [[GameDataManager getDataManager] hasEntityForName:@"Move"
+    BOOL hasPendingGame = [[GameDataManager sharedDataManager] hasEntityForName:@"Move"
                                                              searchPredicate:predicate
                                                                         sort:nil
                                                                        error:nil];
@@ -396,7 +396,7 @@
     NSError *error;
     PlayRecord *last = [sessions objectAtIndex:1];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"sid LIKE[c] %@", last.sid];
-    NSArray *moves = [[GameDataManager getDataManager] loadEntityForName:@"Move"
+    NSArray *moves = [[GameDataManager sharedDataManager] loadEntityForName:@"Move"
                                                          searchPredicate:predicate
                                                                     sort:nil
                                                                    error:&error];
@@ -431,7 +431,7 @@
 {
     NSError *error;
     NSSortDescriptor *dateDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO selector:@selector(compare:)];
-    NSArray *sessions = [[GameDataManager getDataManager] loadEntityForName:@"PlayRecord"
+    NSArray *sessions = [[GameDataManager sharedDataManager] loadEntityForName:@"PlayRecord"
                                                             searchPredicate:nil
                                                                        sort:dateDescriptor
                                                                       error:&error];
