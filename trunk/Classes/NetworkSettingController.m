@@ -18,14 +18,12 @@
  ***************************************************************************/
 
 #import "NetworkSettingController.h"
-#import "QuartzUtils.h"
 
 @implementation NetworkSettingController
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithCGColor:GetCGPatternNamed(@"board_320x480.png")];
     self.title = NSLocalizedString(@"Network", @"");
     
     _usernameText.placeholder = NSLocalizedString(@"Required", @"");
