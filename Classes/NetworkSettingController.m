@@ -71,13 +71,15 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell* cell = nil;
-    UILabel* theLabel = nil;
+    UILabel*         theLabel = nil;
+    UIFont*          defaultFont = [UIFont boldSystemFontOfSize:17.0];
 
     switch (indexPath.section)
     {
         case 0:
             cell = _serverCell;
             theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel.font = defaultFont;
             theLabel.text  = NSLocalizedString(@"Server", @"");
             break;
         case 1:
@@ -85,11 +87,13 @@
             if (indexPath.row == 0) {
                 cell = _usernameCell;
                 theLabel = (UILabel *)[cell viewWithTag:1];
+                theLabel.font = defaultFont;
                 theLabel.text  = NSLocalizedString(@"Username", @"");
                 _usernameText.text = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
             } else {
                 cell = _passwordCell;
                 theLabel = (UILabel *)[cell viewWithTag:1];
+                theLabel.font = defaultFont;
                 theLabel.text  = NSLocalizedString(@"Password", @"");
                 _passwordText.text = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
             }
@@ -98,6 +102,7 @@
         case 2:
             cell = _autoConnectCell;
             theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel.font = defaultFont;
             theLabel.text  = NSLocalizedString(@"Auto Connect", @"");
             _autoConnectSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"];
             break;

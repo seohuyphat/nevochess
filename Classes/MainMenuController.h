@@ -23,13 +23,11 @@
 {
     IBOutlet UIButton* ai_game;
     IBOutlet UIButton* online_game;
-    IBOutlet UIButton* about;
     IBOutlet UIButton* setting;
 }
 
 - (IBAction)newGamePressed:(id)sender;
 - (IBAction)networkGamePressed:(id)sender;
-- (IBAction)aboutPressed:(id)sender;
 - (IBAction)settingPressed:(id)sender;
 
 @end
