@@ -27,7 +27,7 @@
 
 }
 
-@property(nonatomic,retain) NSData *date;
+@property(nonatomic,retain) NSDate *date;
 @property(nonatomic,retain) NSString *sid;
 
 @end
