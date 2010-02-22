@@ -35,7 +35,6 @@
     NSString *releaseVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *about_page = [NSString stringWithFormat:NSLocalizedString(@"About_NevoChess_Key", @""),
                                                                         releaseVersion, buildInfo];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [webview loadHTMLString:about_page baseURL:baseURL];
 }
 

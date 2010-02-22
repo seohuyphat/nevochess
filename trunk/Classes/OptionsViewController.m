@@ -19,6 +19,7 @@
 
 #import "OptionsViewController.h"
 #import "NetworkSettingController.h"
+#import "AboutViewController.h"
 #import "SingleSelectionController.h"
 
 enum ViewTagEnum
@@ -104,7 +105,7 @@ enum ViewTagEnum
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
-    return 3;
+    return 4;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -118,6 +119,7 @@ enum ViewTagEnum
         case 0: return 3;
         case 1: return 2;
         case 2: return 1;
+        case 3: return 1;
     }
     return 0;
 }
@@ -126,7 +128,7 @@ enum ViewTagEnum
 {
     UITableViewCell* cell = nil;
     UILabel*         theLabel = nil;
-    UIFont*          defaultFont = [UIFont systemFontOfSize:18.0];
+    UIFont*          defaultFont = [UIFont boldSystemFontOfSize:17.0];
     
     switch (indexPath.section)
     {
@@ -213,6 +215,23 @@ enum ViewTagEnum
             cell.textLabel.text = NSLocalizedString(@"Network", @"");
             break;
         }
+        case 3: // ----- About
+        {
+            cell = [tableView dequeueReusableCellWithIdentifier:@"about_cell"];
+            if(!cell) {
+                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"about_cell"] autorelease];
+                cell.textLabel.font = defaultFont;
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
+            cell.textLabel.text = NSLocalizedString(@"About", @"");
+
+            NSString* imageName = [[NSBundle mainBundle] pathForResource:@"help"
+                                                                  ofType:@"png"
+                                                             inDirectory:nil];
+            UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
+            cell.imageView.image = theImage;
+            break;
+        }
     }
 
     return cell;
@@ -224,7 +243,7 @@ enum ViewTagEnum
 
     switch (indexPath.section)
     {
-        case 0:
+        case 0: // ----- General
         {
             switch (indexPath.row)
             {
@@ -282,7 +301,7 @@ enum ViewTagEnum
             }
             break;
         }
-        case 1:
+        case 1: // ----- AI
         {
             switch (indexPath.row)
             {
@@ -313,9 +332,14 @@ enum ViewTagEnum
             }
             break;
         }
-        case 2:
+        case 2: // ----- Network
         {
             subController = [[NetworkSettingController alloc] initWithNibName:@"NetworkSettingView" bundle:nil];
+            break;
+        }
+        case 3: // ----- About
+        {
+            subController = [[AboutViewController alloc] initWithNibName:@"AboutViewController" bundle:nil];
             break;
         }
     }

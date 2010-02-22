@@ -20,7 +20,6 @@
 #import "MainMenuController.h"
 #import "AIBoardViewController.h"
 #import "NetworkBoardViewController.h"
-#import "AboutViewController.h"
 #import "OptionsViewController.h"
 
 @implementation MainMenuController
@@ -31,7 +30,6 @@
     self.title = NSLocalizedString(@"Home", @"");
     [ai_game setTitle:NSLocalizedString(@"Home_Play", @"") forState:UIControlStateNormal];
     [online_game setTitle:NSLocalizedString(@"Home_Online", @"") forState:UIControlStateNormal];
-    [about setTitle:NSLocalizedString(@"Home_About", @"") forState:UIControlStateNormal];
     [setting setTitle:NSLocalizedString(@"Home_Settings", @"") forState:UIControlStateNormal];
 }
 
@@ -58,7 +56,6 @@
     [ai_game release];
     [online_game release];
     [setting release];
-    [about release];
     [super dealloc];
 }
 
@@ -74,13 +71,6 @@
     NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
     [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
-}
-
-- (IBAction)aboutPressed:(id)sender
-{
-    AboutViewController *aboutController = [[AboutViewController alloc] initWithNibName:@"AboutViewController" bundle:nil];
-    [self.navigationController pushViewController:aboutController animated:YES];
-    [aboutController release];      
 }
 
 - (IBAction)settingPressed:(id)sender
