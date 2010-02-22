@@ -124,6 +124,15 @@ enum ViewTagEnum
     return 0;
 }
 
+- (UIImage*) _getImageNamed:(NSString*)name
+{
+    NSString* imageName = [[NSBundle mainBundle] pathForResource:name
+                                                          ofType:@"png"
+                                                     inDirectory:nil];
+    UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
+    return theImage;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     UITableViewCell* cell = nil;
@@ -213,6 +222,7 @@ enum ViewTagEnum
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
             cell.textLabel.text = NSLocalizedString(@"Network", @"");
+            cell.imageView.image = [self _getImageNamed:@"applications-internet"];
             break;
         }
         case 3: // ----- About
@@ -224,12 +234,7 @@ enum ViewTagEnum
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
             cell.textLabel.text = NSLocalizedString(@"About", @"");
-
-            NSString* imageName = [[NSBundle mainBundle] pathForResource:@"help"
-                                                                  ofType:@"png"
-                                                             inDirectory:nil];
-            UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
-            cell.imageView.image = theImage;
+            cell.imageView.image = [self _getImageNamed:@"help"];
             break;
         }
     }
