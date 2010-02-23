@@ -12,8 +12,8 @@
 "RESET" = "重新开始";
 
 /* These HOME keys need a single space in the front to separate an icon. */
-"Home_Play" = " 实践";
-"Home_Online" = " 玩在线";
+"Home_Play" = " 开始";
+"Home_Online" = " 在线游戏";
 "Home_Settings" = " 设置";
 "Home_About" = " 关于";
 "About" = "关于";
@@ -44,16 +44,16 @@
 /* Menu keys */
 "Logout" = "注销";
 "Cancel" = "取消";
-"Resign" = "辞职";
-"Draw" = "凹道";
-"Close Table" = "退出桌子";
-"Reset Table" = "游戏重新设置";
+"Resign" = "认输";
+"Draw" = "平局";
+"Close Table" = "退出棋桌";
+"Reset Table" = "棋桌重置";
 
-"Select a Table to join" = "选择一个表加入";
+"Select a Table to join" = "选择游戏棋桌加入";
 "Game Over" = "游戏结束";
-"Tables" = "桌子";
-"Messages" = "谈话";
-"Table #%@" = "桌子 #%@";
+"Tables" = "游戏棋桌";
+"Messages" = "聊天消息";
+"Table #%@" = "棋桌 #%@";
 
 /* Network Settings */
 "Server" = "服务器";
