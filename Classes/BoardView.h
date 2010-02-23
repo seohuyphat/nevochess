@@ -143,6 +143,7 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 - (void) resetBoard;
 - (void) displayEmptyBoard;
 - (void) reverseBoardView;
+- (void) reverseRole;
 
 @end
 

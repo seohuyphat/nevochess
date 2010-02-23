@@ -90,7 +90,6 @@ enum ActionSheetEnum
                 _aiEngine = [[AI_HaQiKiD alloc] init];
                 break;
             case NC_AI_XQWLight_ObjC:
-                // NOTE: The Objective-c AI is still in experimental stage.
                 _aiEngine = [[AI_XQWLightObjC alloc] init];
                 break;
             default:
@@ -133,12 +132,14 @@ enum ActionSheetEnum
     // *** --- START of Toolbar modifications.
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
 
-    // Replace the image of "message-Button" with Search image.
+    // Replace the image of "message-Button" with "Change-Role" image.
     UIBarButtonItem* msgButton = (UIBarButtonItem*) [newItems objectAtIndex:MESSAGE_BUTTON_INDEX];
-    _reverseRoleButton = [[UIBarButtonItem alloc]
-                          initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                          target:msgButton.target action:msgButton.action];
-    _reverseRoleButton.style = UIBarButtonItemStylePlain;
+    NSString* imageName = [[NSBundle mainBundle] pathForResource:@"change-role"
+                                                          ofType:@"png"
+                                                     inDirectory:nil];
+    UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
+    _reverseRoleButton = [[UIBarButtonItem alloc] initWithImage:theImage
+        style:UIBarButtonItemStylePlain target:msgButton.target action:msgButton.action];
     [newItems replaceObjectAtIndex:MESSAGE_BUTTON_INDEX withObject:_reverseRoleButton];
 
     nav_toolbar.items = newItems;
@@ -207,6 +208,7 @@ enum ActionSheetEnum
         // FIXME: in case of this function is invoked before "_AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
         CFRunLoopStop(_robotLoop);
+        robot = nil;
         [self goBackToHomeMenu];
     }
 }
@@ -324,7 +326,7 @@ enum ActionSheetEnum
     [actionSheet release];
 }
 
-// 'Reset' is now the "Reverse-Role" command.
+// 'Messages' is now the "Reverse-Role" command.
 - (IBAction)messagesPressed:(id)sender
 {
     if ([_game getMoveCount] > 0) {
@@ -333,7 +335,7 @@ enum ActionSheetEnum
     }
 
     _myColor = (_myColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
-    [_board reverseBoardView];
+    [_board reverseRole];
 
     if (_myColor == NC_COLOR_BLACK) {
         NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
@@ -520,7 +522,7 @@ enum ActionSheetEnum
 - (void) _loadPendingGame:(NSString *)sPendingGame
 {
     if (_myColor == NC_COLOR_BLACK) {
-        [_board reverseBoardView];
+        [_board reverseRole];
     }
 
     NSArray *moves = [sPendingGame componentsSeparatedByString:@","];

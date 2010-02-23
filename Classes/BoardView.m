@@ -715,4 +715,12 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _black_move_time.frame = redRect;
 }
 
+- (void) reverseRole
+{
+    [self reverseBoardView];
+    NSString* redText = _red_label.text;
+    _red_label.text = _black_label.text;
+    _black_label.text = redText;
+}
+
 @end
