@@ -75,6 +75,7 @@
 		AFB0380F112C5E5D000A9AC1 /* NetworkSettingController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB0380D112C5E5D000A9AC1 /* NetworkSettingController.m */; };
 		AFB03810112C5E5D000A9AC1 /* NetworkSettingView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */; };
 		AFB08A14106A663E00038488 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFB08A12106A663E00038488 /* Localizable.strings */; };
+		AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */ = {isa = PBXBuildFile; fileRef = AFBA3CF51134460B00F8F4ED /* change-role.png */; };
 		AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFEE8C3911325EF800EE7239 /* board_320x480.png */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
@@ -184,6 +185,7 @@
 		AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NetworkSettingView.xib; sourceTree = "<group>"; };
 		AFB08A13106A663E00038488 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; wrapsLines = 1; };
 		AFB08A15106A665300038488 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AFBA3CF51134460B00F8F4ED /* change-role.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "change-role.png"; sourceTree = "<group>"; };
 		AFEE8C3911325EF800EE7239 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 		AFA63FE3106FABD700D7B220 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				AFBA3CF51134460B00F8F4ED /* change-role.png */,
 				AF559E54112720F900C6236D /* help.png */,
 				AF1B672E108558D600032C01 /* start-here.png */,
 				AF1B6723108555DC00032C01 /* applications-internet.png */,
@@ -528,6 +531,7 @@
 				AF6B21EE1131C65200A2AA3A /* WOOD_60px.png in Resources */,
 				AF6B222D1131C92300A2AA3A /* board_60px.png in Resources */,
 				AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */,
+				AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
