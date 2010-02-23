@@ -23,6 +23,8 @@
 
 @interface AIBoardViewController : BoardViewController <UIActionSheetDelegate>
 {
+    NSTimer*     _idleTimer;
+
     NSString*       _aiName;
     AIEngine*       _aiEngine;
 
@@ -33,7 +35,11 @@
     UIBarButtonItem*         _actionButton;
     UIActivityIndicatorView* _aiThinkingActivity;
     UIBarButtonItem*         _aiThinkingButton;
+
+    UIBarButtonItem*         _reverseRoleButton;
 }
+
+@property (nonatomic, retain) NSTimer* _idleTimer;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;

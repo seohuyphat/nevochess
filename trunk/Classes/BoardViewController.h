@@ -84,6 +84,5 @@ enum ActionIndexEnum
 - (void) rescheduleTimer;
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
-- (void) reverseBoardView;
 
 @end
