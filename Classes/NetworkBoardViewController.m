@@ -606,7 +606,7 @@
     if (   (myColor == NC_COLOR_BLACK && _game.blackAtTopSide)
         || (!_game.blackAtTopSide) )
     {
-        [self reverseBoardView];
+        [_board reverseBoardView];
     }
     
     NSString* redInfo = ([table.redId length] == 0 ? @"*"

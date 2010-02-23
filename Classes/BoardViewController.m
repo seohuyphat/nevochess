@@ -216,9 +216,4 @@
     return YES;
 }
 
-- (void) reverseBoardView
-{
-    [_board reverseBoardView];
-}
-
 @end

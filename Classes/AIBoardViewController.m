@@ -28,6 +28,7 @@
 
 
 #define ACTION_BUTTON_INDEX 4
+#define MESSAGE_BUTTON_INDEX 6
 
 enum AlertViewEnum
 {
@@ -55,6 +56,8 @@ enum ActionSheetEnum
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 - (void) _undoLastMove;
+- (void) _countDownToAIMove:(NSTimer*)timer;
+- (void) _onResetDoneByAI:(id)notUsed;
 - (int) _convertStringToAIType:(NSString *)aiSelection;
 
 @end
@@ -68,9 +71,13 @@ enum ActionSheetEnum
 
 @implementation AIBoardViewController
 
+@synthesize _idleTimer;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+    {
+        self._idleTimer = nil;
 
         // Determine the type of AI.
         _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"ai_type"];
@@ -122,12 +129,20 @@ enum ActionSheetEnum
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    // Remove the Messages button.  
+
+    // *** --- START of Toolbar modifications.
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
-    [newItems removeLastObject];  // ... Messages button
-    [newItems removeLastObject];  // ... Messages separator
+
+    // Replace the image of "message-Button" with Search image.
+    UIBarButtonItem* msgButton = (UIBarButtonItem*) [newItems objectAtIndex:MESSAGE_BUTTON_INDEX];
+    _reverseRoleButton = [[UIBarButtonItem alloc]
+                          initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                          target:msgButton.target action:msgButton.action];
+    _reverseRoleButton.style = UIBarButtonItemStylePlain;
+    [newItems replaceObjectAtIndex:MESSAGE_BUTTON_INDEX withObject:_reverseRoleButton];
+
     nav_toolbar.items = newItems;
+    // *** --- END of Toolbar modifications.
 
     _actionButton = [(UIBarButtonItem*)[newItems objectAtIndex:ACTION_BUTTON_INDEX] retain];
     _aiThinkingActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -144,6 +159,11 @@ enum ActionSheetEnum
     [_actionButton release];
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
+    [_reverseRoleButton release];
+    if (_idleTimer) {
+        [_idleTimer invalidate];
+        self._idleTimer = nil;
+    }
     [super dealloc];
 }
 
@@ -182,6 +202,7 @@ enum ActionSheetEnum
         // NOTE: We "reset" the Board's data *here* inside the AI Thread to
         //       avoid clearing data while the AI is thinking of a Move.
         [self resetBoard];
+        [self performSelectorOnMainThread:@selector(_onResetDoneByAI:) withObject:nil waitUntilDone:NO];
     }else{
         // FIXME: in case of this function is invoked before "_AIMove", the app might crash thereafter due to the background AI 
         //       thinking is still on going. So trying to stop the runloop
@@ -203,12 +224,20 @@ enum ActionSheetEnum
 {
     if ( alertView.tag == NC_ALERT_END_GAME ) {
         [self resetBoard];
+        _reverseRoleButton.enabled = YES;
+        if (_myColor == NC_COLOR_BLACK) {
+            NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+            self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
+        }
     }
     else if (    alertView.tag == NC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
     {
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
+        if ( sPendingGame && [sPendingGame length]) {
+            NSString* colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
+            _myColor = ( !colorStr || [colorStr isEqualToString:@"Red"]
+                        ? NC_COLOR_RED : NC_COLOR_BLACK );
             [self _loadPendingGame:sPendingGame];
         }
     }
@@ -270,7 +299,7 @@ enum ActionSheetEnum
 
     UIActionSheet* actionSheet = nil;
 
-    if (moveCount % 2) // Robot is thinking?
+    if (_myColor != [_game getNextColor]) // Robot is thinking?
     {
         actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                   delegate:self
@@ -293,6 +322,30 @@ enum ActionSheetEnum
     actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
     [actionSheet showInView:self.view];
     [actionSheet release];
+}
+
+// 'Reset' is now the "Reverse-Role" command.
+- (IBAction)messagesPressed:(id)sender
+{
+    if ([_game getMoveCount] > 0) {
+        NSLog(@"%s: Game already started. Do nothing.", __FUNCTION__);
+        return;
+    }
+
+    _myColor = (_myColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+    [_board reverseBoardView];
+
+    if (_myColor == NC_COLOR_BLACK) {
+        NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+        self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
+    } else {
+        _reverseRoleButton.enabled = YES;
+        if (_idleTimer) {
+            NSLog(@"%s: Cancel the pending AI-timer...", __FUNCTION__);
+            [_idleTimer invalidate];
+            self._idleTimer = nil;
+        }
+    }
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -339,7 +392,11 @@ enum ActionSheetEnum
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
     nav_toolbar.items = newItems;
-    
+
+    if ([_game getMoveCount] == 1) {
+        _reverseRoleButton.enabled = NO;
+    }
+
     int nGameResult = [_board onNewMove:moveInfo inSetupMode:NO];
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
         [self _handleEndGameInUI];
@@ -348,6 +405,10 @@ enum ActionSheetEnum
 
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
 {
+    if ([_game getMoveCount] == 1) {
+        _reverseRoleButton.enabled = NO;
+    }
+
     // Inform the AI.
     int sqSrc = SRC(move);
     int sqDst = DST(move);
@@ -450,15 +511,22 @@ enum ActionSheetEnum
 
     [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
     [sMoves release];
+
+    [[NSUserDefaults standardUserDefaults]
+            setObject:(_myColor == NC_COLOR_RED ? @"Red" : @"Black")
+            forKey:@"my_color"];
 }
 
 - (void) _loadPendingGame:(NSString *)sPendingGame
 {
+    if (_myColor == NC_COLOR_BLACK) {
+        [_board reverseBoardView];
+    }
+
     NSArray *moves = [sPendingGame componentsSeparatedByString:@","];
     int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
-    BOOL bAIturn = NO;
 
     for (NSNumber *pMove in moves) {
         move  = [pMove integerValue];
@@ -472,12 +540,12 @@ enum ActionSheetEnum
 
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
-        
-        bAIturn = !bAIturn;
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
-    if ( bAIturn && _game.gameResult == kXiangQi_InPlay ) {
+    if (   _myColor != [_game getNextColor]  // AI's turn?
+        && _game.gameResult == kXiangQi_InPlay )
+    {
         [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
     }
 }
@@ -522,6 +590,30 @@ enum ActionSheetEnum
 
         NSNumber* moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
+    }
+    
+    // If it is AI's turn after the game is loaded, then inform the AI.
+    if (   _myColor != [_game getNextColor]  // AI's turn?
+        && _game.gameResult == kXiangQi_InPlay )
+    {
+        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+    }
+}
+
+- (void) _countDownToAIMove:(NSTimer*)timer
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    _reverseRoleButton.enabled = NO;
+    [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+}
+
+- (void) _onResetDoneByAI:(id)notUsed
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    _reverseRoleButton.enabled = YES;
+    if (_myColor == NC_COLOR_BLACK) {
+        NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+        self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
     }
 }
 
