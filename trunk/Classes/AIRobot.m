@@ -47,6 +47,7 @@
 @implementation AIRobot
 
 @synthesize aiName=_aiName;
+@synthesize aiLevel=_aiLevel;
 
 - (id) initWith:(id)delegate
 {
@@ -62,9 +63,9 @@
             default: _aiEngine = nil;
         }
         [_aiEngine initGame];
-        int aiLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"ai_level"];
+        _aiLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"ai_level"];
         int nDifficulty = 1;
-        switch (aiLevel) {
+        switch (_aiLevel) {
             case 0: nDifficulty = 1; break;
             case 1: nDifficulty = 3; break;
             case 2: nDifficulty = 6; break;

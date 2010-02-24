@@ -32,6 +32,7 @@
 @interface AIRobot : NSObject
 {
     NSString*    _aiName;
+    int          _aiLevel;
     AIEngine*    _aiEngine;
     id           _delegate;
     
@@ -41,6 +42,7 @@
 }
 
 @property (nonatomic, readonly) NSString* aiName;
+@property (nonatomic)           int       aiLevel;
 
 - (id) initWith:(id)delegate;
 

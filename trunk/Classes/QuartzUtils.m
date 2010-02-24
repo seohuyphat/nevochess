@@ -56,8 +56,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 CGColorRef kBlackColor, kWhiteColor, 
            kTranslucentGrayColor, kTranslucentLightGrayColor,
            kAlmostInvisibleWhiteColor,
-           kHighlightColor,
-           kRedColor;
+           kHighlightColor, kRedColor, kLightBlueColor;
 
 static CGColorRef CreateDeviceGrayColor(CGFloat w, CGFloat a)
 {
@@ -84,9 +83,10 @@ static void InitQuartzUtils()
     kWhiteColor = CreateDeviceGrayColor(1.0, 1.0); //CGColorCreate( kCGColorSpaceGenericGray, {1.0, 1.0, 1.0});
     kTranslucentGrayColor = CreateDeviceGrayColor(0.0, 0.5); //CGColorCreate( kCGColorSpaceGenericGray, {0.0, 0.5, 1.0});
     kTranslucentLightGrayColor = CreateDeviceGrayColor(0.0, 0.25); //CGColorCreate( kCGColorSpaceGenericGray, {0.0, 0.25, 1.0});
-    kAlmostInvisibleWhiteColor = CreateDeviceGrayColor(1, 0.05); //CGColorCreate( kCGColorSpaceGenericGray, ｛1, 0.05, 1.0});
+    kAlmostInvisibleWhiteColor = CreateDeviceGrayColor(1, 0.05); //CGColorCreate( kCGColorSpaceGenericGray, {1, 0.05, 1.0});
     kHighlightColor = CreateDeviceRGBColor(1, 1, 0, 0.5); //CGColorCreate( kCGColorSpaceGenericRGB, {1, 1, 0, 0.5, 1.0});
     kRedColor = CreateDeviceRGBColor(0.7, 0, 0, 1);
+    kLightBlueColor = CreateDeviceRGBColor(0, .8, .8, 1);
 }
 
 

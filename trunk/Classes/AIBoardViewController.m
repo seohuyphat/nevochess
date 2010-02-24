@@ -73,8 +73,8 @@ enum ActionSheetEnum
         
         _myColor = NC_COLOR_RED;
         [_board setRedLabel:NSLocalizedString(@"You", @"")];
-        [_board setBlackLabel:_aiRobot.aiName];
-        
+        [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
+
         // Restore pending game, if any.
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
         if ( sPendingGame != nil && [sPendingGame length]) {
@@ -188,7 +188,7 @@ enum ActionSheetEnum
     if ([_game getMoveCount] == 0) return;  // Do nothing if game not yet started.
 
     UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:@"NevoChess"
+        [[UIAlertView alloc] initWithTitle:nil
                                    message:NSLocalizedString(@"New game?", @"")
                                   delegate:self 
                          cancelButtonTitle:NSLocalizedString(@"No", @"")
@@ -379,7 +379,7 @@ enum ActionSheetEnum
 - (void) _displayResumeGameAlert
 {
     UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:@"NevoChess"
+        [[UIAlertView alloc] initWithTitle:nil
                                    message:NSLocalizedString(@"Resume game?", @"")
                                   delegate:self 
                          cancelButtonTitle:NSLocalizedString(@"No", @"")
