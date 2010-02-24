@@ -30,6 +30,7 @@
 - (void) _dismissListTableView;
 - (void) _resetAndClearTable;
 - (void) _onNewMessage:(NSString*)msg from:(NSString*)pid;
+- (void) _onMyRatingUpdated:(NSString*)newRating;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event;
@@ -45,6 +46,7 @@
 - (void) _handleNetworkEvent_MSG:(NSString*)event;
 - (void) _handleNetworkEvent_DRAW:(NSString*)event;
 - (void) _handleNetworkEvent_INVITE:(NSString*)event toTable:(NSString*)tableId;
+- (void) _handleNetworkEvent_E_SCORE:(NSString*)event;
 
 - (NSString*) _generateGuestUserName;
 - (int) _generateRandomNumber:(unsigned int)max_value;
@@ -73,6 +75,7 @@
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 
         [_board displayEmptyBoard];
+        [_board setInfoMessage:NSLocalizedString(@"Not connected to network", @"")];
 
         self._username = nil;
         self._password = nil;
@@ -461,6 +464,15 @@
     _messagesButton.title = [NSString stringWithFormat:@"%d", _messageListController.nNew];
 }
 
+- (void) _onMyRatingUpdated:(NSString*)newRating
+{
+    self._rating = newRating;
+    NSString* infoMsg = [NSString stringWithFormat:NSLocalizedString(
+                            @"Welcome %@ (%@)\n\nSelect a Table to join", @""),
+                            _username, _rating];
+    [_board setInfoMessage:infoMsg];
+}
+
 #pragma mark -
 #pragma mark Network-event handers
 
@@ -513,6 +525,8 @@
                     [self _handleNetworkEvent_DRAW:content];
                 } else if ([op isEqualToString:@"INVITE"]) {
                     [self _handleNetworkEvent_INVITE:content toTable:tableId];
+                } else if ([op isEqualToString:@"E_SCORE"]) {
+                    [self _handleNetworkEvent_E_SCORE:content];
                 }
             }
 
@@ -572,7 +586,7 @@
         return; // Other users' login. Ignore for now.
     }
 
-    self._rating = rating;  // Save my Rating.
+    [self _onMyRatingUpdated:rating]; // Save my Rating.
     _loginAuthenticated = YES;
     [self _dismissLoginView];
 
@@ -805,6 +819,27 @@
 
     NSString* msg = [NSString stringWithFormat:@"*INVITE to Table [%@]", tableId ? tableId : @""];
     [self _onNewMessage:msg from:playerInfo];
+}
+
+- (void) _handleNetworkEvent_E_SCORE:(NSString*)event
+{
+    NSArray* components = [event componentsSeparatedByString:@";"];
+    NSString* tableId = [components objectAtIndex:0];
+    NSString* pid = [components objectAtIndex:1];
+    NSString* rating = [components objectAtIndex:2];
+    
+    NSLog(@"%s: Rating of [%@] updated to [%@] at Table [%@].", __FUNCTION__, pid, rating, tableId);
+
+    if ([_username isEqualToString:pid]) {
+        [self _onMyRatingUpdated:rating];
+    }
+
+    NSString* playerInfo = [NSString stringWithFormat:@"%@ (%@)", pid, rating];
+    if ([_redId isEqualToString:pid]) {
+        [_board setRedLabel:playerInfo];
+    } else if ([_blackId isEqualToString:pid]) {
+        [_board setBlackLabel:playerInfo];
+    }
 }
 
 #pragma mark -
