@@ -21,12 +21,6 @@
 #import "Grid.h"
 #import "Referee.h"
 
-#define INVALID_MOVE         (-1)
-#define TOSQUARE(row, col)   (16 * ((row) + 3) + ((col) + 3))
-#define COLUMN(sq)           ((sq) % 16 - 3)
-#define ROW(sq)              ((sq) / 16 - 3)
-
-
 // Possible game result
 enum{
     kXiangQi_Unknown = -1,
