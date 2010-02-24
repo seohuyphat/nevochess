@@ -208,6 +208,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _red_label.text = @"";
     _black_label.text = @"";
     _game_over_msg.hidden = YES;
+    _info_msg.hidden = YES;
 
     _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
     _nthMove = HISTORY_INDEX_END;
@@ -307,6 +308,11 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     self._blackTime = [TimeInfo allocTimeFromString:times];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
+}
+
+- (void) setInfoMessage:(NSString*)msg
+{
+    _info_msg.text = msg;
 }
 
 - (BOOL) _isInReview
@@ -671,6 +677,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
     _game_over_msg.hidden = YES;
+    _info_msg.hidden = YES;
 
     [_game resetGame];
     [_moves removeAllObjects];
@@ -691,8 +698,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _black_time.hidden = YES;
     _black_move_time.hidden = YES;
 
-    _game_over_msg.text = NSLocalizedString(@"Select a Table to join", @"");
-    _game_over_msg.hidden = NO;
+    _game_over_msg.hidden = YES;
+    _info_msg.hidden = NO;
 
     _preview_prev.hidden = YES;
     _preview_next.hidden = YES;
