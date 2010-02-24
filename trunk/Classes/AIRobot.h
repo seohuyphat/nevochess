@@ -17,28 +17,40 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "BoardViewController.h"
-#import "AIRobot.h";
+#import <Foundation/Foundation.h>
 
-@interface AIBoardViewController : BoardViewController<AIRobotDelegate, UIActionSheetDelegate>
+@class AIEngine;
+
+// --------------------------------------
+@protocol AIRobotDelegate <NSObject>
+- (void) onMoveGeneratedByAI:(NSNumber *)moveInfo;
+- (void) onResetDoneByAI;
+- (void) onAIRobotStopped;
+@end
+
+// --------------------------------------
+@interface AIRobot : NSObject
 {
-    NSTimer*     _idleTimer;
-    AIRobot*     _aiRobot;
-
-    UIBarButtonItem*         _actionButton;
-    UIActivityIndicatorView* _aiThinkingActivity;
-    UIBarButtonItem*         _aiThinkingButton;
-
-    UIBarButtonItem*         _reverseRoleButton;
+    NSString*    _aiName;
+    AIEngine*    _aiEngine;
+    id           _delegate;
+    
+    NSThread*     _robot;
+    NSPort*      _robotPort; // the port is used to instruct the robot to do works
+    CFRunLoopRef _robotLoop; // the loop robot is on, used to control its lifecycle
 }
 
-@property (nonatomic, retain) NSTimer* _idleTimer;
+@property (nonatomic, readonly) NSString* aiName;
 
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+- (id) initWith:(id)delegate;
 
-- (void) handleNewMove:(NSNumber *)pMove;
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
-- (void) saveGame;
+/** The following APIs are performned within the Robot's thread. */
+- (void) runStopRobot;
+- (void) runResetRobot;
+- (void) runGenerateMove;
+
+/** The following (synchronous) APIs are performed within the caller's thread. */
+- (void) onMove_sync:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
+- (void) resetRobot_sync;
 
 @end

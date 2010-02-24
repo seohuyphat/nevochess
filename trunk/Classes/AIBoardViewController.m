@@ -19,12 +19,6 @@
 
 #import "AIBoardViewController.h"
 #import "Enums.h"
-#import "NevoChessAppDelegate.h"
-#import "Grid.h"
-#import "Piece.h"
-#import "AI_HaQiKiD.h"
-#import "AI_XQWLight.h"
-#import "XiangQi.h"  // XQWLight Objective-C based AI
 
 
 #define ACTION_BUTTON_INDEX 4
@@ -51,14 +45,11 @@ enum ActionSheetEnum
 
 @interface AIBoardViewController (PrivateMethods)
 
-- (void) _AIMove;
 - (void) _handleEndGameInUI;
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 - (void) _undoLastMove;
 - (void) _countDownToAIMove:(NSTimer*)timer;
-- (void) _onResetDoneByAI:(id)notUsed;
-- (int) _convertStringToAIType:(NSString *)aiSelection;
 
 @end
 
@@ -78,42 +69,11 @@ enum ActionSheetEnum
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
     {
         self._idleTimer = nil;
-
-        // Determine the type of AI.
-        _aiName = [[NSUserDefaults standardUserDefaults] stringForKey:@"ai_type"];
-        int aiType = [self _convertStringToAIType:_aiName];
-        switch (aiType) {
-            case NC_AI_XQWLight:
-                _aiEngine = [[AI_XQWLight alloc] init];
-                break;
-            case NC_AI_HaQiKiD:
-                _aiEngine = [[AI_HaQiKiD alloc] init];
-                break;
-            case NC_AI_XQWLight_ObjC:
-                _aiEngine = [[AI_XQWLightObjC alloc] init];
-                break;
-            default:
-                _aiEngine = nil;
-        }
-        [_aiEngine initGame];
-        int aiLevel = [[NSUserDefaults standardUserDefaults] integerForKey:@"ai_level"];
-        int nDifficulty = 1;
-        switch (aiLevel) {
-            case 0: nDifficulty = 1; break;
-            case 1: nDifficulty = 3; break;
-            case 2: nDifficulty = 6; break;
-            case 3: nDifficulty = 9; break;
-        }
-        [_aiEngine setDifficultyLevel:nDifficulty];
-
-        // Robot
-        _robotPort = [[NSMachPort port] retain]; //retain here otherwise it will be autoreleased
-        [_robotPort setDelegate:self];
-        [NSThread detachNewThreadSelector:@selector(robotThread:) toTarget:self withObject:nil];
-
+        _aiRobot = [[AIRobot alloc] initWith:self];
+        
         _myColor = NC_COLOR_RED;
         [_board setRedLabel:NSLocalizedString(@"You", @"")];
-        [_board setBlackLabel:_aiName];
+        [_board setBlackLabel:_aiRobot.aiName];
         
         // Restore pending game, if any.
         NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
@@ -155,8 +115,7 @@ enum ActionSheetEnum
 
 - (void)dealloc
 {
-    [_aiEngine release];
-    [_robotPort release];
+    [_aiRobot release];
     [_actionButton release];
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
@@ -168,55 +127,12 @@ enum ActionSheetEnum
     [super dealloc];
 }
 
-- (void)robotThread:(void*)param
+- (void) onAIRobotStopped
 {
- 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	BOOL done = NO;
-    
-    robot = [NSThread currentThread];
-    _robotLoop = CFRunLoopGetCurrent();
-    
-    // Set the priority to the highest so that Robot can utilize more time to think
-    [NSThread setThreadPriority:1.0f];
-    
-    // connect myself to the controller
-    [[NSRunLoop currentRunLoop] addPort:_robotPort forMode:NSDefaultRunLoopMode];
-    
-    do  // Let the run loop process things.
-    {
-        // Start the run loop but return after each source is handled.
-        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, NO);
-        // If a source explicitly stopped the run loop, go and exit the loop
-        if (result == kCFRunLoopRunStopped)
-            done = YES;
-    } while (!done);
-	
-    [pool release];   
-}
-
-- (void)resetRobot:(id)restart
-{
-    [activity stopAnimating];
-    if(restart) {
-        [[NSRunLoop currentRunLoop] cancelPerformSelectorsWithTarget:self];
-        // only after or before AI induce begins
-        // NOTE: We "reset" the Board's data *here* inside the AI Thread to
-        //       avoid clearing data while the AI is thinking of a Move.
-        [self resetBoard];
-        [self performSelectorOnMainThread:@selector(_onResetDoneByAI:) withObject:nil waitUntilDone:NO];
-    }else{
-        // FIXME: in case of this function is invoked before "_AIMove", the app might crash thereafter due to the background AI 
-        //       thinking is still on going. So trying to stop the runloop
-        CFRunLoopStop(_robotLoop);
-        robot = nil;
-        [self goBackToHomeMenu];
-    }
-}
-
-- (void) resetBoard
-{
-    [_aiEngine initGame];
-    [_board resetBoard];
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_aiRobot release];
+    _aiRobot = nil;
+    [self goBackToHomeMenu];
 }
 
 //
@@ -225,12 +141,7 @@ enum ActionSheetEnum
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
     if ( alertView.tag == NC_ALERT_END_GAME ) {
-        [self resetBoard];
-        _reverseRoleButton.enabled = YES;
-        if (_myColor == NC_COLOR_BLACK) {
-            NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
-            self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
-        }
+        [_aiRobot runResetRobot];
     }
     else if (    alertView.tag == NC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
@@ -248,10 +159,8 @@ enum ActionSheetEnum
     {
         [activity setHidden:NO];
         [activity startAnimating];
-        
         [self rescheduleTimer];
-        
-        [self performSelector:@selector(resetRobot:) onThread:robot withObject:self waitUntilDone:NO];
+        [_aiRobot runResetRobot];
     }
 }
 
@@ -269,12 +178,9 @@ enum ActionSheetEnum
 {
     [activity setHidden:NO];
     [activity startAnimating];
-
     [_board destroyTimer];
-
-    [self performSelector:@selector(resetRobot:) onThread:robot withObject:nil waitUntilDone:NO];
+    [_aiRobot runStopRobot];
     [self saveGame];
-    // Not needed: [self _resetBoard];
 }
 
 - (IBAction)resetPressed:(id)sender
@@ -364,29 +270,14 @@ enum ActionSheetEnum
     }
 }
 
-- (void)_AIMove
+- (void) onMoveGeneratedByAI:(NSNumber *)moveInfo
 {
-    int row1 = 0, col1 = 0, row2 = 0, col2 = 0;
-
-    NSDate* startTime = [NSDate date];
-    [_aiEngine generateMove:&row1 fromCol:&col1 toRow:&row2 toCol:&col2];
-    NSTimeInterval timeInterval = - [startTime timeIntervalSinceNow]; // in seconds.
-    NSLog(@"%s: AI took [%.02f] seconds.", __FUNCTION__, timeInterval);
-
-    int sqSrc = TOSQUARE(row1, col1);
-    int sqDst = TOSQUARE(row2, col2);
-    int move = MOVE(sqSrc, sqDst);
-
-    if (move == INVALID_MOVE) {
-        NSLog(@"ERROR: %s: Invalid move [%d].", __FUNCTION__, move); 
-        return;
-    }
-
-    [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
-
-    NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-    [self performSelectorOnMainThread:@selector(handleNewMove:)
-                           withObject:moveInfo waitUntilDone:NO];
+    int  move = [moveInfo integerValue];
+    int sqSrc = SRC(move);
+    int sqDst = DST(move);
+    [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+                      
+    [self handleNewMove:moveInfo];
 }
 
 - (void) handleNewMove:(NSNumber *)moveInfo
@@ -414,7 +305,7 @@ enum ActionSheetEnum
     // Inform the AI.
     int sqSrc = SRC(move);
     int sqDst = DST(move);
-    [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 
     if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
         [self _handleEndGameInUI];
@@ -427,7 +318,7 @@ enum ActionSheetEnum
         nav_toolbar.items = newItems;
 
         // AI's turn.
-        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+        [_aiRobot runGenerateMove];
     }
 }
 
@@ -537,8 +428,8 @@ enum ActionSheetEnum
 
         [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                 toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 
         NSNumber *moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
@@ -548,7 +439,7 @@ enum ActionSheetEnum
     if (   _myColor != [_game getNextColor]  // AI's turn?
         && _game.gameResult == kXiangQi_InPlay )
     {
-        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+        [_aiRobot runGenerateMove];
     }
 }
 
@@ -569,7 +460,10 @@ enum ActionSheetEnum
     [activity setHidden:NO];
     [activity startAnimating];
     [self rescheduleTimer];
-    [self resetBoard];
+
+    [_aiRobot resetRobot_sync];
+    [_board resetBoard];
+    
     [activity stopAnimating];
 
     // Re-load the moves before my last Move.
@@ -587,8 +481,8 @@ enum ActionSheetEnum
 
         [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                 toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [_aiEngine onHumanMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 
         NSNumber* moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
@@ -598,7 +492,7 @@ enum ActionSheetEnum
     if (   _myColor != [_game getNextColor]  // AI's turn?
         && _game.gameResult == kXiangQi_InPlay )
     {
-        [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+        [_aiRobot runGenerateMove];
     }
 }
 
@@ -606,12 +500,15 @@ enum ActionSheetEnum
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     _reverseRoleButton.enabled = NO;
-    [self performSelector:@selector(_AIMove) onThread:robot withObject:nil waitUntilDone:NO];
+    [_aiRobot runGenerateMove];
 }
 
-- (void) _onResetDoneByAI:(id)notUsed
+- (void) onResetDoneByAI
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_board resetBoard];
+    [activity stopAnimating];
+    
     _reverseRoleButton.enabled = YES;
     if (_myColor == NC_COLOR_BLACK) {
         NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
@@ -619,23 +516,4 @@ enum ActionSheetEnum
     }
 }
 
-- (int) _convertStringToAIType:(NSString *)aiSelection
-{
-    if ([aiSelection isEqualToString:@"XQWLight"]) {
-        return NC_AI_XQWLight;
-    } else if ([aiSelection isEqualToString:@"HaQiKiD"]) {
-        return NC_AI_HaQiKiD;
-    } else if ([aiSelection isEqualToString:@"XQWLightObjc"]) {
-        return NC_AI_XQWLight_ObjC;
-    }
-    return NC_AI_XQWLight; // Default!
-}
-
-#pragma mark NSMachPort message handle 
-// Handle messages from the controller thread.
-- (void)handlePortMessage:(NSPortMessage *)portMessage
-{
-    //TODO: implement communication message between robot and controller
-}
-        
 @end

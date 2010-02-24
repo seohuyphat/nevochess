@@ -80,6 +80,7 @@
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
 		AFF191D7111D118000849AEA /* MessageListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFF191D6111D118000849AEA /* MessageListView.xib */; };
+		AFF58765113579BF007E5DF1 /* AIRobot.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF58764113579BF007E5DF1 /* AIRobot.m */; };
 		DE3A5C1211033D12006D3CD3 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DE3A5C1111033D12006D3CD3 /* DataManager.m */; };
 		DE964FCE1082511E00980CF6 /* OptionsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE964FCC1082511E00980CF6 /* OptionsView.xib */; };
 /* End PBXBuildFile section */
@@ -191,6 +192,8 @@
 		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
 		AFF191C6111D0E2900849AEA /* MessageListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageListViewController.m; sourceTree = "<group>"; };
 		AFF191D6111D118000849AEA /* MessageListView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MessageListView.xib; sourceTree = "<group>"; };
+		AFF58763113579BF007E5DF1 /* AIRobot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIRobot.h; sourceTree = "<group>"; };
+		AFF58764113579BF007E5DF1 /* AIRobot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AIRobot.m; sourceTree = "<group>"; };
 		AFF89D0F106FEF2B00E2136D /* Enums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enums.h; sourceTree = "<group>"; };
 		DE3A5C1011033D12006D3CD3 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
 		DE3A5C1111033D12006D3CD3 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
@@ -307,6 +310,8 @@
 			children = (
 				AF7FBAD7110F6D07004F7691 /* BoardViewController.h */,
 				AF7FBAD8110F6D07004F7691 /* BoardViewController.m */,
+				AFF58763113579BF007E5DF1 /* AIRobot.h */,
+				AFF58764113579BF007E5DF1 /* AIRobot.m */,
 				AF4B70CA112712F80061590B /* AIBoardViewController.h */,
 				AF4B70CB112712F80061590B /* AIBoardViewController.m */,
 				AF7FBB11110F72BF004F7691 /* NetworkBoardViewController.h */,
@@ -591,6 +596,7 @@
 				AF4B70CC112712F80061590B /* AIBoardViewController.m in Sources */,
 				AFB0380F112C5E5D000A9AC1 /* NetworkSettingController.m in Sources */,
 				AF0F05CD11302A00007F6981 /* SingleSelectionController.m in Sources */,
+				AFF58765113579BF007E5DF1 /* AIRobot.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
