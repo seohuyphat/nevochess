@@ -618,7 +618,7 @@
 
     // Reverse the View if necessary.
     if (   (myColor == NC_COLOR_BLACK && _game.blackAtTopSide)
-        || (!_game.blackAtTopSide) )
+        || (myColor != NC_COLOR_BLACK && !_game.blackAtTopSide) )
     {
         [_board reverseBoardView];
     }
