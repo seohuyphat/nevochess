@@ -165,14 +165,13 @@
 
         CGFloat    cellSize = 33;
         CGColorRef backgroundColor = nil;
-        CGColorRef highlightColor  = kHighlightColor;
+        CGColorRef highlightColor  = kLightBlueColor;
 
         switch (boardType)
         {
             case 1:  // SKELETON background.
             {
                 backgroundColor = GetCGPatternNamed(@"SKELETON.png");
-                highlightColor = kTranslucentLightGrayColor;
                 break;
             }
             case 2:  // WOOD background.
@@ -184,6 +183,7 @@
             {
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
                 cellSize = 34;
+                highlightColor  = kHighlightColor;
                 break;
             }
         }
