@@ -142,6 +142,11 @@
     return s;
 }
 
+- (GridCell*) getCellAt:(int)square
+{
+    return [self getCellAtRow:ROW(square) col:COLUMN(square)];
+}
+
 - (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
 {
     [self getCellAtRow:ROW(cell) col:COLUMN(cell)]._highlighted = bHighlight;
@@ -166,6 +171,7 @@
         CGFloat    cellSize = 33;
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kLightBlueColor;
+        CGColorRef animateColor    = kLightBlueColor;
 
         switch (boardType)
         {
@@ -184,6 +190,7 @@
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
                 cellSize = 34;
                 highlightColor  = kHighlightColor;
+                animateColor    = kHighlightColor;
                 break;
             }
         }
@@ -197,6 +204,7 @@
                                 cellOffset:cellOffset
                            backgroundColor:backgroundColor];
         _grid.highlightColor = highlightColor;
+        _grid.animateColor = animateColor;
 
         //_grid.borderColor = kTranslucentLightGrayColor;
         //_grid.borderWidth = 2;

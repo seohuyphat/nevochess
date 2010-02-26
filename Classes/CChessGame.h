@@ -52,6 +52,7 @@ enum{
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
+- (GridCell*) getCellAt:(int)square;
 - (void) highlightCell:(int)cell highlight:(BOOL)bHighlight;
 
 - (int) doMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;

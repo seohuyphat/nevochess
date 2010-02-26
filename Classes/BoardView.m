@@ -354,13 +354,32 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (void) _showHighlightOfMove:(int)move
 {
     if (_hl_lastMove != INVALID_MOVE) {
-        [_game highlightCell:DST(_hl_lastMove) highlight:NO];
+        GridCell* lastCell = [_game getCellAt:DST(_hl_lastMove)];
+        [lastCell removeAnimationForKey:@"animateBounds"];
+        lastCell._animated = NO;
         _hl_lastMove = INVALID_MOVE;
     }
 
     if (move != INVALID_MOVE) {
-        [_game highlightCell:DST(move) highlight:YES];
         _hl_lastMove = move;
+        GridCell* currentCell = [_game getCellAt:DST(move)];
+        CGFloat ds = 5.0;
+        CGRect oriBounds = currentCell.bounds;
+        CGRect ubounds = oriBounds;
+        ubounds.size.width += ds*2;
+        ubounds.size.height += ds*2;
+
+        // 'bounds' animation
+        CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
+        boundsAnimation.duration=1.0;
+        boundsAnimation.repeatCount=1000;
+        boundsAnimation.autoreverses=YES;
+        boundsAnimation.fromValue=[NSValue valueWithCGRect:oriBounds];
+        boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
+
+        [currentCell addAnimation:boundsAnimation forKey:@"animateBounds"];
+        currentCell._animated = YES;
+        currentCell.bounds = oriBounds;  // Restore!!!
     }
 }
 

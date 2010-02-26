@@ -61,6 +61,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
     CGSize          _spacing;                                                                       
     CGColorRef      _lineColor;
     CGColorRef      _highlightColor;
+    CGColorRef      _animateColor;
     CGPoint         _cellOffset;
     NSMutableArray* _cells; // Really a 2D array, in row-major order.
     GridCell*       _river;
@@ -76,7 +77,8 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 @property (readonly) unsigned rows, columns;    // Dimensions of the grid
 @property (readonly) CGSize spacing;            // x,y spacing of GridCells
 @property CGColorRef lineColor;      // Cell background color, line color (or nil)
-@property CGColorRef highlightColor; // Cell highlight color
+@property CGColorRef highlightColor;
+@property CGColorRef animateColor;
 @property (nonatomic, retain) GridCell* _river;
 
 /** Returns the GridCell at the given coordinates, or nil if there is no cell there.
@@ -102,6 +104,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 {
     Bit*     _bit;
     BOOL     _highlighted;
+    BOOL     _animated;
     Grid*    _grid;
     unsigned _row, _column;
     BOOL     dotted;
@@ -119,6 +122,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 /** BitHolders will be highlighted while the target of a drag operation */
 @property (nonatomic, setter=setHighlighted:) BOOL _highlighted;
+@property (nonatomic, setter=setAnimated:) BOOL _animated;
 
 @property (nonatomic, retain) Grid* _grid;
 @property (nonatomic) unsigned _row, _column;

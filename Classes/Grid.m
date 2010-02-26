@@ -69,6 +69,7 @@
         _spacing = spacing;
         _lineColor = CGColorRetain(kRedColor); // Default setting.
         _highlightColor = nil;
+        _animateColor = nil;
         _cellOffset = cellOffset;
         if (backgroundColor) {
             self.backgroundColor = CGColorRetain(backgroundColor);
@@ -89,8 +90,8 @@
         if (!self.backgroundColor)
         {
             CGRect frame;
-            frame.origin.x = _cellOffset.x + _spacing.width/2;
-            frame.origin.y = _cellOffset.y + 4 * _spacing.height + _spacing.height/2;
+            frame.origin.x = _cellOffset.x + 4.5 * _spacing.width;
+            frame.origin.y = _cellOffset.y + 5.0 * _spacing.height;
             frame.size.height = _spacing.height;
             frame.size.width = _spacing.width * 8;
             _river = [[GridCell alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
@@ -99,7 +100,6 @@
             _river.borderColor = kRedColor;
             _river.borderWidth = 1.0;
         }
-         
     }
     return self;
 }
@@ -108,6 +108,7 @@
 {
     CGColorRelease(_lineColor);
     CGColorRelease(_highlightColor);
+    CGColorRelease(_animateColor);
     [_cells release];
     [_river release];
     [super dealloc];
@@ -127,6 +128,9 @@
 
 - (CGColorRef) highlightColor                { return _highlightColor; }
 - (void) setHighlightColor:(CGColorRef)color { [self setcolor:&_highlightColor withNewColor:color]; }
+
+- (CGColorRef) animateColor                { return _animateColor; }
+- (void) setAnimateColor:(CGColorRef)color { [self setcolor:&_animateColor withNewColor:color]; }
 
 #pragma mark -
 #pragma mark GEOMETRY:
@@ -149,7 +153,8 @@
     unsigned index = row*_nColumns+col;
     GridCell *cell = [_cells objectAtIndex: index];
     if( (id)cell == [NSNull null] ) {
-        CGRect frame = CGRectMake(_cellOffset.x + col*_spacing.width, _cellOffset.y + row*_spacing.height,
+        CGRect frame = CGRectMake(_cellOffset.x + (col + 0.5)*_spacing.width,
+                                  _cellOffset.y + (row + 0.5)*_spacing.height,
                                   _spacing.width,_spacing.height);
         cell = [[GridCell alloc] initWithGrid:self row:row column:col frame:frame];
         if( cell ) {
@@ -224,7 +229,7 @@
 
 @implementation GridCell
 
-@synthesize _highlighted;
+@synthesize _highlighted, _animated;
 @synthesize _bit;
 @synthesize _grid, _row, _column;
 @synthesize dotted, cross;
@@ -241,7 +246,7 @@
         bounds.origin.x -= floor(bounds.origin.x);  // make sure my coords fall on pixel boundaries
         bounds.origin.y -= floor(bounds.origin.y);
         self.bounds = bounds;
-        self.anchorPoint = CGPointMake(0,0);
+        self.anchorPoint = CGPointMake(0.5, 0.5);
         self.borderColor = _grid.highlightColor; // Used when highlighting (see -setHighlighted:)
     }
     return self;
@@ -324,14 +329,44 @@
             {midx - CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
             {midx + CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}};
         CGContextStrokeLineSegments(ctx, crossp, 4);
-    }                                                                                                                                      
+    }
+}
+
+- (void)drawInContext:(CGContextRef)ctx
+{
+    if (!_animated) {
+        return;
+    }
+
+    // ********************
+    self.borderWidth = 0;      // NOTE: Display the "border" highlight.
+    // ********************
+
+    CGFloat ds = 4.0;
+    CGRect newFrame = self.frame;
+    newFrame.origin = CGPointMake(0, 0);
+    newFrame.origin.x += ds/2;
+    newFrame.origin.y += ds/2;
+    newFrame.size.width -= ds;
+    newFrame.size.height -= ds;
+
+    CGContextSetStrokeColorWithColor(ctx, _grid.animateColor);
+    CGContextSetLineWidth(ctx, 3.0);
+    CGContextAddEllipseInRect(ctx, newFrame);
+    CGContextStrokePath(ctx);
 }
 
 - (void) setHighlighted:(BOOL)highlighted
 {
     _highlighted = highlighted;
     self.cornerRadius = ceil(_grid.spacing.width / 4);
-    self.borderWidth = (highlighted ?3 :0);
+    self.borderWidth = (highlighted ? 2 :0);
+}
+
+- (void) setAnimated:(BOOL)animated
+{
+    _animated = animated;
+    [self setNeedsDisplay];
 }
 
 - (GridCell*) nw     { return [_grid cellAtRow: _row+1 column: _column-1]; }
