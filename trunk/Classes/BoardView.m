@@ -172,6 +172,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 @synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
 @synthesize _timer, _previewLastTouched;
+@synthesize _previewLastTouched_prev, _previewLastTouched_next;
 @synthesize _initialTime, _redTime, _blackTime;
 
 
@@ -218,6 +219,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _selectedPiece = nil;
 
     self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
+    self._previewLastTouched_prev = nil;
+    self._previewLastTouched_next = nil;
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
@@ -230,6 +233,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [_timer release];
     [_moves release];
     [_previewLastTouched release];
+    [_previewLastTouched_prev release];
+    [_previewLastTouched_next release];
     [_audioHelper release];
     [super dealloc];
 }
@@ -497,20 +502,18 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     return _moves;
 }
 
-- (IBAction)movePrevPressed:(id)sender
-{
-    self._previewLastTouched = [NSDate date];
-    
+- (BOOL) _doPreviewPREV
+{    
     if ([_moves count] == 0) {
         NSLog(@"%s: No Moves made yet.", __FUNCTION__);
-        return;
+        return NO;
     }
     else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
         _nthMove = [_moves count] - 1; // Get the latest move.
     }
     else if (_nthMove == HISTORY_INDEX_BEGIN) {
         NSLog(@"%s: The index is already at BEGIN. Do nothing.", __FUNCTION__);
-        return;
+        return NO;
     }
     
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
@@ -536,19 +539,36 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         prevMove = [(NSNumber*)pMove.move intValue];
     }
     [self _showHighlightOfMove:prevMove];
+    return YES;
 }
 
-- (IBAction)moveNextPressed:(id)sender
+- (BOOL) _doPreviewBEGIN
+{
+    while ([self _doPreviewPREV]) { /* keep going */}
+    return YES;
+}
+
+- (IBAction)movePrevPressed:(id)sender
 {
     self._previewLastTouched = [NSDate date];
-    
+
+    NSTimeInterval timeInterval = - [_previewLastTouched_prev timeIntervalSinceNow]; // in seconds.
+    if (timeInterval > 0.9) { // do "go-BEGIN" if older than 1 seconds?
+        [self _doPreviewBEGIN];
+    } else {
+        [self _doPreviewPREV];
+    }
+}
+
+- (BOOL) _doPreviewNEXT
+{    
     if ([_moves count] == 0) {
         NSLog(@"%s: No Moves made yet.", __FUNCTION__);
-        return;
+        return NO;
     }
     else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
         NSLog(@"%s: No PREV done. Do nothing.", __FUNCTION__);
-        return;
+        return NO;
     }
     
     ++_nthMove;
@@ -578,6 +598,44 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     }
     [_game movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
     [self _showHighlightOfMove:move];
+    return YES;
+}
+
+- (BOOL) _doPreviewEND
+{
+    while ([self _doPreviewNEXT]) { /* keep going */}
+    return YES;
+}
+
+- (IBAction)moveNextPressed:(id)sender
+{
+    self._previewLastTouched = [NSDate date];
+
+    NSTimeInterval timeInterval = - [_previewLastTouched_next timeIntervalSinceNow]; // in seconds.
+    if (timeInterval > 0.9) { // do "go-END" if older than 1 seconds?
+        [self _doPreviewEND];
+    } else {
+        [self _doPreviewNEXT];
+    }
+}
+
+- (UIView *)hitTest:(CGPoint)p withEvent:(UIEvent *)event
+{
+    UIView* foundView = [_preview_prev hitTest:[_preview_prev convertPoint:p fromView:self]
+                                     withEvent:event];
+    if ([foundView isKindOfClass:[UIButton class]]) {
+        self._previewLastTouched_prev = [NSDate date];
+    }
+    else {
+
+        foundView = [_preview_next hitTest:[_preview_next convertPoint:p fromView:self]
+                                 withEvent:event];
+        if ([foundView isKindOfClass:[UIButton class]]) {
+            self._previewLastTouched_next = [NSDate date];
+        }
+    }
+    
+    return [super hitTest:p withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -588,7 +646,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     
     UITouch *touch = [[touches allObjects] objectAtIndex:0];
     CGPoint p = [touch locationInView:self];
-    NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
+    //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
     
     BoardView *view = self;
     Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];

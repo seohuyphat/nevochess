@@ -98,7 +98,9 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
     IBOutlet UIButton*    _preview_prev;
     IBOutlet UIButton*    _preview_next;
     NSDate*               _previewLastTouched;
-
+    NSDate*               _previewLastTouched_prev;
+    NSDate*               _previewLastTouched_next;
+    
     NSTimer*              _timer;
     
     TimeInfo*             _initialTime;
@@ -126,6 +128,8 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 @property (nonatomic, retain) TimeInfo* _redTime;
 @property (nonatomic, retain) TimeInfo* _blackTime;
 @property (nonatomic, retain) NSDate* _previewLastTouched;
+@property (nonatomic, retain) NSDate* _previewLastTouched_prev;
+@property (nonatomic, retain) NSDate* _previewLastTouched_next;
 
 - (IBAction)movePrevPressed:(id)sender;
 - (IBAction)moveNextPressed:(id)sender;
