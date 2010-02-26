@@ -487,10 +487,21 @@ enum ActionSheetEnum
         NSNumber* moveInfo = [NSNumber numberWithInteger:move];
         [self handleNewMove:moveInfo];
     }
-    
+
+    // Handle the special case if the game is reset to the beginning.
+    if ([_game getMoveCount] == 0)
+    {
+        NSLog(@"%s: Game reset to the beginning.", __FUNCTION__);
+        _reverseRoleButton.enabled = YES;
+
+        if (_myColor == NC_COLOR_BLACK) {
+            NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+            self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
+        }
+    }
     // If it is AI's turn after the game is loaded, then inform the AI.
-    if (   _myColor != [_game getNextColor]  // AI's turn?
-        && _game.gameResult == kXiangQi_InPlay )
+    else if (   _myColor != [_game getNextColor]
+             && _game.gameResult == kXiangQi_InPlay )
     {
         [_aiRobot runGenerateMove];
     }
