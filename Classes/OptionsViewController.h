@@ -19,16 +19,19 @@
 
 #import <UIKit/UIKit.h>
 #import "SingleSelectionController.h"
+#import "NetworkSettingController.h"
 
-@interface OptionsViewController : UITableViewController <SingleSelectionDelegate>
+@interface OptionsViewController : UITableViewController <SingleSelectionDelegate,
+                                                          NetworkSettingDelegate>
 {
     IBOutlet UITableViewCell* _soundCell;
-    IBOutlet UISwitch*        _soundSwitch;
+    IBOutlet UITableViewCell* _boardCell;
+    IBOutlet UITableViewCell* _pieceCell;
+    IBOutlet UITableViewCell* _aiLevelCell;
+    IBOutlet UITableViewCell* _aiTypeCell;
+    IBOutlet UITableViewCell* _networkCell;
 
-    UITableViewCell*   _pieceCell;
-    UITableViewCell*   _boardCell;
-    UITableViewCell*   _aiLevelCell;
-    UITableViewCell*   _aiTypeCell;
+    IBOutlet UISwitch*        _soundSwitch;
 
     // --- Piece Style.
     NSArray*           _pieceChoices;
@@ -44,6 +47,9 @@
 
     NSArray*           _aiTypeChoices;
     NSUInteger         _aiType;
+
+    // --- Network
+    NSString*          _username;
 }
 
 - (IBAction) autoConnectValueChanged:(id)sender;

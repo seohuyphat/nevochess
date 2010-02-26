@@ -298,7 +298,7 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>MainMenuController</string>
 					<string>UIResponder</string>
-					<string>{{83, 110}, {320, 480}}</string>
+					<string>{{83, 112}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -335,7 +335,6 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>aboutPressed:</string>
 							<string>networkGamePressed:</string>
 							<string>newGamePressed:</string>
 							<string>settingPressed:</string>
@@ -345,21 +344,18 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>about</string>
 							<string>ai_game</string>
 							<string>online_game</string>
 							<string>setting</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>

@@ -18,16 +18,14 @@
  ***************************************************************************/
 
 #import "OptionsViewController.h"
-#import "NetworkSettingController.h"
 #import "AboutViewController.h"
-#import "SingleSelectionController.h"
 
 enum ViewTagEnum
 {
-    VIEW_TAG_PIECE_STYLE  = 1,  // Must be non-zero.
-    VIEW_TAG_BOARD_STYLE  = 2,
-    VIEW_TAG_AI_LEVEL     = 3,
-    VIEW_TAG_AI_TYPE      = 4
+    VIEW_TAG_BOARD_STYLE  = 1,  // The tags must be non-zero.
+    VIEW_TAG_PIECE_STYLE,
+    VIEW_TAG_AI_TYPE,
+    VIEW_TAG_AI_LEVEL
 };
 
 @implementation OptionsViewController
@@ -78,6 +76,9 @@ enum ViewTagEnum
     NSString* aiStr = [[NSUserDefaults standardUserDefaults] objectForKey:@"ai_type"];
     _aiType = [_aiTypeChoices indexOfObject:aiStr];
     if (_aiType == NSNotFound) { _aiType = 0; }
+
+    // --- Network
+    _username = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
 }
 
 - (void)viewWillAppear:(BOOL)animated 
@@ -137,6 +138,7 @@ enum ViewTagEnum
 {
     UITableViewCell* cell = nil;
     UILabel*         theLabel = nil;
+    UILabel*         theValue = nil;
     UIFont*          defaultFont = [UIFont boldSystemFontOfSize:17.0];
     
     switch (indexPath.section)
@@ -153,30 +155,24 @@ enum ViewTagEnum
                     theLabel.text  = NSLocalizedString(@"Sound", @"");
                     break;
                 }
-                case 1:  // - Piece
+                case 1:   // - Board
                 {
-                    cell = [tableView dequeueReusableCellWithIdentifier:@"piece_cell"];
-                    if(!cell) {
-                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"piece_cell"] autorelease];
-                        cell.textLabel.font = defaultFont;
-                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    }
-                    _pieceCell = cell;
-                    cell.textLabel.text = NSLocalizedString(@"Piece Style", @"");
-                    cell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
+                    cell = _boardCell;
+                    theLabel = (UILabel *)[cell viewWithTag:1];
+                    theLabel.font = defaultFont;
+                    theLabel.text  = NSLocalizedString(@"Board", @"");
+                    theValue = (UILabel *)[cell viewWithTag:2];
+                    theValue.text = [_boardChoices objectAtIndex:_boardType];
                     break;
                 }
-                case 2:   // - Board
+                case 2:  // - Piece
                 {
-                    cell = [tableView dequeueReusableCellWithIdentifier:@"board_cell"];
-                    if(!cell) {
-                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"board_cell"] autorelease];
-                        cell.textLabel.font = defaultFont;
-                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    }
-                    _boardCell = cell;
-                    cell.textLabel.text = NSLocalizedString(@"Board Style", @"");
-                    cell.detailTextLabel.text = [_boardChoices objectAtIndex:_boardType];
+                    cell = _pieceCell;
+                    theLabel = (UILabel *)[cell viewWithTag:1];
+                    theLabel.font = defaultFont;
+                    theLabel.text  = NSLocalizedString(@"Piece", @"");
+                    theValue = (UILabel *)[cell viewWithTag:2];
+                    theValue.text = [_pieceChoices objectAtIndex:_pieceType];
                     break;
                 }
             }
@@ -188,47 +184,42 @@ enum ViewTagEnum
             {
                 case 0:
                 {
-                    cell = [tableView dequeueReusableCellWithIdentifier:@"ai_level_cell"];
-                    if(!cell) {
-                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_level_cell"] autorelease];
-                        cell.textLabel.font = defaultFont;
-                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    }
-                    cell.textLabel.text = NSLocalizedString(@"AI Level", @"");
-                    cell.detailTextLabel.text = [_aiLevelChoices objectAtIndex:_aiLevel];
-                    _aiLevelCell = cell;
+                    cell = _aiTypeCell;
+                    theLabel = (UILabel *)[cell viewWithTag:1];
+                    theLabel.font = defaultFont;
+                    theLabel.text  = NSLocalizedString(@"AI Type", @"");
+                    theValue = (UILabel *)[cell viewWithTag:2];
+                    theValue.text = [_aiTypeChoices objectAtIndex:_aiType];
                     break;
                 }
                 case 1:
-                    cell = [tableView dequeueReusableCellWithIdentifier:@"ai_type_cell"];
-                    if(!cell) {
-                        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"ai_type_cell"] autorelease];
-                        cell.textLabel.font = defaultFont;
-                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    }
-                    cell.textLabel.text = NSLocalizedString(@"AI Type", @"");
-                    cell.detailTextLabel.text = [_aiTypeChoices objectAtIndex:_aiType];
-                    _aiTypeCell = cell;
+                {
+                    cell = _aiLevelCell;
+                    theLabel = (UILabel *)[cell viewWithTag:1];
+                    theLabel.font = defaultFont;
+                    theLabel.text  = NSLocalizedString(@"AI Level", @"");
+                    theValue = (UILabel *)[cell viewWithTag:2];
+                    theValue.text = [_aiLevelChoices objectAtIndex:_aiLevel];
                     break;
+                }
+
             }
             break;
         }
         case 2: // ----- Network
-        {
-            cell = [tableView dequeueReusableCellWithIdentifier:@"network_setting_cell"];
-            if(!cell) {
-                cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"network_setting_cell"] autorelease];
-                cell.textLabel.font = defaultFont;
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            }
-            cell.textLabel.text = NSLocalizedString(@"Network", @"");
-            cell.imageView.image = [self _getImageNamed:@"applications-internet"];
+        {            
+            cell = _networkCell;
+            theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel.font = defaultFont;
+            theLabel.text  = NSLocalizedString(@"Network", @"");
+            theValue = (UILabel *)[cell viewWithTag:2];
+            theValue.text = _username;
             break;
         }
         case 3: // ----- About
         {
             cell = [tableView dequeueReusableCellWithIdentifier:@"about_cell"];
-            if(!cell) {
+            if (!cell) {
                 cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"about_cell"] autorelease];
                 cell.textLabel.font = defaultFont;
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -252,33 +243,7 @@ enum ViewTagEnum
         {
             switch (indexPath.row)
             {
-                case 1:  // - Piece
-                {
-                    NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
-                                            @"pieces/alfaerie_31x31", @"pieces/iXiangQi",
-                                            nil];
-                    NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[piecePaths count]];
-                    for (NSString* subPath in piecePaths)
-                    {
-                        NSString* path = [[NSBundle mainBundle] pathForResource:@"rking"
-                                                                         ofType:@"png"
-                                                                    inDirectory:subPath];
-                        [imageNames addObject:path];
-                    }
-
-                    SingleSelectionController* controller =
-                        [[SingleSelectionController alloc] initWithChoices:_pieceChoices
-                                                                imageNames:imageNames
-                                                                  delegate:self];
-                    [imageNames release];
-                    [controller setRowHeight:50];
-                    subController = controller;
-                    controller.title = _pieceCell.textLabel.text;
-                    controller.selectionIndex = _pieceType;
-                    controller.tag = VIEW_TAG_PIECE_STYLE;
-                    break;
-                }
-                case 2:  // - Board
+                case 1:  // - Board
                 {
                     NSArray* boards = [NSArray arrayWithObjects:@"board_60px",
                                         @"SKELETON_60px", @"WOOD_60px", nil];
@@ -303,6 +268,32 @@ enum ViewTagEnum
                     controller.tag = VIEW_TAG_BOARD_STYLE;
                     break;
                 }
+                case 2:  // - Piece
+                {
+                    NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
+                                           @"pieces/alfaerie_31x31", @"pieces/iXiangQi",
+                                           nil];
+                    NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[piecePaths count]];
+                    for (NSString* subPath in piecePaths)
+                    {
+                        NSString* path = [[NSBundle mainBundle] pathForResource:@"rking"
+                                                                         ofType:@"png"
+                                                                    inDirectory:subPath];
+                        [imageNames addObject:path];
+                    }
+                    
+                    SingleSelectionController* controller =
+                    [[SingleSelectionController alloc] initWithChoices:_pieceChoices
+                                                            imageNames:imageNames
+                                                              delegate:self];
+                    [imageNames release];
+                    [controller setRowHeight:50];
+                    subController = controller;
+                    controller.title = _pieceCell.textLabel.text;
+                    controller.selectionIndex = _pieceType;
+                    controller.tag = VIEW_TAG_PIECE_STYLE;
+                    break;
+                }
             }
             break;
         }
@@ -311,18 +302,6 @@ enum ViewTagEnum
             switch (indexPath.row)
             {
                 case 0:
-                {
-                    SingleSelectionController* controller =
-                        [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices
-                                                                imageNames:nil
-                                                                  delegate:self];
-                    subController = controller;
-                    controller.title = _aiLevelCell.textLabel.text;
-                    controller.selectionIndex = _aiLevel;
-                    controller.tag = VIEW_TAG_AI_LEVEL;
-                    break;
-                }
-                case 1:
                 {
                     SingleSelectionController* controller =
                         [[SingleSelectionController alloc] initWithChoices:_aiTypeChoices
@@ -334,12 +313,25 @@ enum ViewTagEnum
                     controller.tag = VIEW_TAG_AI_TYPE;
                     break;
                 }
+                case 1:
+                {
+                    SingleSelectionController* controller =
+                    [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices
+                                                            imageNames:nil
+                                                              delegate:self];
+                    subController = controller;
+                    controller.title = _aiLevelCell.textLabel.text;
+                    controller.selectionIndex = _aiLevel;
+                    controller.tag = VIEW_TAG_AI_LEVEL;
+                    break;
+                }
             }
             break;
         }
         case 2: // ----- Network
         {
             subController = [[NetworkSettingController alloc] initWithNibName:@"NetworkSettingView" bundle:nil];
+            ((NetworkSettingController*)subController).delegate = self;
             break;
         }
         case 3: // ----- About
@@ -371,33 +363,25 @@ enum ViewTagEnum
 {
     switch (controller.tag)
     {
-        case VIEW_TAG_PIECE_STYLE:
-        {
-            if (_pieceType != index)
-            {
-                _pieceType = index;
-                _pieceCell.detailTextLabel.text = [_pieceChoices objectAtIndex:_pieceType];
-                [[NSUserDefaults standardUserDefaults] setInteger:_pieceType forKey:@"piece_type"];
-            }
-            break;
-        }
         case VIEW_TAG_BOARD_STYLE:
         {
             if (_boardType != index)
             {
                 _boardType = index;
-                _boardCell.detailTextLabel.text = [_boardChoices objectAtIndex:_boardType];
+                UILabel* theValue = (UILabel *)[_boardCell viewWithTag:2];
+                theValue.text = [_boardChoices objectAtIndex:_boardType];
                 [[NSUserDefaults standardUserDefaults] setInteger:_boardType forKey:@"board_type"];
             }
             break;
         }
-        case VIEW_TAG_AI_LEVEL:
+        case VIEW_TAG_PIECE_STYLE:
         {
-            if (_aiLevel != index)
+            if (_pieceType != index)
             {
-                _aiLevel = index;
-                _aiLevelCell.detailTextLabel.text = [_aiLevelChoices objectAtIndex:_aiLevel];
-                [[NSUserDefaults standardUserDefaults] setInteger:_aiLevel forKey:@"ai_level"];
+                _pieceType = index;
+                UILabel* theValue = (UILabel *)[_pieceCell viewWithTag:2];
+                theValue.text = [_pieceChoices objectAtIndex:_pieceType];
+                [[NSUserDefaults standardUserDefaults] setInteger:_pieceType forKey:@"piece_type"];
             }
             break;
         }
@@ -406,12 +390,33 @@ enum ViewTagEnum
             if (_aiType != index)
             {
                 _aiType = index;
-                _aiTypeCell.detailTextLabel.text = [_aiTypeChoices objectAtIndex:_aiType];
+                UILabel* theValue = (UILabel *)[_aiTypeCell viewWithTag:2];
+                theValue.text = [_aiTypeChoices objectAtIndex:_aiType];
                 [[NSUserDefaults standardUserDefaults] setObject:[_aiTypeChoices objectAtIndex:_aiType] forKey:@"ai_type"];
             }
             break;
         }
+        case VIEW_TAG_AI_LEVEL:
+        {
+            if (_aiLevel != index)
+            {
+                _aiLevel = index;
+                UILabel* theValue = (UILabel *)[_aiLevelCell viewWithTag:2];
+                theValue.text = [_aiLevelChoices objectAtIndex:_aiLevel];
+                [[NSUserDefaults standardUserDefaults] setInteger:_aiLevel forKey:@"ai_level"];
+            }
+            break;
+        }
     }
+}
+
+#pragma mark -
+#pragma mark SingleSelectionDelegate methods
+
+- (void) didChangeUsername:(NetworkSettingController*)controller username:(NSString*)username
+{
+    UILabel* theValue = (UILabel *)[_networkCell viewWithTag:2];
+    theValue.text = username;
 }
 
 #pragma mark Event handlers

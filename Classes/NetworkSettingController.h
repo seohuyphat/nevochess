@@ -19,9 +19,18 @@
 
 #import <UIKit/UIKit.h>
 
+@class NetworkSettingController;
 
+// --------------------------------------
+@protocol NetworkSettingDelegate <NSObject>
+- (void) didChangeUsername:(NetworkSettingController*)controller username:(NSString*)username;
+@end
+
+// --------------------------------------
 @interface NetworkSettingController : UITableViewController
 {
+    id<NetworkSettingDelegate> _delegate;
+
     IBOutlet UITableViewCell* _serverCell;
     IBOutlet UITableViewCell* _usernameCell;
     IBOutlet UITableViewCell* _passwordCell;
@@ -31,6 +40,8 @@
     IBOutlet UITextField* _passwordText;
     IBOutlet UISwitch*    _autoConnectSwitch;
 }
+
+@property (nonatomic, retain) id<NetworkSettingDelegate> delegate;
 
 - (IBAction) textFieldDidEndEditing:(UITextField *)textField;
 - (IBAction) autoConnectValueChanged:(id)sender;
