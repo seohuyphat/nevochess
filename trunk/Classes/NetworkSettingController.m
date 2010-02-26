@@ -21,6 +21,8 @@
 
 @implementation NetworkSettingController
 
+@synthesize delegate=_delegate;
+
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
@@ -116,6 +118,7 @@
     [_usernameText release];
     [_passwordText release];
     [_autoConnectSwitch release];
+    [_delegate release];
     [super dealloc];
 }
 
@@ -124,7 +127,9 @@
 - (IBAction) textFieldDidEndEditing:(UITextField *)textField
 {
     if (textField == _usernameText) {
-        [[NSUserDefaults standardUserDefaults] setObject:textField.text forKey:@"network_username"];
+        NSString* username = textField.text;
+        [[NSUserDefaults standardUserDefaults] setObject:username forKey:@"network_username"];
+        [_delegate didChangeUsername:self username:username];
     } else if (textField == _passwordText) {
         [[NSUserDefaults standardUserDefaults] setObject:textField.text forKey:@"network_password"];
     }
