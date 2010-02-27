@@ -72,6 +72,7 @@
     switch (pieceType) {
         case 0: pieceFolder = @"pieces/xqwizard_31x31"; break;
         case 1: pieceFolder = @"pieces/alfaerie_31x31"; break;
+        case 2: pieceFolder = @"pieces/HOXChess"; break;
         default: pieceFolder = @"pieces/iXiangQi"; break;
     }
     imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
@@ -169,6 +170,8 @@
         self._board = board;
 
         CGFloat    cellSize = 33;
+        CGPoint    cellOffset = CGPointMake(2, 3);
+        CGPoint    boardOffset = CGPointMake(5, 32);
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kLightBlueColor;
         CGColorRef animateColor    = kLightBlueColor;
@@ -180,7 +183,15 @@
                 backgroundColor = GetCGPatternNamed(@"SKELETON.png");
                 break;
             }
-            case 2:  // WOOD background.
+            case 2:  // HOXChess background.
+            {
+                backgroundColor = GetCGPatternNamed(@"HOXChess.png");
+                cellSize = 34;
+                cellOffset = CGPointMake(6, 5);
+                boardOffset = CGPointMake(2, 28);
+                break;
+            }
+            case 3:  // WOOD background.
             {
                 backgroundColor = GetCGPatternNamed(@"WOOD.png");
                 break;
@@ -195,9 +206,8 @@
             }
         }
 
-        CGPoint cellOffset = CGPointMake(2, 3);  // NOTE: Fixed point.
         CGSize spacing = CGSizeMake(cellSize, cellSize);
-        CGPoint pos = CGPointMake(board.bounds.origin.x + 5, board.bounds.origin.y + 32);
+        CGPoint pos = CGPointMake(board.bounds.origin.x + boardOffset.x, board.bounds.origin.y + boardOffset.y);
 
         _grid = [[Grid alloc] initWithRows:10 columns:9
                                    spacing:spacing position:pos

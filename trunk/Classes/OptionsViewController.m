@@ -41,6 +41,7 @@ enum ViewTagEnum
     _pieceChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Chinese", @""),
                                         NSLocalizedString(@"Western", @""),
+                                        @"HOXChess",
                                         @"iXiangQi",
                                         nil];
     _pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
@@ -51,6 +52,7 @@ enum ViewTagEnum
                                         NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Skeleton", @""),
                                         NSLocalizedString(@"Wood", @""),
+                                        NSLocalizedString(@"HOXChess", @""),
                                         nil];
     _boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
     if (_boardType >= [_boardChoices count]) { _boardType = 0; }
@@ -246,7 +248,7 @@ enum ViewTagEnum
                 case 1:  // - Board
                 {
                     NSArray* boards = [NSArray arrayWithObjects:@"board_60px",
-                                        @"SKELETON_60px", @"WOOD_60px", nil];
+                                        @"SKELETON_60px", @"HOXChess_60px", @"WOOD_60px", nil];
                     NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[boards count]];
                     for (NSString* name in boards)
                     {
@@ -271,7 +273,7 @@ enum ViewTagEnum
                 case 2:  // - Piece
                 {
                     NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
-                                           @"pieces/alfaerie_31x31", @"pieces/iXiangQi",
+                                           @"pieces/alfaerie_31x31", @"pieces/HOXChess", @"pieces/iXiangQi",
                                            nil];
                     NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[piecePaths count]];
                     for (NSString* subPath in piecePaths)
