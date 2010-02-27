@@ -28,9 +28,11 @@
 {
     [super viewDidLoad];
     self.title = NSLocalizedString(@"Home", @"");
-    [ai_game setTitle:NSLocalizedString(@"Home_Play", @"") forState:UIControlStateNormal];
-    [online_game setTitle:NSLocalizedString(@"Home_Online", @"") forState:UIControlStateNormal];
-    [setting setTitle:NSLocalizedString(@"Home_Settings", @"") forState:UIControlStateNormal];
+
+    // Add a single space in front to separate the Image and the Text.
+    [ai_game setTitle:[@" " stringByAppendingString:NSLocalizedString(@"Practice", @"")] forState:UIControlStateNormal];
+    [online_game setTitle:[@" " stringByAppendingString:NSLocalizedString(@"Play Online", @"")] forState:UIControlStateNormal];
+    [setting setTitle:[@" " stringByAppendingString:NSLocalizedString(@"Settings", @"")] forState:UIControlStateNormal];
 }
 
 - (void)viewWillAppear:(BOOL)animated 
@@ -78,8 +80,6 @@
     OptionsViewController *optionController = [[OptionsViewController alloc] initWithNibName:@"OptionsView" bundle:nil];
     [self.navigationController pushViewController:optionController animated:YES];
     [optionController release];
-    
 }
-
 
 @end
