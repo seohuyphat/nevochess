@@ -366,7 +366,7 @@ enum ActionSheetEnum
     [_board playSound:sound];
     [_board onGameOver];
 
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NevoChess"
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
                                                     message:msg
                                                    delegate:self 
                                           cancelButtonTitle:nil
