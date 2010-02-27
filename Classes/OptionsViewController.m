@@ -51,8 +51,8 @@ enum ViewTagEnum
     _boardChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Skeleton", @""),
-                                        NSLocalizedString(@"Wood", @""),
                                         NSLocalizedString(@"HOXChess", @""),
+                                        NSLocalizedString(@"Wood", @""),
                                         nil];
     _boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
     if (_boardType >= [_boardChoices count]) { _boardType = 0; }
