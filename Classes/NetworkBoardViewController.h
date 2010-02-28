@@ -17,7 +17,7 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "BoardView.h"
+#import "BoardViewController.h"
 #import "CChessGame.h"
 #import "LoginViewController.h"
 #import "TableListViewController.h"

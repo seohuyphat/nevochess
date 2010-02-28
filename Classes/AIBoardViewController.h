@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import "BoardView.h"
+#import "BoardViewController.h"
 #import "CChessGame.h"
 #import "AIRobot.h";
 
