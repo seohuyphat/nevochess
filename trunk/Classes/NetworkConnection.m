@@ -43,8 +43,7 @@
 - (id) init
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    self = [super init];
-    if (self != nil) {
+    if (self = [super init]) {
         _connectionState = NC_CONN_STATE_NONE;
         self._username = nil;
         self._password = nil;
@@ -63,6 +62,7 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     self._username = nil;
     self._password = nil;
+    self.delegate = nil;
     [super dealloc];
 }
 

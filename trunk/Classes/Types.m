@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #import "Types.h"
-
+#import "Enums.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -96,6 +96,85 @@
     if (buttonIndex == resetIndex) { return ACTION_INDEX_RESET; }
     if (buttonIndex == logoutIndex) { return ACTION_INDEX_LOGOUT; }
     return ACTION_INDEX_CANCEL;
+}
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    MoveAtom
+//
+///////////////////////////////////////////////////////////////////////////////
+
+@implementation MoveAtom
+
+@synthesize move;
+@synthesize srcPiece;
+@synthesize capturedPiece;
+
+- (id)initWithMove:(int)mv
+{
+    if (self = [super init]) {
+        self.move = [NSNumber numberWithInteger:mv];
+        self.srcPiece = nil;
+        self.capturedPiece = nil;
+    }
+    return self;
+}
+
+- (NSString*) description
+{
+    int m = [(NSNumber*)self.move intValue];
+    int sqSrc = SRC(m);
+    int sqDst = DST(m);
+    return [NSString stringWithFormat: @"%u%u -> %u%u)", ROW(sqSrc), COLUMN(sqSrc), ROW(sqDst), COLUMN(sqDst)];
+}
+
+- (void)dealloc
+{
+    [move release];
+    [srcPiece release];
+    [capturedPiece release];
+    [super dealloc];
+}
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//    TimeInfo
+//
+///////////////////////////////////////////////////////////////////////////////
+@implementation TimeInfo
+
+@synthesize gameTime, moveTime, freeTime;
+
+- (id)initWithTime:(TimeInfo*)other
+{
+    if (self = [self init]) {
+        gameTime = other.gameTime;
+        moveTime = other.moveTime;
+        freeTime = other.freeTime;
+    }
+    return self;
+}
+
+- (void) decrement
+{
+    if (gameTime > 0) { --gameTime; }
+    if (moveTime > 0) { --moveTime; }
+}
+
++ (id)allocTimeFromString:(NSString *)timeContent
+{
+    TimeInfo* newTime = [TimeInfo new];
+    NSArray* components = [timeContent componentsSeparatedByString:@"/"];
+    
+    newTime.gameTime = [[components objectAtIndex:0] intValue];
+    newTime.moveTime = [[components objectAtIndex:1] intValue];
+    newTime.freeTime = [[components objectAtIndex:2] intValue];
+    
+    return newTime;
 }
 
 @end

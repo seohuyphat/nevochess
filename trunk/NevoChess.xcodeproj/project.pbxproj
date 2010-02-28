@@ -20,7 +20,6 @@
 		4B67333210423930009DA9E7 /* pieces in Resources */ = {isa = PBXBuildFile; fileRef = 4B67330E10423930009DA9E7 /* pieces */; };
 		4B67338A104259F5009DA9E7 /* CChessGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B673389104259F5009DA9E7 /* CChessGame.m */; };
 		4BA901E4103AE37A0039C307 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA901E2103AE37A0039C307 /* AboutViewController.m */; };
-		4BBB5F2A103303D500243E55 /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F13103303D500243E55 /* BoardView.m */; };
 		4BBB5F2F103303D500243E55 /* Grid.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1D103303D500243E55 /* Grid.m */; };
 		4BBB5F30103303D500243E55 /* Piece.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F1F103303D500243E55 /* Piece.m */; };
 		4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BBB5F21103303D500243E55 /* QuartzUtils.m */; };
@@ -88,6 +87,7 @@
 		AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */ = {isa = PBXBuildFile; fileRef = AFBA3CF51134460B00F8F4ED /* change-role.png */; };
 		AFC901A011386FCF00CAB0DD /* AI-avatar.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC9019F11386FCF00CAB0DD /* AI-avatar.png */; };
 		AFC901A71138708300CAB0DD /* AI-level.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC901A61138708300CAB0DD /* AI-level.png */; };
+		AFE46CC9113B08E000208548 /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE46CC8113B08E000208548 /* BoardView.m */; };
 		AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFEE8C3911325EF800EE7239 /* board_320x480.png */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
@@ -116,8 +116,6 @@
 		4B673389104259F5009DA9E7 /* CChessGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CChessGame.m; sourceTree = "<group>"; };
 		4BA901E1103AE37A0039C307 /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
 		4BA901E2103AE37A0039C307 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
-		4BBB5F12103303D500243E55 /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
-		4BBB5F13103303D500243E55 /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
 		4BBB5F14103303D500243E55 /* CChessGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CChessGame.h; sourceTree = "<group>"; };
 		4BBB5F1C103303D500243E55 /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Grid.h; sourceTree = "<group>"; };
 		4BBB5F1D103303D500243E55 /* Grid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Grid.m; sourceTree = "<group>"; };
@@ -211,6 +209,8 @@
 		AFBA3CF51134460B00F8F4ED /* change-role.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "change-role.png"; sourceTree = "<group>"; };
 		AFC9019F11386FCF00CAB0DD /* AI-avatar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-avatar.png"; sourceTree = "<group>"; };
 		AFC901A61138708300CAB0DD /* AI-level.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-level.png"; sourceTree = "<group>"; };
+		AFE46CC7113B08E000208548 /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
+		AFE46CC8113B08E000208548 /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
 		AFEE8C3911325EF800EE7239 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
@@ -338,6 +338,8 @@
 				AF778B78113ABBB4005A1E31 /* Types.m */,
 				AFF58763113579BF007E5DF1 /* AIRobot.h */,
 				AFF58764113579BF007E5DF1 /* AIRobot.m */,
+				AFE46CC7113B08E000208548 /* BoardView.h */,
+				AFE46CC8113B08E000208548 /* BoardView.m */,
 				AF4B70CA112712F80061590B /* AIBoardViewController.h */,
 				AF4B70CB112712F80061590B /* AIBoardViewController.m */,
 				AF7FBB11110F72BF004F7691 /* NetworkBoardViewController.h */,
@@ -354,8 +356,6 @@
 				AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */,
 				4BBB5F24103303D500243E55 /* MainMenuController.h */,
 				4BBB5F25103303D500243E55 /* MainMenuController.m */,
-				4BBB5F12103303D500243E55 /* BoardView.h */,
-				4BBB5F13103303D500243E55 /* BoardView.m */,
 				4BBB5F14103303D500243E55 /* CChessGame.h */,
 				4B673389104259F5009DA9E7 /* CChessGame.m */,
 				4BBB5F1C103303D500243E55 /* Grid.h */,
@@ -613,7 +613,6 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* NevoChessAppDelegate.m in Sources */,
-				4BBB5F2A103303D500243E55 /* BoardView.m in Sources */,
 				4BBB5F2F103303D500243E55 /* Grid.m in Sources */,
 				4BBB5F30103303D500243E55 /* Piece.m in Sources */,
 				4BBB5F31103303D500243E55 /* QuartzUtils.m in Sources */,
@@ -645,6 +644,7 @@
 				AF0F05CD11302A00007F6981 /* SingleSelectionController.m in Sources */,
 				AFF58765113579BF007E5DF1 /* AIRobot.m in Sources */,
 				AF778B79113ABBB4005A1E31 /* Types.m in Sources */,
+				AFE46CC9113B08E000208548 /* BoardView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

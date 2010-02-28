@@ -19,6 +19,7 @@
 
 #import "AIBoardViewController.h"
 #import "Enums.h"
+#import "Types.h"
 
 #define ACTION_BUTTON_INDEX 4
 
@@ -79,7 +80,11 @@ enum ActionSheetEnum
 {
     [super viewDidLoad];
 
+    _board = [[BoardViewController alloc] initWithNibName:@"BoardView" bundle:nil];
     _board.boardOwner = self;
+    [self.view addSubview:_board.view];
+    [self.view bringSubviewToFront:_toolbar];
+
     self._game = _board.game;    
     self._tableId = nil;
 
@@ -105,6 +110,7 @@ enum ActionSheetEnum
 
 - (void)dealloc
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     [_aiRobot release];
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
@@ -113,7 +119,15 @@ enum ActionSheetEnum
         [_idleTimer invalidate];
         self._idleTimer = nil;
     }
+    self._board = nil;
     [super dealloc];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_board.view removeFromSuperview];
+    self._board = nil;
 }
 
 - (void) onAIRobotStopped

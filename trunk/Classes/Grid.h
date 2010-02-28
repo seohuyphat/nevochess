@@ -51,6 +51,12 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 #import "Piece.h"
 @class GridCell;
 
+// Hit-testing callbacks (to identify which layers caller is interested in):
+typedef BOOL (*LayerMatchCallback)(CALayer*);
+
+BOOL layerIsBit( CALayer* layer );
+BOOL layerIsGridCell( CALayer* layer );
+// ----------------------------------------------------------------------------
 
 /** Regular geometric grids of GridCells that Bits can be placed on.
  *  (customized for Xiangqi).

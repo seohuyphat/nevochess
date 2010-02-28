@@ -49,3 +49,45 @@ enum ActionIndexEnum
                    title:(NSString*)title;
 - (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex;
 @end
+
+////////////////////////////////////////////////////////////////////
+//
+// Move review holder unit
+//
+////////////////////////////////////////////////////////////////////
+
+@interface MoveAtom : NSObject {
+    id move;
+    id srcPiece;
+    id capturedPiece;
+}
+
+@property(nonatomic,retain) id move;
+@property(nonatomic,retain) id srcPiece;
+@property(nonatomic,retain) id capturedPiece;
+
+- (id)initWithMove:(int)mv;
+
+@end
+
+////////////////////////////////////////////////////////////////////
+//
+// TimeInfo
+//
+////////////////////////////////////////////////////////////////////
+@interface TimeInfo : NSObject
+{
+    int  gameTime;  // Game-time (in seconds).
+    int  moveTime;  // Move-time (in seconds).
+    int  freeTime;  // Free-time (in seconds).
+}
+
+@property (nonatomic) int gameTime;
+@property (nonatomic) int moveTime;
+@property (nonatomic) int freeTime;
+
+- (id)initWithTime:(TimeInfo*)other;
+- (void) decrement;
++ (id)allocTimeFromString:(NSString *)timeContent;
+
+@end

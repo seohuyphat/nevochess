@@ -37,32 +37,31 @@
     IBOutlet UILabel*                 _joinTablePromptLabel;
     IBOutlet UIButton*                _joinTablePromptButton;
 
-    IBOutlet BoardView*               _board;
+    BoardViewController* _board;
+    CChessGame*          _game;
+    NSString*            _tableId;
+    ColorEnum            _myColor;  // The color (role) of the LOCAL player.
 
-    CChessGame*        _game;
-    NSString*          _tableId;
-    ColorEnum          _myColor;  // The color (role) of the LOCAL player.
+    NSString*            _username;
+    NSString*            _password;
+    NSString*            _rating;
+    NetworkConnection*   _connection;
 
-    NSString*          _username;
-    NSString*          _password;
-    NSString*          _rating;
-    NetworkConnection* _connection;
+    NSString*            _redId;
+    NSString*            _blackId;
 
-    NSString*          _redId;
-    NSString*          _blackId;
+    BOOL                 _isGameOver;
 
-    BOOL               _isGameOver;
-
-    BOOL               _loginCanceled;
-    BOOL               _loginAuthenticated;
-    BOOL               _logoutPending;
+    BOOL                 _loginCanceled;
+    BOOL                 _loginAuthenticated;
+    BOOL                 _logoutPending;
 
     LoginViewController*       _loginController;
     TableListViewController*   _tableListController;
     MessageListViewController* _messageListController;
 }
 
-@property (nonatomic, retain) BoardView* _board;
+@property (nonatomic, retain) BoardViewController* _board;
 @property (nonatomic, retain) CChessGame* _game;
 @property (nonatomic, retain) NSString* _tableId;
 @property (nonatomic, retain) NSString* _username;

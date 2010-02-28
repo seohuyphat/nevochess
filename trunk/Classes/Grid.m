@@ -52,6 +52,10 @@
 #import "Piece.h"
 #import "QuartzUtils.h"
 
+BOOL layerIsBit( CALayer* layer )      { return [layer isKindOfClass: [Bit class]]; }
+BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell class]]; }
+
+// ---------------------------------------------------------------------------
 @implementation Grid
 
 @synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
