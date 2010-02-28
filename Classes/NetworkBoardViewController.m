@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #import "NetworkBoardViewController.h"
+#import "Types.h"
 
 @interface NetworkBoardViewController (PrivateMethods)
 
@@ -61,6 +62,9 @@
 
 @implementation NetworkBoardViewController
 
+@synthesize _board;
+@synthesize _game;
+@synthesize _tableId;
 @synthesize _username, _password, _rating;
 @synthesize _redId;
 @synthesize _blackId;
@@ -73,26 +77,7 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-
-        [_board displayEmptyBoard];
-        [_board setInfoMessage:NSLocalizedString(@"Not connected to network", @"")];
-
-        self._username = nil;
-        self._password = nil;
-        self._rating = nil;
-        self._redId = nil;
-        self._blackId = nil;
-        _isGameOver = NO;
-        _loginCanceled = NO;
-        _loginAuthenticated = NO;
-        _logoutPending = NO;
-        self._loginController = nil;
-        self._tableListController = nil;
-
-        self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
-        _messageListController.delegate = self;
-
-        self._connection = nil;
+        // Empty.
     }
     
     return self;
@@ -103,21 +88,33 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidLoad];
 
-    // Replace the image of "addButton" with Search image.
-    NSArray* items = nav_toolbar.items;
-    UIBarButtonItem* addButton = (UIBarButtonItem*) [items objectAtIndex:2];
-    NSMutableArray* newItems = [NSMutableArray arrayWithArray:items];
-    UIBarButtonItem* newButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch 
-                                                                               target:addButton.target action:addButton.action];
-    newButton.style = UIBarButtonItemStylePlain;
-    [newItems replaceObjectAtIndex:2 withObject:newButton];
-    [newButton release];
-    nav_toolbar.items = newItems;
-
-    _actionButton = (UIBarButtonItem*)[items objectAtIndex:4];
+    _userInfoLabel.text = NSLocalizedString(@"Not connected to network", @"");
+    _joinTablePromptLabel.text = nil;
+    _joinTablePromptButton.hidden = YES;
     _actionButton.enabled = NO;
-    _messagesButton = (UIBarButtonItem*)[items objectAtIndex:6];
     _messagesButton.enabled = NO;
+
+    self._username = nil;
+    self._password = nil;
+    self._rating = nil;
+    self._redId = nil;
+    self._blackId = nil;
+    _isGameOver = NO;
+    _loginCanceled = NO;
+    _loginAuthenticated = NO;
+    _logoutPending = NO;
+    self._loginController = nil;
+    self._tableListController = nil;
+
+    self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
+    _messageListController.delegate = self;
+
+    self._connection = nil;
+    _board.boardOwner = self;
+    self._game = _board.game;
+
+    self._tableId = nil;
+    _myColor = NC_COLOR_UNKNOWN;
 } 
 
 - (void)viewWillAppear:(BOOL)animated
@@ -187,6 +184,11 @@
     [actionSheet release];
 }
 
+- (void) goBackToHomeMenu
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 - (void) _handleCommandLogout
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
@@ -209,8 +211,7 @@
     // !!!!!!!!!!!!!!!!!!!
 }
 
-// 'Reset' is now a LIST command.
-- (IBAction)resetPressed:(id)sender
+- (IBAction)searchPressed:(id)sender
 {
     if (!_loginAuthenticated) {
         [self _showLoginView:@""];
@@ -242,6 +243,7 @@
             NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
+            [_board removeFromSuperview];
             [_board displayEmptyBoard];
             _actionButton.enabled = NO;
             break;
@@ -302,6 +304,11 @@
     // Send over the network.
     NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", col1, row1, col2, row2];
     [_connection send_MOVE:_tableId move:moveStr];
+}
+
+- (BOOL) isMyTurnNext
+{
+    return ([_game getNextColor] == _myColor);
 }
 
 - (BOOL) isGameReady
@@ -385,8 +392,8 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_connection) {
         NSLog(@"%s: Connecting to network...", __FUNCTION__);
-        [activity setHidden:NO];
-        [activity startAnimating];
+        [_activity setHidden:NO];
+        [_activity startAnimating];
         self._connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;
         [_connection connect];
@@ -444,7 +451,7 @@
 - (void) _dismissLoginView
 {
     [self.navigationController popToViewController:self animated:YES];
-    [activity stopAnimating];
+    [_activity stopAnimating];
 }
 
 - (void) _dismissListTableView
@@ -454,6 +461,11 @@
 
 - (void) _resetAndClearTable
 {
+    if (!_board.superview)
+    {
+        [self.view addSubview:_board];
+        [self.view bringSubviewToFront:_activity];
+    }
     [_board resetBoard];
     _isGameOver = NO;
 }
@@ -467,10 +479,9 @@
 - (void) _onMyRatingUpdated:(NSString*)newRating
 {
     self._rating = newRating;
-    NSString* infoMsg = [NSString stringWithFormat:NSLocalizedString(
-                            @"Welcome %@ (%@)\n\nSelect a Table to join", @""),
-                            _username, _rating];
-    [_board setInfoMessage:infoMsg];
+    _userInfoLabel.text = [NSString stringWithFormat:@"%@ (%@)", _username, _rating];
+    _joinTablePromptLabel.text = NSLocalizedString(@"Select a Table to join", @"");
+    _joinTablePromptButton.hidden = NO;
 }
 
 #pragma mark -
@@ -629,9 +640,9 @@
                            : [NSString stringWithFormat:@"%@ (%@)", table.blackId, table.blackRating]);
     [_board setRedLabel:redInfo];
     [_board setBlackLabel:blackInfo];
-    [self setInitialTime:table.itimes];
-    [self setRedTime:table.redTimes];
-    [self setBlackTime:table.blackTimes];
+    [_board setInitialTime:table.itimes];
+    [_board setRedTime:table.redTimes];
+    [_board setBlackTime:table.blackTimes];
 
     self._redId = ([table.redId length] == 0 ? nil : table.redId);
     self._blackId = ([table.blackId length] == 0 ? nil : table.blackId);
@@ -781,9 +792,9 @@
         return;
     }
 
-    [self setInitialTime:itimes];
-    [self setRedTime:itimes];
-    [self setBlackTime:itimes];
+    [_board setInitialTime:itimes];
+    [_board setRedTime:itimes];
+    [_board setBlackTime:itimes];
 }
 
 - (void) _handleNetworkEvent_MSG:(NSString*)event

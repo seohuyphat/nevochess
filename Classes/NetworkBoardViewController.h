@@ -17,22 +17,38 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-
-#import "BoardViewController.h"
+#import "BoardView.h"
+#import "CChessGame.h"
 #import "LoginViewController.h"
 #import "TableListViewController.h"
 #import "MessageListViewController.h"
 #import "NetworkConnection.h"
 
-@interface NetworkBoardViewController : BoardViewController <LoginDelegate,
+@interface NetworkBoardViewController : UIViewController <BoardOwner, LoginDelegate,
     TableListDelegate, MessageListDelegate, NetworkHandler, UIActionSheetDelegate>
 {
+    IBOutlet UIToolbar*               _toolbar;
+    IBOutlet UIActivityIndicatorView* _activity;
+    IBOutlet UIBarButtonItem*         _actionButton;
+    IBOutlet UIBarButtonItem*         _messagesButton;
+
+    IBOutlet UIImageView*             _userInfoImage;
+    IBOutlet UILabel*                 _userInfoLabel;
+    IBOutlet UILabel*                 _joinTablePromptLabel;
+    IBOutlet UIButton*                _joinTablePromptButton;
+
+    IBOutlet BoardView*               _board;
+
+    CChessGame*        _game;
+    NSString*          _tableId;
+    ColorEnum          _myColor;  // The color (role) of the LOCAL player.
+
     NSString*          _username;
     NSString*          _password;
     NSString*          _rating;
     NetworkConnection* _connection;
 
-    NSString*          _redId; // TODO: We should use the 'players' in Game class.
+    NSString*          _redId;
     NSString*          _blackId;
 
     BOOL               _isGameOver;
@@ -44,10 +60,11 @@
     LoginViewController*       _loginController;
     TableListViewController*   _tableListController;
     MessageListViewController* _messageListController;
-    UIBarButtonItem*           _actionButton;
-    UIBarButtonItem*           _messagesButton;
 }
 
+@property (nonatomic, retain) BoardView* _board;
+@property (nonatomic, retain) CChessGame* _game;
+@property (nonatomic, retain) NSString* _tableId;
 @property (nonatomic, retain) NSString* _username;
 @property (nonatomic, retain) NSString* _password;
 @property (nonatomic, retain) NSString* _rating;
@@ -59,7 +76,9 @@
 @property (nonatomic, retain) MessageListViewController* _messageListController;
 
 - (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
+- (IBAction)searchPressed:(id)sender;
+- (IBAction)actionPressed:(id)sender;
+- (IBAction)messagesPressed:(id)sender;
 
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 

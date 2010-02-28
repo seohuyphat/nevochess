@@ -17,8 +17,8 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "BoardViewController.h"
-#import "NevoChessAppDelegate.h"
+#import "Types.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -41,7 +41,7 @@
                    title:(NSString*)title
 {
     [self _clearAllIndices];
-
+    
     if ([state isEqualToString:@"play"]) {
         resignIndex = 0;
         drawIndex = 1;
@@ -83,7 +83,7 @@
              destructiveButtonTitle:nil
                   otherButtonTitles:nil];
     }
-
+    
     self.actionSheetStyle = UIActionSheetStyleAutomatic;
     return self;
 }
@@ -96,124 +96,6 @@
     if (buttonIndex == resetIndex) { return ACTION_INDEX_RESET; }
     if (buttonIndex == logoutIndex) { return ACTION_INDEX_LOGOUT; }
     return ACTION_INDEX_CANCEL;
-}
-
-@end
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Implementation of Public methods
-//
-///////////////////////////////////////////////////////////////////////////////
-
-@implementation BoardViewController
-
-@synthesize _board;
-@synthesize _game;
-@synthesize _tableId;
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        self._board = (BoardView*) self.view;
-        _board.boardOwner = self;
-
-        self._game = ((BoardView*)self.view).game;
-
-        self._tableId = nil;
-        _myColor = NC_COLOR_UNKNOWN;
-    }
-    
-    return self;
-}
-
-- (void)viewDidLoad
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    [super viewDidLoad];
-}
-
-- (void)didReceiveMemoryWarning
-{
-	// Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)dealloc
-{
-    [_board release];
-    [_game release];
-    [_tableId release];
-    [super dealloc];
-}
-
-#pragma mark Button actions
-
-- (IBAction)homePressed:(id)sender
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
-- (IBAction)resetPressed:(id)sender
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
-- (IBAction)actionPressed:(id)sender
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
-- (IBAction)messagesPressed:(id)sender
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
-{
-    NSLog(@"%s: ENTER. move = [%d -> %d], result=[%d]", __FUNCTION__, SRC(move), DST(move), nGameResult);
-}
-
-- (void) goBackToHomeMenu
-{
-    [((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController popViewControllerAnimated:YES];
-}
-
-- (void) setInitialTime:(NSString*)times
-{
-    [_board setInitialTime:times];
-}
-
-- (void) setRedTime:(NSString*)times
-{
-    [_board setRedTime:times];
-}
-
-- (void) setBlackTime:(NSString*)times
-{
-    [_board setBlackTime:times];
-}
-
-- (void) saveGame
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-}
-
-- (void) rescheduleTimer
-{
-    [_board rescheduleTimer];
-}
-
-- (BOOL) isMyTurnNext
-{
-    return ([_game getNextColor] == _myColor);
-}
-
-- (BOOL) isGameReady
-{
-    return YES;
 }
 
 @end

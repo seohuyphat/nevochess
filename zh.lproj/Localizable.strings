@@ -75,7 +75,7 @@
 
 /* Network errors and warnings */
 "Not connected to network" = "未连接到网络";
-"Welcome %@ (%@)\n\nSelect a Table to join" = "欢迎%@%@\n\n选择加入一个表";
+"Select a Table to join" = "选择加入一个表";
 
 /* Other (misc.) */
 "Select a Table to join" = "选择游戏棋桌加入";

@@ -63,14 +63,14 @@
 
 - (IBAction)newGamePressed:(id)sender
 {
-    AIBoardViewController *chessboard = [[AIBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
+    AIBoardViewController *chessboard = [[AIBoardViewController alloc] initWithNibName:@"AIBoardView" bundle:nil];
     [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }
 
 - (IBAction)networkGamePressed:(id)sender
 {
-    NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"ChessBoardViewController" bundle:nil];
+    NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"NetworkBoardView" bundle:nil];
     [self.navigationController pushViewController:chessboard animated:YES];
     [chessboard release];
 }
