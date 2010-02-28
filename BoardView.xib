@@ -43,7 +43,7 @@
 					<object class="IBUIActivityIndicatorView" id="431462434">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">-2147483356</int>
-						<string key="NSFrame">{{137, 190}, {37, 37}}</string>
+						<string key="NSFrame">{{137, 185}, {37, 37}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -53,7 +53,7 @@
 					<object class="IBUILabel" id="862456266">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{41, 8}, {159, 21}}</string>
+						<string key="NSFrame">{{41, 3}, {159, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -80,7 +80,7 @@
 					<object class="IBUILabel" id="871502716">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{41, 388}, {159, 21}}</string>
+						<string key="NSFrame">{{41, 386}, {159, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -100,7 +100,7 @@
 					<object class="IBUIButton" id="484791061">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{9, 382}, {29, 31}}</string>
+						<string key="NSFrame">{{9, 380}, {29, 31}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -129,7 +129,7 @@
 					<object class="IBUIButton" id="180915614">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{9, 4}, {29, 31}}</string>
+						<string key="NSFrame">{{9, -1}, {29, 31}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -145,7 +145,7 @@
 					<object class="IBUILabel" id="30022488">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{224, 10}, {42, 21}}</string>
+						<string key="NSFrame">{{224, 5}, {42, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -166,7 +166,7 @@
 					<object class="IBUILabel" id="269992884">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{224, 385}, {42, 21}}</string>
+						<string key="NSFrame">{{224, 383}, {42, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -183,7 +183,7 @@
 					<object class="IBUILabel" id="84738666">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{271, 10}, {27, 21}}</string>
+						<string key="NSFrame">{{271, 5}, {27, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -202,7 +202,7 @@
 					<object class="IBUILabel" id="1022524294">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{271, 386}, {27, 20}}</string>
+						<string key="NSFrame">{{271, 384}, {27, 20}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -218,7 +218,7 @@
 					<object class="IBUILabel" id="234926650">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{41, 197}, {235, 21}}</string>
+						<string key="NSFrame">{{41, 192}, {235, 21}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<object class="NSColor" key="IBUIBackgroundColor" id="54993528">
 							<int key="NSColorSpace">3</int>
@@ -245,7 +245,7 @@
 					<object class="IBUIButton" id="165997883">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{94, 383}, {60, 30}}</string>
+						<string key="NSFrame">{{94, 381}, {60, 30}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -268,7 +268,7 @@
 					<object class="IBUIButton" id="846184212">
 						<reference key="NSNextResponder" ref="94514847"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{162, 383}, {60, 30}}</string>
+						<string key="NSFrame">{{162, 381}, {60, 30}}</string>
 						<reference key="NSSuperview" ref="94514847"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -425,21 +425,39 @@ AAMAAAABAAEAAAFTAAMAAAAEAAACAgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">moveNextPressed:</string>
-						<reference key="source" ref="846184212"/>
+						<string key="label">previewPrevious_DOWN:</string>
+						<reference key="source" ref="165997883"/>
 						<reference key="destination" ref="372490531"/>
-						<int key="IBEventType">7</int>
+						<int key="IBEventType">1</int>
 					</object>
-					<int key="connectionID">189</int>
+					<int key="connectionID">192</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">movePrevPressed:</string>
+						<string key="label">previewPrevious_UP:</string>
 						<reference key="source" ref="165997883"/>
 						<reference key="destination" ref="372490531"/>
 						<int key="IBEventType">7</int>
 					</object>
-					<int key="connectionID">190</int>
+					<int key="connectionID">193</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">previewNext_UP:</string>
+						<reference key="source" ref="846184212"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">194</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">previewNext_DOWN:</string>
+						<reference key="source" ref="846184212"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">1</int>
+					</object>
+					<int key="connectionID">195</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -601,7 +619,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAACAgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">190</int>
+			<int key="maxID">195</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -613,11 +631,15 @@ AAMAAAABAAEAAAFTAAMAAAAEAAACAgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>moveNextPressed:</string>
-							<string>movePrevPressed:</string>
+							<string>previewNext_DOWN:</string>
+							<string>previewNext_UP:</string>
+							<string>previewPrevious_DOWN:</string>
+							<string>previewPrevious_UP:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>

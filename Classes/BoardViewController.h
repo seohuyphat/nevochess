@@ -89,8 +89,10 @@
 @property (nonatomic, retain) NSDate* _previewLastTouched_prev;
 @property (nonatomic, retain) NSDate* _previewLastTouched_next;
 
-- (IBAction)movePrevPressed:(id)sender;
-- (IBAction)moveNextPressed:(id)sender;
+- (IBAction) previewPrevious_DOWN:(id)sender;
+- (IBAction) previewPrevious_UP:(id)sender;
+- (IBAction) previewNext_DOWN:(id)sender;
+- (IBAction) previewNext_UP:(id)sender;
 
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;
