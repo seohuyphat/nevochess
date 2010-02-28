@@ -56,7 +56,6 @@
 
 #import "BoardView.h"
 #import "QuartzUtils.h"
-#import "NevoChessAppDelegate.h"
 #import "Grid.h"
 #import "Piece.h"
 
@@ -179,8 +178,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (void) awakeFromNib
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    ((NevoChessAppDelegate*)[[UIApplication sharedApplication] delegate]).navigationController.navigationBarHidden = YES;
-
     _gameboard = [[CALayer alloc] init];
     _gameboard.frame = [self _gameBoardFrame];
     [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
@@ -209,7 +206,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _red_label.text = @"";
     _black_label.text = @"";
     _game_over_msg.hidden = YES;
-    _info_msg.hidden = YES;
 
     _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
     _nthMove = HISTORY_INDEX_END;
@@ -313,11 +309,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     self._blackTime = [TimeInfo allocTimeFromString:times];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
-}
-
-- (void) setInfoMessage:(NSString*)msg
-{
-    _info_msg.text = msg;
 }
 
 - (BOOL) _isInReview
@@ -651,8 +642,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     BoardView *view = self;
     Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
-     if (   !piece && p.y > 382
-         && (_gameboard.superlayer != nil)) // Visible?
+     if (!piece && p.y > 382)
      {
          _preview_prev.hidden = NO;
          _preview_next.hidden = NO;
@@ -730,18 +720,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void) resetBoard
 {
-    [_game showBoard:YES];
-    [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
-
-    _red_seat.hidden = NO;
-    _black_seat.hidden = NO;
-    _red_label.hidden = NO;
-    _black_label.hidden = NO;
-    _red_time.hidden = NO;
-    _red_move_time.hidden = NO;
-    _black_time.hidden = NO;
-    _black_move_time.hidden = NO;
-
     [self _setHighlightCells:NO];
     [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
     _selectedPiece = nil;
@@ -754,7 +732,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
     _game_over_msg.hidden = YES;
-    _info_msg.hidden = YES;
 
     [_game resetGame];
     [_moves removeAllObjects];
@@ -763,24 +740,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void) displayEmptyBoard
 {
-    [_game showBoard:NO];
-    [_gameboard removeFromSuperlayer];
-
-    _red_seat.hidden = YES;
-    _black_seat.hidden = YES;
-    _red_label.hidden = YES;
-    _black_label.hidden = YES;
-    _red_time.hidden = YES;
-    _red_move_time.hidden = YES;
-    _black_time.hidden = YES;
-    _black_move_time.hidden = YES;
-
     _game_over_msg.hidden = YES;
-    _info_msg.hidden = NO;
-
-    _preview_prev.hidden = YES;
-    _preview_next.hidden = YES;
-
     [_moves removeAllObjects];
     _nthMove = HISTORY_INDEX_END;
 }

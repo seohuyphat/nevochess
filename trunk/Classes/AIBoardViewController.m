@@ -20,9 +20,7 @@
 #import "AIBoardViewController.h"
 #import "Enums.h"
 
-
 #define ACTION_BUTTON_INDEX 4
-#define MESSAGE_BUTTON_INDEX 6
 
 enum AlertViewEnum
 {
@@ -62,26 +60,18 @@ enum ActionSheetEnum
 
 @implementation AIBoardViewController
 
+@synthesize _board;
+@synthesize _game;
+@synthesize _tableId;
 @synthesize _idleTimer;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
     {
-        self._idleTimer = nil;
-        _aiRobot = [[AIRobot alloc] initWith:self];
-        
-        _myColor = NC_COLOR_RED;
-        [_board setRedLabel:NSLocalizedString(@"You", @"")];
-        [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
-
-        // Restore pending game, if any.
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame != nil && [sPendingGame length]) {
-            [self _displayResumeGameAlert];
-        }
+        // Empty.
     }
-    
+
     return self;
 }
 
@@ -89,34 +79,33 @@ enum ActionSheetEnum
 {
     [super viewDidLoad];
 
-    // *** --- START of Toolbar modifications.
-    NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+    _board.boardOwner = self;
+    self._game = _board.game;    
+    self._tableId = nil;
 
-    // Replace the image of "message-Button" with "Change-Role" image.
-    UIBarButtonItem* msgButton = (UIBarButtonItem*) [newItems objectAtIndex:MESSAGE_BUTTON_INDEX];
-    NSString* imageName = [[NSBundle mainBundle] pathForResource:@"change-role"
-                                                          ofType:@"png"
-                                                     inDirectory:nil];
-    UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
-    _reverseRoleButton = [[UIBarButtonItem alloc] initWithImage:theImage
-        style:UIBarButtonItemStylePlain target:msgButton.target action:msgButton.action];
-    [newItems replaceObjectAtIndex:MESSAGE_BUTTON_INDEX withObject:_reverseRoleButton];
+    self._idleTimer = nil;
+    _aiRobot = [[AIRobot alloc] initWith:self];
 
-    nav_toolbar.items = newItems;
-    // *** --- END of Toolbar modifications.
+    _myColor = NC_COLOR_RED;
+    [_board setRedLabel:NSLocalizedString(@"You", @"")];
+    [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
 
-    _actionButton = [(UIBarButtonItem*)[newItems objectAtIndex:ACTION_BUTTON_INDEX] retain];
+    // Restore pending game, if any.
+    NSString* sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
+    if ( sPendingGame && [sPendingGame length]) {
+        [self _displayResumeGameAlert];
+    }
+
     _aiThinkingActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     _aiThinkingActivity.hidden = YES;
     _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
-    [activity stopAnimating];
+    [_activity stopAnimating];
 }
 
 - (void)dealloc
 {
     [_aiRobot release];
-    [_actionButton release];
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
     [_reverseRoleButton release];
@@ -133,6 +122,11 @@ enum ActionSheetEnum
     [_aiRobot release];
     _aiRobot = nil;
     [self goBackToHomeMenu];
+}
+
+- (void) goBackToHomeMenu
+{
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 //
@@ -157,9 +151,9 @@ enum ActionSheetEnum
     else if (    alertView.tag == NC_ALERT_RESET_GAME
              && buttonIndex != [alertView cancelButtonIndex] )
     {
-        [activity setHidden:NO];
-        [activity startAnimating];
-        [self rescheduleTimer];
+        [_activity setHidden:NO];
+        [_activity startAnimating];
+        [_board rescheduleTimer];
         [_aiRobot runResetRobot];
     }
 }
@@ -176,8 +170,8 @@ enum ActionSheetEnum
 
 - (IBAction)homePressed:(id)sender
 {
-    [activity setHidden:NO];
-    [activity startAnimating];
+    [_activity setHidden:NO];
+    [_activity startAnimating];
     [_board destroyTimer];
     [_aiRobot runStopRobot];
     [self saveGame];
@@ -232,8 +226,7 @@ enum ActionSheetEnum
     [actionSheet release];
 }
 
-// 'Messages' is now the "Reverse-Role" command.
-- (IBAction)messagesPressed:(id)sender
+- (IBAction)reverseRolePressed:(id)sender
 {
     if ([_game getMoveCount] > 0) {
         NSLog(@"%s: Game already started. Do nothing.", __FUNCTION__);
@@ -282,9 +275,9 @@ enum ActionSheetEnum
 
 - (void) handleNewMove:(NSNumber *)moveInfo
 {
-    NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
-    nav_toolbar.items = newItems;
+    _toolbar.items = newItems;
 
     if ([_game getMoveCount] == 1) {
         _reverseRoleButton.enabled = NO;
@@ -313,9 +306,9 @@ enum ActionSheetEnum
     else {
         _aiThinkingActivity.hidden = NO;
         [_aiThinkingActivity startAnimating];
-        NSMutableArray* newItems = [NSMutableArray arrayWithArray:nav_toolbar.items];
+        NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
         [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
-        nav_toolbar.items = newItems;
+        _toolbar.items = newItems;
 
         // AI's turn.
         [_aiRobot runGenerateMove];
@@ -457,14 +450,14 @@ enum ActionSheetEnum
     // NOTE: We know that at this time AI is not thinking.
     //       Therefore, we directly reset the Game to avoid race conditions.
     //
-    [activity setHidden:NO];
-    [activity startAnimating];
-    [self rescheduleTimer];
+    [_activity setHidden:NO];
+    [_activity startAnimating];
+    [_board rescheduleTimer];
 
     [_aiRobot resetRobot_sync];
     [_board resetBoard];
     
-    [activity stopAnimating];
+    [_activity stopAnimating];
 
     // Re-load the moves before my last Move.
     MoveAtom* pMove = nil;
@@ -518,13 +511,23 @@ enum ActionSheetEnum
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [_board resetBoard];
-    [activity stopAnimating];
+    [_activity stopAnimating];
     
     _reverseRoleButton.enabled = YES;
     if (_myColor == NC_COLOR_BLACK) {
         NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
         self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
     }
+}
+
+- (BOOL) isMyTurnNext
+{
+    return ([_game getNextColor] == _myColor);
+}
+
+- (BOOL) isGameReady
+{
+    return YES;
 }
 
 @end

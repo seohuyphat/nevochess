@@ -17,28 +17,45 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
-#import "BoardViewController.h"
+#import <UIKit/UIKit.h>
+#import "BoardView.h"
+#import "CChessGame.h"
 #import "AIRobot.h";
 
-@interface AIBoardViewController : BoardViewController<AIRobotDelegate, UIActionSheetDelegate>
+@interface AIBoardViewController : UIViewController
+                            <BoardOwner, AIRobotDelegate, UIActionSheetDelegate>
 {
+    IBOutlet UIToolbar*               _toolbar;
+    IBOutlet UIActivityIndicatorView* _activity;
+    IBOutlet UIBarButtonItem*         _actionButton;
+    IBOutlet UIBarButtonItem*         _reverseRoleButton;
+    IBOutlet BoardView*               _board;
+
+    CChessGame*  _game;
+    NSString*    _tableId;
+    ColorEnum    _myColor;  // The color (role) of the LOCAL player.
+
     NSTimer*     _idleTimer;
     AIRobot*     _aiRobot;
 
-    UIBarButtonItem*         _actionButton;
     UIActivityIndicatorView* _aiThinkingActivity;
     UIBarButtonItem*         _aiThinkingButton;
-
-    UIBarButtonItem*         _reverseRoleButton;
 }
 
+@property (nonatomic, retain) BoardView* _board;
+@property (nonatomic, retain) CChessGame* _game;
+@property (nonatomic, retain) NSString* _tableId;
 @property (nonatomic, retain) NSTimer* _idleTimer;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
+- (IBAction)actionPressed:(id)sender;
+- (IBAction)reverseRolePressed:(id)sender;
 
 - (void) handleNewMove:(NSNumber *)pMove;
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 - (void) saveGame;
+
+- (void) goBackToHomeMenu;
 
 @end

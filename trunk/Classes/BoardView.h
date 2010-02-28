@@ -93,7 +93,6 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
     IBOutlet UILabel*     _black_move_time;
 
     IBOutlet UILabel*     _game_over_msg;
-    IBOutlet UILabel*     _info_msg;
 
     IBOutlet UIButton*    _preview_prev;
     IBOutlet UIButton*    _preview_next;
@@ -139,7 +138,6 @@ typedef BOOL (*LayerMatchCallback)(CALayer*);
 - (void) setInitialTime:(NSString*)times;
 - (void) setRedTime:(NSString*)times;
 - (void) setBlackTime:(NSString*)times;
-- (void) setInfoMessage:(NSString*)msg;
 - (void) rescheduleTimer;
 - (void) destroyTimer;
 - (int) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup;

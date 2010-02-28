@@ -17,14 +17,14 @@
  *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
+/*
+ *  Enums.h
+ *  Created by Huy Phan on 02/28/2010.
+ *
+ *  Containing the common types that are used throughout the project.
+ */
 
-#import <UIKit/UIKit.h>
-#import "BoardView.h"
-#import "CChessGame.h"
-#import "TableListViewController.h"  // TODO: To get TimeInfo, TableInfo, ...
-
-
-// TODO: Temporary place here! ---------------------------------------
+#import <Foundation/Foundation.h>
 
 enum ActionIndexEnum
 {
@@ -48,41 +48,4 @@ enum ActionIndexEnum
 - (id)initWithTableState:(NSString *)state delegate:(id<UIActionSheetDelegate>)delegate
                    title:(NSString*)title;
 - (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex;
-@end
-
-// -------------------------------------------------------
-@interface BoardViewController : UIViewController <BoardOwner>
-{
-    
-    IBOutlet UIToolbar*   nav_toolbar;
-    IBOutlet UIActivityIndicatorView *activity;
-
-    BoardView*            _board;
-    CChessGame*           _game;
-
-    NSString*             _tableId;
-    ColorEnum             _myColor;  // The color (role) of the LOCAL player.
-}
-
-@property (nonatomic, retain) BoardView* _board;
-@property (nonatomic, retain) CChessGame* _game;
-@property (nonatomic, retain) NSString* _tableId;
-
-- (IBAction)homePressed:(id)sender;
-- (IBAction)resetPressed:(id)sender;
-- (IBAction)actionPressed:(id)sender;
-- (IBAction)messagesPressed:(id)sender;
-
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
-
-- (void) goBackToHomeMenu;
-- (void) setInitialTime:(NSString*)times;
-- (void) setRedTime:(NSString*)times;
-- (void) setBlackTime:(NSString*)times;
-
-- (void) saveGame;
-- (void) rescheduleTimer;
-- (BOOL) isMyTurnNext;
-- (BOOL) isGameReady;
-
 @end

@@ -75,7 +75,7 @@
 
 /* Network errors and warnings */
 "Not connected to network" = "Not connected to network";
-"Welcome %@ (%@)\n\nSelect a Table to join" = "Welcome %@ (%@)\n\nSelect a Table to join";
+"Select a Table to join" = "Select a Table to join";
 
 /* Other (misc.) */
 "Select a Table to join" = "Select a Table to join";
