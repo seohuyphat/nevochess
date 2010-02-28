@@ -63,23 +63,23 @@
 
 - (IBAction)newGamePressed:(id)sender
 {
-    AIBoardViewController *chessboard = [[AIBoardViewController alloc] initWithNibName:@"AIBoardView" bundle:nil];
-    [self.navigationController pushViewController:chessboard animated:YES];
-    [chessboard release];
+    AIBoardViewController* aiController = [[AIBoardViewController alloc] initWithNibName:@"AIBoardView" bundle:nil];
+    [self.navigationController pushViewController:aiController animated:YES];
+    [aiController release];
 }
 
 - (IBAction)networkGamePressed:(id)sender
 {
-    NetworkBoardViewController *chessboard = [[NetworkBoardViewController alloc] initWithNibName:@"NetworkBoardView" bundle:nil];
-    [self.navigationController pushViewController:chessboard animated:YES];
-    [chessboard release];
+    NetworkBoardViewController* networkController = [[NetworkBoardViewController alloc] initWithNibName:@"NetworkBoardView" bundle:nil];
+    [self.navigationController pushViewController:networkController animated:YES];
+    [networkController release];
 }
 
 - (IBAction)settingPressed:(id)sender
 {
-    OptionsViewController *optionController = [[OptionsViewController alloc] initWithNibName:@"OptionsView" bundle:nil];
-    [self.navigationController pushViewController:optionController animated:YES];
-    [optionController release];
+    OptionsViewController* optionsController = [[OptionsViewController alloc] initWithNibName:@"OptionsView" bundle:nil];
+    [self.navigationController pushViewController:optionsController animated:YES];
+    [optionsController release];
 }
 
 @end

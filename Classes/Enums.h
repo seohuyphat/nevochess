@@ -94,4 +94,8 @@ typedef enum
 #define COLUMN(sq)           ((sq) % 16 - 3)
 #define ROW(sq)              ((sq) / 16 - 3)
 
+#define SRC(mv)              ((mv) & 255)
+#define DST(mv)              ((mv) >> 8)
+#define MOVE(sqSrc, sqDst)   ((sqSrc) + (sqDst) * 256)
+
 ////////////////////// END OF FILE ////////////////////////////////////////////

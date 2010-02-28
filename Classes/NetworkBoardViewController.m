@@ -106,10 +106,11 @@
     self._loginController = nil;
     self._tableListController = nil;
 
-    self._messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
+    _messageListController = [[MessageListViewController alloc] initWithNibName:@"MessageListView" bundle:nil];
     _messageListController.delegate = self;
 
     self._connection = nil;
+    _board = [[BoardViewController alloc] initWithNibName:@"BoardView" bundle:nil];
     _board.boardOwner = self;
     self._game = _board.game;
 
@@ -159,6 +160,7 @@
 
 - (void)dealloc
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     [_username release];
     [_password release];
     [_rating release];
@@ -168,6 +170,7 @@
     self._loginController = nil;
     self._tableListController = nil;
     self._messageListController = nil;
+    self._board = nil;
     [super dealloc];
 }
 
@@ -186,6 +189,13 @@
 
 - (void) goBackToHomeMenu
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_board.view removeFromSuperview];
+    [_board destroyTimer];
+    self._board = nil;
+    _messageListController.delegate = nil;
+    _loginController.delegate = nil;
+    _tableListController._delegate = nil;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -243,7 +253,7 @@
             NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
             [_connection send_LEAVE:_tableId];
             self._tableId = nil; 
-            [_board removeFromSuperview];
+            [_board.view removeFromSuperview];
             [_board displayEmptyBoard];
             _actionButton.enabled = NO;
             break;
@@ -394,7 +404,7 @@
         NSLog(@"%s: Connecting to network...", __FUNCTION__);
         [_activity setHidden:NO];
         [_activity startAnimating];
-        self._connection = [[NetworkConnection alloc] init];
+        _connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;
         [_connection connect];
     }
@@ -414,7 +424,7 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_loginController) {
         NSLog(@"%s: Creating new Login view...", __FUNCTION__);
-        self._loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
+        _loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
         _loginController.delegate = self;
     }
     [_loginController setErrorString:errorStr];
@@ -431,7 +441,7 @@
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_tableListController) {
-        self._tableListController = [[TableListViewController alloc] initWithDelegate:self];
+        _tableListController = [[TableListViewController alloc] initWithDelegate:self];
     }
     if (event) {
         [_tableListController reinitWithList:event];
@@ -461,9 +471,10 @@
 
 - (void) _resetAndClearTable
 {
-    if (!_board.superview)
+    if (!_board.view.superview)
     {
-        [self.view addSubview:_board];
+        [self.view addSubview:_board.view];
+        [self.view bringSubviewToFront:_toolbar];
         [self.view bringSubviewToFront:_activity];
     }
     [_board resetBoard];

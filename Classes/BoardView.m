@@ -1,63 +1,27 @@
-/*
- 
- File: BoardView.m
- 
- Abstract: 
- 
- Version: 1.0
- 
- Disclaimer: IMPORTANT:  This Apple software is supplied to you by 
- Apple Inc. ("Apple") in consideration of your agreement to the
- following terms, and your use, installation, modification or
- redistribution of this Apple software constitutes acceptance of these
- terms.  If you do not agree with these terms, please do not use,
- install, modify or redistribute this Apple software.
- 
- In consideration of your agreement to abide by the following terms, and
- subject to these terms, Apple grants you a personal, non-exclusive
- license, under Apple's copyrights in this original Apple software (the
- "Apple Software"), to use, reproduce, modify and redistribute the Apple
- Software, with or without modifications, in source and/or binary forms;
- provided that if you redistribute the Apple Software in its entirety and
- without modifications, you must retain this notice and the following
- text and disclaimers in all such redistributions of the Apple Software. 
- Neither the name, trademarks, service marks or logos of Apple Inc. 
- may be used to endorse or promote products derived from the Apple
- Software without specific prior written permission from Apple.  Except
- as expressly stated in this notice, no other rights or licenses, express
- or implied, are granted by Apple herein, including but not limited to
- any patent rights that may be infringed by your derivative works or by
- other works in which the Apple Software may be incorporated.
- 
- The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
- MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
- THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
- FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
- OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
- 
- IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
- OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
- MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
- AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
- STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
- 
- Copyright © 2007 Apple Inc. All Rights Reserved.
- 
- */
-
 /***************************************************************************
+ *  Copyright 2009-2010 Nevo Hua  <nevo.hua@playxiangqi.com>               *
+ *                                                                         * 
+ *  This file is part of NevoChess.                                        *
  *                                                                         *
- * Customized by the PlayXiangqi team to work as a Xiangqi Board.          *
+ *  NevoChess is free software: you can redistribute it and/or modify      *
+ *  it under the terms of the GNU General Public License as published by   *
+ *  the Free Software Foundation, either version 3 of the License, or      *
+ *  (at your option) any later version.                                    *
  *                                                                         *
+ *  NevoChess is distributed in the hope that it will be useful,           *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          *
+ *  GNU General Public License for more details.                           *
+ *                                                                         *
+ *  You should have received a copy of the GNU General Public License      *
+ *  along with NevoChess.  If not, see <http://www.gnu.org/licenses/>.     *
  ***************************************************************************/
 
 #import "BoardView.h"
 #import "QuartzUtils.h"
 #import "Grid.h"
 #import "Piece.h"
+#import "Types.h"
 
 enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
@@ -65,98 +29,16 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     HISTORY_INDEX_BEGIN = -1
 };
 
-BOOL layerIsBit( CALayer* layer )      { return [layer isKindOfClass: [Bit class]]; }
-BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell class]]; }
-
 ///////////////////////////////////////////////////////////////////////////////
 //
-//    MoveAtom
-//
-///////////////////////////////////////////////////////////////////////////////
-
-@implementation MoveAtom
-
-@synthesize move;
-@synthesize srcPiece;
-@synthesize capturedPiece;
-
-- (id)initWithMove:(int)mv
-{
-    if (self = [super init]) {
-        self.move = [NSNumber numberWithInteger:mv];
-        self.srcPiece = nil;
-        self.capturedPiece = nil;
-    }
-    return self;
-}
-
-- (NSString*) description
-{
-    int m = [(NSNumber*)self.move intValue];
-    int sqSrc = SRC(m);
-    int sqDst = DST(m);
-    return [NSString stringWithFormat: @"%u%u -> %u%u)", ROW(sqSrc), COLUMN(sqSrc), ROW(sqDst), COLUMN(sqDst)];
-}
-
-- (void)dealloc
-{
-    [move release];
-    [srcPiece release];
-    [capturedPiece release];
-    [super dealloc];
-}
-
-@end
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//    TimeInfo
-//
-///////////////////////////////////////////////////////////////////////////////
-@implementation TimeInfo
-
-@synthesize gameTime, moveTime, freeTime;
-
-- (id)initWithTime:(TimeInfo*)other
-{
-    if (self = [self init]) {
-        gameTime = other.gameTime;
-        moveTime = other.moveTime;
-        freeTime = other.freeTime;
-    }
-    return self;
-}
-
-- (void) decrement
-{
-    if (gameTime > 0) { --gameTime; }
-    if (moveTime > 0) { --moveTime; }
-}
-
-+ (id)allocTimeFromString:(NSString *)timeContent
-{
-    TimeInfo* newTime = [TimeInfo new];
-    NSArray* components = [timeContent componentsSeparatedByString:@"/"];
-    
-    newTime.gameTime = [[components objectAtIndex:0] intValue];
-    newTime.moveTime = [[components objectAtIndex:1] intValue];
-    newTime.freeTime = [[components objectAtIndex:2] intValue];
-    
-    return newTime;
-}
-
-@end
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//    BoardView
+//    BoardViewController
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 //
-// Private methods (BoardView)
+// Private methods (BoardViewController)
 //
-@interface BoardView (PrivateMethods)
+@interface BoardViewController (PrivateMethods)
 - (CGRect) _gameBoardFrame;
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
@@ -166,7 +48,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (NSString*) _allocStringFrom:(int)seconds;
 @end
 
-@implementation BoardView
+@implementation BoardViewController
 
 @synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
@@ -175,53 +57,59 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 @synthesize _initialTime, _redTime, _blackTime;
 
 
-- (void) awakeFromNib
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
-    _gameboard = [[CALayer alloc] init];
-    _gameboard.frame = [self _gameBoardFrame];
-    [self.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+    {
+        _gameboard = [[CALayer alloc] init];
+        _gameboard.frame = [self _gameBoardFrame];
+        [self.view.layer insertSublayer:_gameboard atIndex:0]; // ... in the back.
 
-    int boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
-    _game = [[CChessGame alloc] initWithBoard:_gameboard boardType:boardType];
+        int boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
+        _game = [[CChessGame alloc] initWithBoard:_gameboard boardType:boardType];
 
-    _audioHelper = ( [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"]
-                    ? [self _initSoundSystem:NC_SOUND_PATH]
-                    : nil );    
-    _boardOwner = nil;
+        _audioHelper = ( [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"]
+                        ? [self _initSoundSystem:NC_SOUND_PATH]
+                        : nil );    
+        _boardOwner = nil;
 
-    self._initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
-    self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
-    self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
-    _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-    _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-    _red_time.text = [self _allocStringFrom:_redTime.gameTime];
-    _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
-    
-    _black_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-    _black_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-    _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
-    _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
+        self._initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
+        self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
+        self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
+        _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _red_time.text = [self _allocStringFrom:_redTime.gameTime];
+        _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
+        
+        _black_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _black_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
+        _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
-    _red_label.text = @"";
-    _black_label.text = @"";
-    _game_over_msg.hidden = YES;
+        _red_label.text = @"";
+        _black_label.text = @"";
+        _game_over_msg.hidden = YES;
 
-    _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
-    _nthMove = HISTORY_INDEX_END;
+        _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
+        _nthMove = HISTORY_INDEX_END;
 
-    _hl_nMoves = 0;
-    _hl_lastMove = INVALID_MOVE;
-    _selectedPiece = nil;
+        _hl_nMoves = 0;
+        _hl_lastMove = INVALID_MOVE;
+        _selectedPiece = nil;
 
-    self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
-    self._previewLastTouched_prev = nil;
-    self._previewLastTouched_next = nil;
-    self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
+        self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
+        self._previewLastTouched_prev = nil;
+        self._previewLastTouched_next = nil;
+        self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
+    }
+
+    return self;
 }
 
 - (void)dealloc
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     [_gameboard removeFromSuperlayer];
     [_gameboard release];
     [_game release];
@@ -237,7 +125,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (CGRect) _gameBoardFrame
 {
-    CGRect bounds = self.layer.bounds;
+    CGRect bounds = self.view.layer.bounds;
 /*
     bounds.origin.x += 2;
     bounds.origin.y += 2;
@@ -274,12 +162,12 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
        LayerMatchCallback: (LayerMatchCallback)match offset: (CGPoint*)outOffset
 {
     CGPoint where = locationInWindow;
-    where = [_gameboard convertPoint: where fromLayer: self.layer];
+    where = [_gameboard convertPoint: where fromLayer:self.view.layer];
     CALayer *layer = [_gameboard hitTest: where];
     while( layer ) {
         if( match(layer) ) {
-            CGPoint bitPos = [self.layer convertPoint: layer.position 
-                              fromLayer: layer.superlayer];
+            CGPoint bitPos = [self.view.layer convertPoint:layer.position 
+                              fromLayer:layer.superlayer];
             if( outOffset )
                 *outOffset = CGPointMake( bitPos.x-where.x, bitPos.y-where.y);
             return layer;
@@ -612,21 +500,21 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (UIView *)hitTest:(CGPoint)p withEvent:(UIEvent *)event
 {
-    UIView* foundView = [_preview_prev hitTest:[_preview_prev convertPoint:p fromView:self]
+    UIView* foundView = [_preview_prev hitTest:[_preview_prev convertPoint:p fromView:self.view]
                                      withEvent:event];
     if ([foundView isKindOfClass:[UIButton class]]) {
         self._previewLastTouched_prev = [NSDate date];
     }
     else {
 
-        foundView = [_preview_next hitTest:[_preview_next convertPoint:p fromView:self]
+        foundView = [_preview_next hitTest:[_preview_next convertPoint:p fromView:self.view]
                                  withEvent:event];
         if ([foundView isKindOfClass:[UIButton class]]) {
             self._previewLastTouched_next = [NSDate date];
         }
     }
     
-    return [super hitTest:p withEvent:event];
+    return [super.view hitTest:p withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -636,11 +524,11 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     }
     
     UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    CGPoint p = [touch locationInView:self];
+    CGPoint p = [touch locationInView:self.view];
     //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
     
-    BoardView *view = self;
-    Piece *piece = (Piece*)[view hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+    // **** UIView *view = self.view;
+    Piece *piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
      if (!piece && p.y > 382)
      {
@@ -679,7 +567,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
             return;
         }
     } else {
-        holder = (GridCell*)[view hitTestPoint:p LayerMatchCallback:layerIsGridCell offset:NULL];
+        holder = (GridCell*)[self hitTestPoint:p LayerMatchCallback:layerIsGridCell offset:NULL];
     }
     
     // Make a Move from the last selected cell to the current selected cell.

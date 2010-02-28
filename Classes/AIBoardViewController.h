@@ -29,20 +29,20 @@
     IBOutlet UIActivityIndicatorView* _activity;
     IBOutlet UIBarButtonItem*         _actionButton;
     IBOutlet UIBarButtonItem*         _reverseRoleButton;
-    IBOutlet BoardView*               _board;
 
-    CChessGame*  _game;
-    NSString*    _tableId;
-    ColorEnum    _myColor;  // The color (role) of the LOCAL player.
+    BoardViewController*  _board;
+    CChessGame*           _game;
+    NSString*             _tableId;
+    ColorEnum             _myColor;  // The color (role) of the LOCAL player.
 
-    NSTimer*     _idleTimer;
-    AIRobot*     _aiRobot;
+    NSTimer*              _idleTimer;
+    AIRobot*              _aiRobot;
 
     UIActivityIndicatorView* _aiThinkingActivity;
     UIBarButtonItem*         _aiThinkingButton;
 }
 
-@property (nonatomic, retain) BoardView* _board;
+@property (nonatomic, retain) BoardViewController* _board;
 @property (nonatomic, retain) CChessGame* _game;
 @property (nonatomic, retain) NSString* _tableId;
 @property (nonatomic, retain) NSTimer* _idleTimer;
