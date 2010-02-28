@@ -427,7 +427,12 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (IBAction)movePrevPressed:(id)sender
+- (IBAction) previewPrevious_DOWN:(id)sender
+{
+    self._previewLastTouched_prev = [NSDate date];
+}
+
+- (IBAction) previewPrevious_UP:(id)sender
 {
     self._previewLastTouched = [NSDate date];
 
@@ -440,7 +445,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 }
 
 - (BOOL) _doPreviewNEXT
-{    
+{
     if ([_moves count] == 0) {
         NSLog(@"%s: No Moves made yet.", __FUNCTION__);
         return NO;
@@ -486,7 +491,12 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (IBAction)moveNextPressed:(id)sender
+- (IBAction) previewNext_DOWN:(id)sender
+{
+    self._previewLastTouched_next = [NSDate date];
+}
+
+- (IBAction) previewNext_UP:(id)sender
 {
     self._previewLastTouched = [NSDate date];
 
@@ -498,25 +508,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 }
 
-- (UIView *)hitTest:(CGPoint)p withEvent:(UIEvent *)event
-{
-    UIView* foundView = [_preview_prev hitTest:[_preview_prev convertPoint:p fromView:self.view]
-                                     withEvent:event];
-    if ([foundView isKindOfClass:[UIButton class]]) {
-        self._previewLastTouched_prev = [NSDate date];
-    }
-    else {
-
-        foundView = [_preview_next hitTest:[_preview_next convertPoint:p fromView:self.view]
-                                 withEvent:event];
-        if ([foundView isKindOfClass:[UIButton class]]) {
-            self._previewLastTouched_next = [NSDate date];
-        }
-    }
-    
-    return [super.view hitTest:p withEvent:event];
-}
-
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if ( [[event allTouches] count] != 1 ) { // Valid for single touch only
@@ -525,9 +516,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     UITouch *touch = [[touches allObjects] objectAtIndex:0];
     CGPoint p = [touch locationInView:self.view];
-    //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);
-    
-    // **** UIView *view = self.view;
+    //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);    
+
     Piece *piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
      if (!piece && p.y > 382)
