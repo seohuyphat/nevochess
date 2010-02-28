@@ -87,7 +87,7 @@
 		AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */ = {isa = PBXBuildFile; fileRef = AFBA3CF51134460B00F8F4ED /* change-role.png */; };
 		AFC901A011386FCF00CAB0DD /* AI-avatar.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC9019F11386FCF00CAB0DD /* AI-avatar.png */; };
 		AFC901A71138708300CAB0DD /* AI-level.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC901A61138708300CAB0DD /* AI-level.png */; };
-		AFE46CC9113B08E000208548 /* BoardView.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE46CC8113B08E000208548 /* BoardView.m */; };
+		AFE46CC9113B08E000208548 /* BoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE46CC8113B08E000208548 /* BoardViewController.m */; };
 		AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFEE8C3911325EF800EE7239 /* board_320x480.png */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
@@ -209,8 +209,8 @@
 		AFBA3CF51134460B00F8F4ED /* change-role.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "change-role.png"; sourceTree = "<group>"; };
 		AFC9019F11386FCF00CAB0DD /* AI-avatar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-avatar.png"; sourceTree = "<group>"; };
 		AFC901A61138708300CAB0DD /* AI-level.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-level.png"; sourceTree = "<group>"; };
-		AFE46CC7113B08E000208548 /* BoardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardView.h; sourceTree = "<group>"; };
-		AFE46CC8113B08E000208548 /* BoardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardView.m; sourceTree = "<group>"; };
+		AFE46CC7113B08E000208548 /* BoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardViewController.h; sourceTree = "<group>"; };
+		AFE46CC8113B08E000208548 /* BoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardViewController.m; sourceTree = "<group>"; };
 		AFEE8C3911325EF800EE7239 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
@@ -338,8 +338,8 @@
 				AF778B78113ABBB4005A1E31 /* Types.m */,
 				AFF58763113579BF007E5DF1 /* AIRobot.h */,
 				AFF58764113579BF007E5DF1 /* AIRobot.m */,
-				AFE46CC7113B08E000208548 /* BoardView.h */,
-				AFE46CC8113B08E000208548 /* BoardView.m */,
+				AFE46CC7113B08E000208548 /* BoardViewController.h */,
+				AFE46CC8113B08E000208548 /* BoardViewController.m */,
 				AF4B70CA112712F80061590B /* AIBoardViewController.h */,
 				AF4B70CB112712F80061590B /* AIBoardViewController.m */,
 				AF7FBB11110F72BF004F7691 /* NetworkBoardViewController.h */,
@@ -644,7 +644,7 @@
 				AF0F05CD11302A00007F6981 /* SingleSelectionController.m in Sources */,
 				AFF58765113579BF007E5DF1 /* AIRobot.m in Sources */,
 				AF778B79113ABBB4005A1E31 /* Types.m in Sources */,
-				AFE46CC9113B08E000208548 /* BoardView.m in Sources */,
+				AFE46CC9113B08E000208548 /* BoardViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
