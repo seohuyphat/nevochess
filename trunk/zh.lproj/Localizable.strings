@@ -75,7 +75,10 @@
 
 /* Network errors and warnings */
 "Not connected to network" = "未连接到网络";
-"Select a Table to join" = "选择加入一个表";
+"Username is empty" = "用户名是空的";
+"Password is empty" = "密码是空的";
+"Username is wrong" = "用户名是错误的";
+"Password is wrong" = "密码错误";
 
 /* Other (misc.) */
 "Select a Table to join" = "选择游戏棋桌加入";

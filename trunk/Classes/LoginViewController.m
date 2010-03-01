@@ -114,7 +114,10 @@ enum LoginButtonEnum
 {
     NSLog(@"%s: ENTER. [%@]", __FUNCTION__, _username.text);
     if ([_username.text length] == 0) {
-        [self setErrorString:@"Username is required"];
+        [self setErrorString:NSLocalizedString(@"Username is empty", @"")];
+        return;
+    } else if ([_password.text length] == 0) {
+        [self setErrorString:NSLocalizedString(@"Password is empty", @"")];
         return;
     }
     _clickedButton = BUTTON_LOGIN;
