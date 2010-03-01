@@ -32,6 +32,7 @@
 - (void) _resetAndClearTable;
 - (void) _onNewMessage:(NSString*)msg from:(NSString*)pid;
 - (void) _onMyRatingUpdated:(NSString*)newRating;
+- (NSString*) _getLocalizedLoginError:(int)code defaultError:(NSString*)error;
 
 - (NSMutableDictionary*) _allocNewEvent:(NSString*)event;
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event;
@@ -143,7 +144,7 @@
         }
         else {
             NSLog(@"%s: Show the Login view...", __FUNCTION__);
-            [self _showLoginView:@""];
+            [self _showLoginView:nil];
         }
     }
 }
@@ -224,7 +225,7 @@
 - (IBAction)searchPressed:(id)sender
 {
     if (!_loginAuthenticated) {
-        [self _showLoginView:@""];
+        [self _showLoginView:nil];
         return;
     }
     [self _showListTableView:nil];
@@ -592,11 +593,21 @@
     return entries;
 }
 
+- (NSString*) _getLocalizedLoginError:(int)code defaultError:(NSString*)error
+{
+    switch (code)
+    {
+        case 5: return NSLocalizedString(@"Password is wrong", @"");
+        case 6: return NSLocalizedString(@"Username is wrong", @"");
+    }
+    return error;
+}
+   
 - (void) _handleNetworkEvent_LOGIN:(int)code withContent:(NSString*)event
 {
     if (code != 0) {  // Error
         NSLog(@"%s: Login failed. Error: [%@].", __FUNCTION__, event);
-        [self _showLoginView:event];
+        [self _showLoginView:[self _getLocalizedLoginError:code defaultError:event]];
         return;
     }
     NSArray* components = [event componentsSeparatedByString:@";"];
