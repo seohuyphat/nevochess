@@ -1,60 +1,60 @@
 /* 
-   Localizable.strings (English version)
+   Localizable.strings (French version)
    NevoChess
 
    Copyright 2009-2010 PlayXiangqi. All rights reserved.
    
-   Language: English
+   Language: French
    Translator: Huy Phan
  */
 
 "About_NevoChess_Key" = "<body><h3>NevoChess %@</h3><div><b>NevoChess</b> is an open source XiangQi application for iPhone/iPod touch, hosted on <a href=\"http://nevochess.googlecode.com\">Google Code</a>. Please contact us at <a href=\"mailto:nevochess@playxiangqi.com\"><font face=\"Times New Roman\">nevochess@PlayXiangqi.com</font></a></div><h3>Developers</h3><div>Nevo Hua (Beijing, China) <br/>Huy Phan (San Francisco, USA) </div><h3>Acknowledgement</h3><div><p><b>XQWLight</b> is an open source AI engine written by Huang Chen at <a href=\"http://www.elephantbase.net\">elephantbase.net</a></p><p><b>HaQiKi D</b> is an AI engine written by H.G. Muller at <a href=\"http://home.hccnet.nl/h.g.muller/XQhaqikid.html\">home.hccnet.nl/h.g.muller</a></p></div><div>%@</div></body>";
 
 /* Commonly shared keys to be used across the App. */
-"Yes" = "Yes";
-"No" = "No";
-"You" = "You";
-"Required" = "Required";
-"Default" = "Default";
+"Yes" = "Oui";
+"No" = "Non";
+"You" = "Tu";
+"Required" = "Requise";
+"Default" = "Défaut";
 
 /* HOME menu keys. */
-"Home" = "Home";
-"Practice" = "Practice";
-"Play Online" = "Play Online";
-"Settings" = "Settings";
+"Home" = "Accueil";
+"Practice" = "Pratique";
+"Play Online" = "Jouer en ligne";
+"Settings" = "Paramètres";
 
 /* Menu (navigation) keys */
-"Logout" = "Logout";
-"Cancel" = "Cancel";
-"Resign" = "Resign";
-"Draw" = "Draw";
-"Close Table" = "Close Table";
-"Reset Table" = "Reset Table";
-"Undo Move" = "Undo Move";
-"Resume game?" = "Resume game?";
-"New game?" = "New game?";
+"Logout" = "Déconnexion";
+"Cancel" = "Annuler";
+"Resign" = "Abandonner";
+"Draw" = "Match nul";
+"Close Table" = "Fermer Tableau";
+"Reset Table" = "Réinitialiser la table";
+"Undo Move" = "Annuler Déplacer";
+"Resume game?" = "Reprendre jeu?";
+"New game?" = "Nouveau jeu?";
 
 /* The main Settings page */
-"Sound" = "Sound";
-"Board" = "Board";
-"Piece" = "Piece";
-"AI Type" = "AI Type";
-"AI Level" = "AI Level";
-"Network" = "Network";
-"About" = "About";
+"Sound" = "Son";
+"Board" = "L'échiquier";
+"Piece" = "Pièce";
+"AI Type" = "Type AI";
+"AI Level" = "Niveau AI";
+"Network" = "Réseau";
+"About" = "Informations";
 
 /* Piece Types */
-"Chinese" = "Chinese";
+"Chinese" = "Chinois";
 "Western" = "Western";
 
 /* AI Levels */
-"Easy" = "Easy";
+"Easy" = "Simple";
 "Normal" = "Normal";
-"Hard" = "Hard";
-"Master" = "Master";
+"Hard" = "Dur";
+"Master" = "Maître";
 
 /* Game status messages. */
-"Game Over" = "Game Over";
+"Game Over" = "Partie Terminée";
 "You win,congratulations!" = "You win,congratulations!";
 "Computer wins. Don't give up, please try again!" = "Computer wins. Don't give up, please try again!";
 "You lose. You may try again!" = "You lose. You may try again!";
@@ -62,28 +62,28 @@
 "Sorry,we made too many moves, please restart again!" = "Sorry,we made too many moves, please restart again!";
 
 /* Network-Login view */
-"Username" = "Username";
-"Password" = "Password";
-"Guest" = "Guest";
-"Login" = "Login";
+"Username" = "Identifiant";
+"Password" = "Mot de Passe";
+"Guest" = "Invité";
+"Login" = "Connexion";
 
 /* Network Settings */
-"Server" = "Server";
-"Account" = "Account";
-"Auto Connect" = "Auto Connect";
+"Server" = "Serveur";
+"Account" = "Compte";
+"Auto Connect" = "Connexion Automatique";
 
 /* Network errors and warnings */
-"Not connected to network" = "Not connected to network";
-"Username is empty" = "Username is empty";
-"Password is empty" = "Password is empty";
-"Username is wrong" = "Username is wrong";
-"Password is wrong" = "Password is wrong";
+"Not connected to network" = "Pas de connexion au réseau";
+"Username is empty" = "Identifiant est vide";
+"Password is empty" = "Mot-de-Passe est vide";
+"Username is wrong" = "Identifiant est erroné";
+"Password is wrong" = "Mot-de-Passe est erroné";
 
 /* Other (misc.) */
-"Select a Table to join" = "Select a Table to join";
-"Tables" = "Tables";
+"Select a Table to join" = "Sélectionnez une table";
+"Tables" = "Tableaux";
 "Messages" = "Messages";
-"Table #%@" = "Table #%@";
+"Table #%@" = "Tableau #%@";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "General";

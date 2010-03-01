@@ -124,7 +124,7 @@
 					<object class="IBUILabel" id="785677093">
 						<reference key="NSNextResponder" ref="305440373"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{54, 318}, {184, 25}}</string>
+						<string key="NSFrame">{{54, 318}, {236, 25}}</string>
 						<reference key="NSSuperview" ref="305440373"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -169,12 +169,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAACAgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBUILabel" id="75146585">
 						<reference key="NSNextResponder" ref="305440373"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{15, 363}, {160, 21}}</string>
+						<string key="NSFrame">{{15, 363}, {165, 21}}</string>
 						<reference key="NSSuperview" ref="305440373"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
-						<string key="IBUIText">join_table_prompt</string>
+						<string key="IBUIText">Select a Table to join</string>
 						<reference key="IBUITextColor" ref="540038722"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">1</int>
@@ -484,7 +484,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAACAgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>NetworkBoardViewController</string>
 					<string>UIResponder</string>
-					<string>{{15, 6}, {320, 460}}</string>
+					<string>{{15, 34}, {320, 460}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>

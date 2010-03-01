@@ -209,6 +209,7 @@
 		AFBA3CF51134460B00F8F4ED /* change-role.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "change-role.png"; sourceTree = "<group>"; };
 		AFC9019F11386FCF00CAB0DD /* AI-avatar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-avatar.png"; sourceTree = "<group>"; };
 		AFC901A61138708300CAB0DD /* AI-level.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-level.png"; sourceTree = "<group>"; };
+		AFE387D6113C2A68007B94CC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AFE46CC7113B08E000208548 /* BoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardViewController.h; sourceTree = "<group>"; };
 		AFE46CC8113B08E000208548 /* BoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardViewController.m; sourceTree = "<group>"; };
 		AFEE8C3911325EF800EE7239 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
@@ -523,6 +524,8 @@
 				French,
 				German,
 				zh,
+				fr_FR,
+				fr,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
@@ -656,6 +659,7 @@
 			children = (
 				AFB08A13106A663E00038488 /* English */,
 				AFB08A15106A665300038488 /* zh */,
+				AFE387D6113C2A68007B94CC /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

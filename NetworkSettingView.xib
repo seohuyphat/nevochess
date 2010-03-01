@@ -12,11 +12,11 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="10"/>
 			<integer value="11"/>
-			<integer value="21"/>
 			<integer value="4"/>
-			<integer value="9"/>
+			<integer value="15"/>
+			<integer value="21"/>
+			<integer value="10"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -218,7 +218,7 @@
 							<object class="IBUILabel" id="886530450">
 								<reference key="NSNextResponder" ref="444290801"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{7, 10}, {124, 21}}</string>
+								<string key="NSFrame">{{7, 10}, {179, 21}}</string>
 								<reference key="NSSuperview" ref="444290801"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -285,30 +285,32 @@
 								<int key="IBUIBaselineAdjustment">1</int>
 								<float key="IBUIMinimumFontSize">10</float>
 							</object>
-							<object class="IBUITextField" id="198003553">
+							<object class="IBUILabel" id="219450037">
 								<reference key="NSNextResponder" ref="600045778"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{135, 4}, {156, 31}}</string>
+								<string key="NSFrame">{{137, 4}, {156, 31}}</string>
 								<reference key="NSSuperview" ref="600045778"/>
 								<bool key="IBUIOpaque">NO</bool>
-								<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
-								<bool key="IBUIEnabled">NO</bool>
-								<int key="IBUIContentVerticalAlignment">0</int>
-								<string key="IBUIText">games.playxiangqi.com</string>
+								<bool key="IBUIClipsSubviews">YES</bool>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
+								<string key="IBUIText">PlayXiangqi.com</string>
 								<object class="NSColor" key="IBUITextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MAA</bytes>
-									<reference key="NSCustomColorSpace" ref="359917222"/>
+									<int key="NSColorSpace">6</int>
+									<string key="NSCatalogName">System</string>
+									<string key="NSColorName">alternateSelectedControlColor</string>
+									<object class="NSColor" key="NSColor">
+										<int key="NSColorSpace">1</int>
+										<bytes key="NSRGB">MCAwIDEAA</bytes>
+									</object>
 								</object>
-								<object class="NSFont" key="IBUIFont">
-									<string key="NSName">Helvetica</string>
-									<double key="NSSize">12</double>
-									<int key="NSfFlags">16</int>
+								<nil key="IBUIHighlightedColor"/>
+								<object class="NSColor" key="IBUIShadowColor">
+									<int key="NSColorSpace">1</int>
+									<bytes key="NSRGB">MC42IDAuNiAwLjYgMC42AA</bytes>
 								</object>
-								<bool key="IBUIClearsOnBeginEditing">YES</bool>
-								<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
-								<float key="IBUIMinimumFontSize">17</float>
-								<object class="IBUITextInputTraits" key="IBUITextInputTraits"/>
+								<string key="IBUIShadowOffset">{0, 0}</string>
+								<int key="IBUIBaselineAdjustment">1</int>
+								<float key="IBUIMinimumFontSize">10</float>
 							</object>
 						</object>
 						<string key="NSFrameSize">{320, 43}</string>
@@ -532,7 +534,7 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="602252371"/>
-							<reference ref="198003553"/>
+							<reference ref="219450037"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -542,8 +544,8 @@
 						<reference key="parent" ref="244516402"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">25</int>
-						<reference key="object" ref="198003553"/>
+						<int key="objectID">36</int>
+						<reference key="object" ref="219450037"/>
 						<reference key="parent" ref="244516402"/>
 					</object>
 				</object>
@@ -567,7 +569,7 @@
 					<string>21.IBEditorWindowLastContentRect</string>
 					<string>21.IBPluginDependency</string>
 					<string>22.IBPluginDependency</string>
-					<string>25.IBPluginDependency</string>
+					<string>36.IBPluginDependency</string>
 					<string>4.IBEditorWindowLastContentRect</string>
 					<string>4.IBPluginDependency</string>
 					<string>9.IBEditorWindowLastContentRect</string>
@@ -613,7 +615,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">35</int>
+			<int key="maxID">36</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
