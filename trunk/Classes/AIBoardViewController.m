@@ -126,6 +126,7 @@ enum ActionSheetEnum
 - (void)viewDidDisappear:(BOOL)animated
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    [self saveGame];
     [_board.view removeFromSuperview];
     self._board = nil;
 }
@@ -188,7 +189,6 @@ enum ActionSheetEnum
     [_activity startAnimating];
     [_board destroyTimer];
     [_aiRobot runStopRobot];
-    [self saveGame];
 }
 
 - (IBAction)resetPressed:(id)sender
