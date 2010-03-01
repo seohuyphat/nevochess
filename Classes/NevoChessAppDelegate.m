@@ -19,7 +19,6 @@
 
 #import "NevoChessAppDelegate.h"
 #import "Enums.h"
-#import "AIBoardViewController.h"
 
 @implementation NevoChessAppDelegate
 
@@ -49,11 +48,7 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    UIViewController *topController = [navigationController topViewController];
-    if ([topController isKindOfClass:[AIBoardViewController class]]) {
-        AIBoardViewController* chessController = (AIBoardViewController*)topController;
-        [chessController saveGame];
-    }
+    // Empty.
 }
 
 - (void)dealloc {
