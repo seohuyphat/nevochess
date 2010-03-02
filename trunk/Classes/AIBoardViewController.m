@@ -84,6 +84,7 @@ enum ActionSheetEnum
     _board.boardOwner = self;
     [self.view addSubview:_board.view];
     [self.view bringSubviewToFront:_toolbar];
+    [self.view bringSubviewToFront:_activity];
 
     self._game = _board.game;    
     self._tableId = nil;
