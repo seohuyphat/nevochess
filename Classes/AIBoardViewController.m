@@ -50,6 +50,7 @@ enum ActionSheetEnum
 - (void) _undoLastMove;
 - (void) _countDownToAIMove;
 - (void) _askAIToGenerateMove;
+- (void) _onAfterDidMove;
 
 @end
 
@@ -287,44 +288,30 @@ enum ActionSheetEnum
     int sqSrc = SRC(move);
     int sqDst = DST(move);
     [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-                      
-    [self handleNewMove:moveInfo];
+    [self handleNewMove:move];
 }
 
-- (void) handleNewMove:(NSNumber *)moveInfo
+- (void) handleNewMove:(int)move
 {
+    [_board onNewMove:move inSetupMode:NO];
+
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
     _toolbar.items = newItems;
 
-    if ([_game getMoveCount] == 1) {
-        _reverseRoleButton.enabled = NO;
-        _resetButton.enabled = YES;
-    }
-
-    [_board onNewMove:moveInfo inSetupMode:NO];
-    if ( _game.gameResult != NC_GAME_STATUS_IN_PROGRESS ) { // Game Over?
-        [self _handleEndGameInUI];
-    }
+    [self _onAfterDidMove];
 }
 
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
 {
-    if ([_game getMoveCount] == 1) {
-        _reverseRoleButton.enabled = NO;
-        _resetButton.enabled =YES;
-    }
+    [self _onAfterDidMove];
 
-    // Inform the AI.
-    int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
-    if ( nGameResult != NC_GAME_STATUS_IN_PROGRESS ) {
-        [self _handleEndGameInUI];
-    }
-    else {
-        // AI's turn.
+    // Inform the AI if the game is not over.
+    if ( nGameResult == NC_GAME_STATUS_IN_PROGRESS ) {
+        int sqSrc = SRC(move);
+        int sqDst = DST(move);
+        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
+                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         [self _askAIToGenerateMove];
     }
 }
@@ -337,6 +324,7 @@ enum ActionSheetEnum
     
     _reverseRoleButton.enabled = YES;
     _resetButton.enabled = NO;
+    _actionButton.enabled = NO;
     if (_myColor == NC_COLOR_BLACK) {
         [self _countDownToAIMove];
     }
@@ -451,9 +439,7 @@ enum ActionSheetEnum
                 toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
-        NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-        [self handleNewMove:moveInfo];
+        [self handleNewMove:move];
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
@@ -504,9 +490,7 @@ enum ActionSheetEnum
                 toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
         [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                         toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-
-        NSNumber* moveInfo = [NSNumber numberWithInteger:move];
-        [self handleNewMove:moveInfo];
+        [self handleNewMove:move];
     }
 
     // Handle the special case if the game is reset to the beginning.
@@ -515,6 +499,7 @@ enum ActionSheetEnum
         NSLog(@"%s: Game reset to the beginning.", __FUNCTION__);
         _reverseRoleButton.enabled = YES;
         _resetButton.enabled = NO;
+        _actionButton.enabled = NO;
         if (_myColor == NC_COLOR_BLACK) {
             [self _countDownToAIMove];
         }
@@ -545,6 +530,19 @@ enum ActionSheetEnum
 
     _reverseRoleButton.enabled = NO;
     [_aiRobot runGenerateMove];
+}
+
+- (void) _onAfterDidMove
+{    
+    if ([_game getMoveCount] == 1) {
+        _reverseRoleButton.enabled = NO;
+        _resetButton.enabled = YES;
+        _actionButton.enabled = YES;
+    }
+
+    if ( _game.gameResult != NC_GAME_STATUS_IN_PROGRESS ) { // Game Over?
+        [self _handleEndGameInUI];
+    }
 }
 
 - (BOOL) isMyTurnNext

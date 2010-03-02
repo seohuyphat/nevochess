@@ -53,7 +53,7 @@
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)reverseRolePressed:(id)sender;
 
-- (void) handleNewMove:(NSNumber *)pMove;
+- (void) handleNewMove:(int)move;
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
 - (void) saveGame;
 
