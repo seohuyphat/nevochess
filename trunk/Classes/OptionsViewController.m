@@ -265,7 +265,7 @@ enum ViewTagEnum
                     [imageNames release];
                     [controller setRowHeight:80];
                     subController = controller;
-                    controller.title = _boardCell.textLabel.text;
+                    controller.title = ((UILabel*)[_boardCell viewWithTag:1]).text;
                     controller.selectionIndex = _boardType;
                     controller.tag = VIEW_TAG_BOARD_STYLE;
                     break;
@@ -291,7 +291,7 @@ enum ViewTagEnum
                     [imageNames release];
                     [controller setRowHeight:50];
                     subController = controller;
-                    controller.title = _pieceCell.textLabel.text;
+                    controller.title = ((UILabel*)[_pieceCell viewWithTag:1]).text;
                     controller.selectionIndex = _pieceType;
                     controller.tag = VIEW_TAG_PIECE_STYLE;
                     break;
@@ -310,7 +310,7 @@ enum ViewTagEnum
                                                                 imageNames:nil
                                                                   delegate:self];
                     subController = controller;
-                    controller.title = _aiTypeCell.textLabel.text;
+                    controller.title = ((UILabel*)[_aiTypeCell viewWithTag:1]).text;
                     controller.selectionIndex = _aiType;
                     controller.tag = VIEW_TAG_AI_TYPE;
                     break;
@@ -322,7 +322,7 @@ enum ViewTagEnum
                                                             imageNames:nil
                                                               delegate:self];
                     subController = controller;
-                    controller.title = _aiLevelCell.textLabel.text;
+                    controller.title = ((UILabel*)[_aiLevelCell viewWithTag:1]).text;
                     controller.selectionIndex = _aiLevel;
                     controller.tag = VIEW_TAG_AI_LEVEL;
                     break;
