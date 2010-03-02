@@ -48,7 +48,8 @@ enum ActionSheetEnum
 - (void) _displayResumeGameAlert;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 - (void) _undoLastMove;
-- (void) _countDownToAIMove:(NSTimer*)timer;
+- (void) _countDownToAIMove;
+- (void) _askAIToGenerateMove;
 
 @end
 
@@ -72,7 +73,6 @@ enum ActionSheetEnum
     {
         // Empty.
     }
-
     return self;
 }
 
@@ -251,8 +251,7 @@ enum ActionSheetEnum
     [_board reverseRole];
 
     if (_myColor == NC_COLOR_BLACK) {
-        NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
-        self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
+        [self _countDownToAIMove];
     } else {
         _reverseRoleButton.enabled = YES;
         if (_idleTimer) {
@@ -318,14 +317,20 @@ enum ActionSheetEnum
         [self _handleEndGameInUI];
     }
     else {
-        _aiThinkingActivity.hidden = NO;
-        [_aiThinkingActivity startAnimating];
-        NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
-        [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
-        _toolbar.items = newItems;
-
         // AI's turn.
-        [_aiRobot runGenerateMove];
+        [self _askAIToGenerateMove];
+    }
+}
+
+- (void) onResetDoneByAI
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_board resetBoard];
+    [_activity stopAnimating];
+    
+    _reverseRoleButton.enabled = YES;
+    if (_myColor == NC_COLOR_BLACK) {
+        [self _countDownToAIMove];
     }
 }
 
@@ -446,7 +451,7 @@ enum ActionSheetEnum
     if (   _myColor != [_game getNextColor]  // AI's turn?
         && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
-        [_aiRobot runGenerateMove];
+        [self _askAIToGenerateMove];
     }
 }
 
@@ -500,38 +505,36 @@ enum ActionSheetEnum
     {
         NSLog(@"%s: Game reset to the beginning.", __FUNCTION__);
         _reverseRoleButton.enabled = YES;
-
         if (_myColor == NC_COLOR_BLACK) {
-            NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
-            self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
+            [self _countDownToAIMove];
         }
     }
     // If it is AI's turn after the game is loaded, then inform the AI.
     else if (   _myColor != [_game getNextColor]
              && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
-        [_aiRobot runGenerateMove];
+        [self _askAIToGenerateMove];
     }
 }
 
-- (void) _countDownToAIMove:(NSTimer*)timer
+- (void) _countDownToAIMove
+{
+    NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+    self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0
+        target:self selector:@selector(_askAIToGenerateMove) userInfo:nil repeats:NO];
+}
+
+- (void) _askAIToGenerateMove
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
+    _aiThinkingActivity.hidden = NO;
+    [_aiThinkingActivity startAnimating];
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
+    [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
+    _toolbar.items = newItems;
+
     _reverseRoleButton.enabled = NO;
     [_aiRobot runGenerateMove];
-}
-
-- (void) onResetDoneByAI
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    [_board resetBoard];
-    [_activity stopAnimating];
-    
-    _reverseRoleButton.enabled = YES;
-    if (_myColor == NC_COLOR_BLACK) {
-        NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
-        self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(_countDownToAIMove:) userInfo:nil repeats:NO];
-    }
 }
 
 - (BOOL) isMyTurnNext
