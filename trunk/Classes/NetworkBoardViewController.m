@@ -692,9 +692,7 @@
         
         [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
                 toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        
-        NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-        [_board onNewMove:moveInfo inSetupMode:YES];
+        [_board onNewMove:move inSetupMode:YES];
     }
 }
 
@@ -720,9 +718,7 @@
     
     [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
             toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    
-    NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-    [_board onNewMove:moveInfo inSetupMode:NO];
+    [_board onNewMove:move inSetupMode:NO];
 }
 
 - (void) _handleNetworkEvent_E_END:(NSString*)event

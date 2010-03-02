@@ -275,9 +275,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
-- (void) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup
+- (void) onNewMove:(int)move inSetupMode:(BOOL)bSetup
 {
-    int  move = [moveInfo integerValue];
     ColorEnum moveColor = ([_game getNextColor] == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
 
     if (!bSetup) {
@@ -583,10 +582,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         if ([_game isLegalMove:move])
         {
             [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
-            
-            NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            [self onNewMove:moveInfo inSetupMode:NO];
-
+            [self onNewMove:move inSetupMode:NO];
             [_boardOwner onLocalMoveMade:move gameResult:_game.gameResult];
         }
     } else {
