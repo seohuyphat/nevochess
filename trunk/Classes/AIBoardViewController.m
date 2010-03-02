@@ -95,16 +95,20 @@ enum ActionSheetEnum
     [_board setRedLabel:NSLocalizedString(@"You", @"")];
     [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
 
-    // Restore pending game, if any.
-    NSString* sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-    if ( sPendingGame && [sPendingGame length]) {
-        [self _displayResumeGameAlert];
-    }
-
     _aiThinkingActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     _aiThinkingActivity.hidden = YES;
     _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
+    // Restore pending game, if any.
+    NSString* sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
+    if ([sPendingGame length]) {
+        //[self _displayResumeGameAlert];
+        NSString* colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
+        _myColor = ( !colorStr || [colorStr isEqualToString:@"Red"]
+                    ? NC_COLOR_RED : NC_COLOR_BLACK );
+        [self _loadPendingGame:sPendingGame];
+    }
+    
     [_activity stopAnimating];
 }
 
@@ -294,6 +298,7 @@ enum ActionSheetEnum
 
     if ([_game getMoveCount] == 1) {
         _reverseRoleButton.enabled = NO;
+        _resetButton.enabled = YES;
     }
 
     [_board onNewMove:moveInfo inSetupMode:NO];
@@ -306,6 +311,7 @@ enum ActionSheetEnum
 {
     if ([_game getMoveCount] == 1) {
         _reverseRoleButton.enabled = NO;
+        _resetButton.enabled =YES;
     }
 
     // Inform the AI.
@@ -329,6 +335,7 @@ enum ActionSheetEnum
     [_activity stopAnimating];
     
     _reverseRoleButton.enabled = YES;
+    _resetButton.enabled = NO;
     if (_myColor == NC_COLOR_BLACK) {
         [self _countDownToAIMove];
     }
@@ -424,6 +431,7 @@ enum ActionSheetEnum
 
 - (void) _loadPendingGame:(NSString *)sPendingGame
 {
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     if (_myColor == NC_COLOR_BLACK) {
         [_board reverseRole];
     }
@@ -505,6 +513,7 @@ enum ActionSheetEnum
     {
         NSLog(@"%s: Game reset to the beginning.", __FUNCTION__);
         _reverseRoleButton.enabled = YES;
+        _resetButton.enabled = NO;
         if (_myColor == NC_COLOR_BLACK) {
             [self _countDownToAIMove];
         }

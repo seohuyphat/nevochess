@@ -27,6 +27,7 @@
 {
     IBOutlet UIToolbar*               _toolbar;
     IBOutlet UIActivityIndicatorView* _activity;
+    IBOutlet UIBarButtonItem*         _resetButton;
     IBOutlet UIBarButtonItem*         _actionButton;
     IBOutlet UIBarButtonItem*         _reverseRoleButton;
 
