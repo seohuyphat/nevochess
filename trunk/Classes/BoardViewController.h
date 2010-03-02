@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import <CoreGraphics/CoreGraphics.h>
-#import <QuartzCore/QuartzCore.h>
 #import "CChessGame.h"
 #import "AudioHelper.h"
 
@@ -75,16 +73,12 @@
     int                   _nthMove;     // pivot for the Move Review
 }
 
-- (CALayer*) hitTestPoint: (CGPoint)locationInWindow
-       LayerMatchCallback: (LayerMatchCallback)match
-                   offset: (CGPoint*)outOffset;
+- (CALayer*) hitTestPoint:(CGPoint)locationInWindow
+       LayerMatchCallback:(LayerMatchCallback)match offset:(CGPoint*)outOffset;
 
 @property (readonly) CChessGame* game;
 @property (nonatomic, retain) id <BoardOwner> boardOwner;
 @property (nonatomic, retain) NSTimer* _timer;
-@property (nonatomic, retain) TimeInfo* _initialTime;
-@property (nonatomic, retain) TimeInfo* _redTime;
-@property (nonatomic, retain) TimeInfo* _blackTime;
 @property (nonatomic, retain) NSDate* _previewLastTouched;
 @property (nonatomic, retain) NSDate* _previewLastTouched_prev;
 @property (nonatomic, retain) NSDate* _previewLastTouched_next;
@@ -101,7 +95,7 @@
 - (void) setBlackTime:(NSString*)times;
 - (void) rescheduleTimer;
 - (void) destroyTimer;
-- (int) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup;
+- (void) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup;
 - (void) onGameOver;
 - (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;

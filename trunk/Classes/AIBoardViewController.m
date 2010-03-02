@@ -297,8 +297,8 @@ enum ActionSheetEnum
         _reverseRoleButton.enabled = NO;
     }
 
-    int nGameResult = [_board onNewMove:moveInfo inSetupMode:NO];
-    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
+    [_board onNewMove:moveInfo inSetupMode:NO];
+    if ( _game.gameResult != NC_GAME_STATUS_IN_PROGRESS ) { // Game Over?
         [self _handleEndGameInUI];
     }
 }
@@ -314,7 +314,7 @@ enum ActionSheetEnum
     int sqDst = DST(move);
     [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
 
-    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
+    if ( nGameResult != NC_GAME_STATUS_IN_PROGRESS ) {
         [self _handleEndGameInUI];
     }
     else {
@@ -343,29 +343,29 @@ enum ActionSheetEnum
     NSString *sound = nil;
     NSString *msg   = nil;
 
-    switch ( _game.gameResult ) {
-        case kXiangQi_YouWin:
-            sound = @"WIN";
-            msg = NSLocalizedString(@"You win,congratulations!", @"");
-            break;
-        case kXiangQi_ComputerWin:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"Computer wins. Don't give up, please try again!", @"");
-            break;
-        case kXiangqi_YouLose:
-            sound = @"LOSS";
-            msg = NSLocalizedString(@"You lose. You may try again!", @"");
-            break;
-        case kXiangQi_Draw:
-            sound = @"DRAW";
-            msg = NSLocalizedString(@"Sorry,we are in draw!", @"");
-            break;
-        case kXiangQi_OverMoves:
-            sound = @"ILLEGAL";
-            msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
-            break;
-        default:
-            break;  // Do nothing
+    GameStatusEnum result = _game.gameResult;
+
+    if (   (result == NC_GAME_STATUS_RED_WIN && _myColor == NC_COLOR_RED)
+        || (result == NC_GAME_STATUS_BLACK_WIN && _myColor == NC_COLOR_BLACK) )
+    {
+        sound = @"WIN";
+        msg = NSLocalizedString(@"You win,congratulations!", @"");
+    }
+    else if (  (result == NC_GAME_STATUS_RED_WIN && _myColor == NC_COLOR_BLACK)
+           || (result == NC_GAME_STATUS_BLACK_WIN && _myColor == NC_COLOR_RED) )
+    {
+        sound = @"LOSS";
+        msg = NSLocalizedString(@"Computer wins. Don't give up, please try again!", @"");
+    }
+    else if (result == NC_GAME_STATUS_DRAWN)
+    {
+        sound = @"DRAW";
+        msg = NSLocalizedString(@"Sorry,we are in draw!", @"");
+    }
+    else if (result == NC_GAME_STATUS_TOO_MANY_MOVES)
+    {
+        sound = @"ILLEGAL";
+        msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
     }
     
     if ( !sound ) return;
@@ -400,7 +400,7 @@ enum ActionSheetEnum
 {
     NSMutableString *sMoves = [NSMutableString new];
 
-    if ( _game.gameResult == kXiangQi_InPlay ) {
+    if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
         NSMutableArray* moves = [_board getMoves];
         for (MoveAtom *pMove in moves) {
             NSNumber *move = pMove.move;
@@ -444,7 +444,7 @@ enum ActionSheetEnum
 
     // If it is AI's turn after the game is loaded, then inform the AI.
     if (   _myColor != [_game getNextColor]  // AI's turn?
-        && _game.gameResult == kXiangQi_InPlay )
+        && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
         [_aiRobot runGenerateMove];
     }
@@ -508,7 +508,7 @@ enum ActionSheetEnum
     }
     // If it is AI's turn after the game is loaded, then inform the AI.
     else if (   _myColor != [_game getNextColor]
-             && _game.gameResult == kXiangQi_InPlay )
+             && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
         [_aiRobot runGenerateMove];
     }

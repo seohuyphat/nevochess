@@ -38,6 +38,7 @@
 - (void) _resetPieces;
 - (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color;
 - (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
+- (int) _checkGameStatus;
 
 @end
 
@@ -244,7 +245,7 @@
         [_grid cellAtRow: 8 column: 4].cross = YES;
 
         _blackAtTopSide = YES;
-        _gameResult = kXiangQi_InPlay;
+        _gameResult = NC_GAME_STATUS_IN_PROGRESS;
         
         // Create a Referee to manage the Game.
         _referee = [[Referee alloc] init];
@@ -265,7 +266,9 @@
     int move = MOVE(sqSrc, sqDst);
     int captured = 0;
 
-    [_referee makeMove:move captured:&captured];    
+    [_referee makeMove:move captured:&captured];
+    [self _checkGameStatus];
+
     return captured;
 }
 
@@ -279,31 +282,31 @@
     return [_referee isLegalMove:mv];
 }
 
-- (int) checkGameStatus
+- (int) _checkGameStatus
 {
-    int nGameResult = kXiangQi_Unknown;
-    BOOL isAI = ([self getNextColor] == NC_COLOR_RED); // AI just made this Move.
+    GameStatusEnum nGameResult = NC_GAME_STATUS_UNKNOWN;
+    BOOL redMoved = ([self getNextColor] == NC_COLOR_BLACK); // Red just moved?
 
     if ( [_referee isMate] ) {
-        nGameResult = (isAI ? kXiangQi_ComputerWin : kXiangQi_YouWin);
+        nGameResult = (redMoved ? NC_GAME_STATUS_RED_WIN : NC_GAME_STATUS_BLACK_WIN);
     }
     else {
         // Check repeat status
         int nRepVal = 0;
         if( [_referee repStatus:3 repValue:&nRepVal] > 0) {
-            if (isAI) {
-                nGameResult = nRepVal < -WIN_VALUE ? kXiangQi_ComputerWin 
-                    : (nRepVal > WIN_VALUE ? kXiangQi_YouWin : kXiangQi_Draw);
+            if (redMoved) {
+                nGameResult = nRepVal < -WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
+                    : (nRepVal > WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
             } else {
-                nGameResult = nRepVal > WIN_VALUE ? kXiangQi_ComputerWin 
-                    : (nRepVal < -WIN_VALUE ? kXiangQi_YouWin : kXiangQi_Draw);
+                nGameResult = nRepVal > WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
+                    : (nRepVal < -WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
             }
         } else if ([_referee get_nMoveNum] > NC_MAX_MOVES_PER_GAME) {
-            nGameResult = kXiangQi_OverMoves; // Too many moves
+            nGameResult = NC_GAME_STATUS_TOO_MANY_MOVES;
         }
     }
 
-    if ( nGameResult != kXiangQi_Unknown ) {  // Game Result changed?
+    if ( nGameResult != NC_GAME_STATUS_UNKNOWN ) {  // Game Result changed?
         _gameResult = nGameResult;
     }
 
@@ -324,7 +327,7 @@
     _blackAtTopSide = saved_blackAtTopSide;
     
     [_referee initGame];
-    _gameResult = kXiangQi_InPlay;
+    _gameResult = NC_GAME_STATUS_IN_PROGRESS;
 }
 
 - (void) reverseView

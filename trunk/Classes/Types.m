@@ -167,7 +167,7 @@
 
 + (id)allocTimeFromString:(NSString *)timeContent
 {
-    TimeInfo* newTime = [TimeInfo new];
+    TimeInfo* newTime = [[TimeInfo alloc] init];
     NSArray* components = [timeContent componentsSeparatedByString:@"/"];
     
     newTime.gameTime = [[components objectAtIndex:0] intValue];
