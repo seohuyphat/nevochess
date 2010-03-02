@@ -188,7 +188,7 @@
             {
                 backgroundColor = GetCGPatternNamed(@"HOXChess.png");
                 cellSize = 34;
-                cellOffset = CGPointMake(6, 5);
+                cellOffset = CGPointMake(7, 1);
                 boardOffset = CGPointMake(2, 28);
                 break;
             }
