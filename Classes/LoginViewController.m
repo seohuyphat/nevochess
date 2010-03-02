@@ -84,7 +84,6 @@ enum LoginButtonEnum
 - (void)viewDidDisappear:(BOOL)animated
 {
     NSLog(@"%s: ENTER. Clicked-button = [%d]", __FUNCTION__, _clickedButton);
-
     if (_clickedButton == BUTTON_NONE) { // canceled?
         [delegate handleLoginRequest:nil username:nil password:nil];
     }
@@ -96,7 +95,9 @@ enum LoginButtonEnum
 	// e.g. self.myOutlet = nil;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
+    NSLog(@"%s: ENTER.", __FUNCTION__);
     self.delegate = nil;
     [super dealloc];
 }

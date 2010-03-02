@@ -178,10 +178,12 @@
 
 - (IBAction)homePressed:(id)sender
 {
-    NSString* title = nil;
-    if (_loginAuthenticated && _username) {
-        title = [NSString stringWithFormat:@"%@ (%@)", _username, _rating];
+    if (!_loginAuthenticated || !_username) {
+        [self goBackToHomeMenu];
+        return;
     }
+
+    NSString* title = [NSString stringWithFormat:@"%@ (%@)", _username, _rating];
     NSString* state = @"logout";
     BoardActionSheet* actionSheet = [[BoardActionSheet alloc] initWithTableState:state delegate:self title:title];
     [actionSheet showInView:self.view];

@@ -80,5 +80,6 @@
 - (IBAction)messagesPressed:(id)sender;
 
 - (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
+- (void) goBackToHomeMenu;
 
 @end
