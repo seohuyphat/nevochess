@@ -54,8 +54,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 @synthesize boardOwner=_boardOwner;
 @synthesize _timer, _previewLastTouched;
 @synthesize _previewLastTouched_prev, _previewLastTouched_next;
-@synthesize _initialTime, _redTime, _blackTime;
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -74,9 +72,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
                         : nil );    
         _boardOwner = nil;
 
-        self._initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
-        self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
-        self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
+        _initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
+        _redTime = [[TimeInfo alloc] initWithTime:_initialTime];
+        _blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
         _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
         _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
         _red_time.text = [self _allocStringFrom:_redTime.gameTime];
@@ -158,21 +156,23 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 // Locates the layer at a given point in window coords.
 //    If the leaf layer doesn't pass the layer-match callback, the nearest ancestor that does is returned.
 //    If outOffset is provided, the point's position relative to the layer is stored into it.
-- (CALayer*) hitTestPoint: (CGPoint)locationInWindow
-       LayerMatchCallback: (LayerMatchCallback)match offset: (CGPoint*)outOffset
+- (CALayer*) hitTestPoint:(CGPoint)locationInWindow
+       LayerMatchCallback:(LayerMatchCallback)match offset:(CGPoint*)outOffset
 {
     CGPoint where = locationInWindow;
     where = [_gameboard convertPoint: where fromLayer:self.view.layer];
-    CALayer *layer = [_gameboard hitTest: where];
-    while( layer ) {
-        if( match(layer) ) {
-            CGPoint bitPos = [self.view.layer convertPoint:layer.position 
-                              fromLayer:layer.superlayer];
-            if( outOffset )
+    CALayer *layer = [_gameboard hitTest:where];
+    while ( layer ) {
+        if ( match(layer) ) {
+            CGPoint bitPos = [self.view.layer convertPoint:layer.position
+                                                 fromLayer:layer.superlayer];
+            if ( outOffset ) {
                 *outOffset = CGPointMake( bitPos.x-where.x, bitPos.y-where.y);
+            }
             return layer;
-        } else
+        } else {
             layer = layer.superlayer;
+        }
     }
     return nil;
 }
@@ -182,19 +182,22 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) setInitialTime:(NSString*)times
 {
-    self._initialTime = [TimeInfo allocTimeFromString:times];
+    [_initialTime release];
+    _initialTime = [TimeInfo allocTimeFromString:times];
 }
 
 - (void) setRedTime:(NSString*)times
 {
-    self._redTime = [TimeInfo allocTimeFromString:times];
+    [_redTime release];
+    _redTime = [TimeInfo allocTimeFromString:times];
     _red_time.text = [self _allocStringFrom:_redTime.gameTime];
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
 }
 
 - (void) setBlackTime:(NSString*)times
 {
-    self._blackTime = [TimeInfo allocTimeFromString:times];
+    [_blackTime release];
+    _blackTime = [TimeInfo allocTimeFromString:times];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 }
@@ -272,7 +275,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
-- (int) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup
+- (void) onNewMove:(NSNumber *)moveInfo inSetupMode:(BOOL)bSetup
 {
     int  move = [moveInfo integerValue];
     ColorEnum moveColor = ([_game getNextColor] == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
@@ -289,7 +292,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if ([self _isInReview]) {
         // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
         //       to signal that it is NOT yet processed.
-        return kXiangQi_Unknown;
+        return;
     }
 
     int sqSrc = SRC(move);
@@ -317,9 +320,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     // Add this new Move to the Move-History.
     pMove.srcPiece = piece;
     pMove.capturedPiece = capture;
-
-    int nGameResult = [_game checkGameStatus];
-    return nGameResult;
 }
 
 - (void) onGameOver
@@ -361,13 +361,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) rescheduleTimer
 {
-    if (self._timer) [self._timer invalidate];
+    if (_timer) [_timer invalidate];
     self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
 }
 
 - (void) destroyTimer
 {
-    if (self._timer) [self._timer invalidate];
+    if (_timer) [_timer invalidate];
     self._timer = nil;
 }
 
@@ -585,9 +585,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
             
             NSNumber *moveInfo = [NSNumber numberWithInteger:move];
-            int nGameResult = [self onNewMove:moveInfo inSetupMode:NO];
-            
-            [_boardOwner onLocalMoveMade:move gameResult:nGameResult];
+            [self onNewMove:moveInfo inSetupMode:NO];
+
+            [_boardOwner onLocalMoveMade:move gameResult:_game.gameResult];
         }
     } else {
         [self _setHighlightCells:NO];
@@ -602,8 +602,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
     _selectedPiece = nil;
 
-    self._redTime = [[TimeInfo alloc] initWithTime:_initialTime];
-    self._blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
+    [_redTime release];
+    _redTime = [[TimeInfo alloc] initWithTime:_initialTime];
+    [_blackTime release];
+    _blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
     _red_time.text = [self _allocStringFrom:_redTime.gameTime];
     _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
     _black_time.text = [self _allocStringFrom:_blackTime.gameTime];

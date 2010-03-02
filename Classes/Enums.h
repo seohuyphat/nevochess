@@ -74,6 +74,20 @@ typedef enum
 } ColorEnum;
 
 /**
+ * Game's status.
+ */
+typedef enum 
+{
+    NC_GAME_STATUS_UNKNOWN = -1,
+
+    NC_GAME_STATUS_IN_PROGRESS,
+    NC_GAME_STATUS_RED_WIN,        // Game Over. Red won.
+    NC_GAME_STATUS_BLACK_WIN,      // Game Over. Black won.
+    NC_GAME_STATUS_DRAWN,          // Game Over. Drawn.
+    NC_GAME_STATUS_TOO_MANY_MOVES  // Game Over. Too many moves.
+} GameStatusEnum;
+
+/**
  * Possible AI engines.
  */
 typedef enum

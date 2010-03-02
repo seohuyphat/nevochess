@@ -21,20 +21,6 @@
 #import "Grid.h"
 #import "Referee.h"
 
-// Possible game result
-enum{
-    kXiangQi_Unknown = -1,
-    kXiangQi_InPlay,
-    kXiangQi_YouWin,
-    kXiangQi_ComputerWin,
-    //we need this state because you might play with other online player
-    kXiangqi_YouLose,
-    kXiangQi_Draw,
-    kXiangQi_OverMoves,
-};
-
-@class Piece;
-
 @interface CChessGame : NSObject
 {
     CALayer*        _board;
@@ -44,7 +30,7 @@ enum{
     BOOL            _blackAtTopSide;
 
     Referee*        _referee;
-    int             _gameResult;
+    GameStatusEnum  _gameResult;
 }
 
 - (id) initWithBoard:(CALayer*)board boardType:(int)boardType;
@@ -59,7 +45,6 @@ enum{
 
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
 - (BOOL) isLegalMove:(int)mv;
-- (int) checkGameStatus;
 - (ColorEnum) getNextColor;
 - (int) getMoveCount;
 - (void) resetGame;
@@ -68,6 +53,6 @@ enum{
 @property (nonatomic, retain) CALayer* _board;
 @property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
-@property (nonatomic, readonly) int gameResult;
+@property (nonatomic, readonly) GameStatusEnum gameResult;
 
 @end
