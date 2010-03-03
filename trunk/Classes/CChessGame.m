@@ -108,9 +108,8 @@
     position = [s.superlayer convertPoint:position toLayer:_board];
     piece.position = position;
     piece.holder = s;
-    if(piece.superlayer == nil) {
-        // restore the captured piece during reset
-        [_board addSublayer:piece];
+    if (!piece.superlayer) {
+        [piece putbackInLayer:_board]; // Restore the captured piece.
     }
 }
 

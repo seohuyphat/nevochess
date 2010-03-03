@@ -50,7 +50,7 @@
 
 #import "Piece.h"
 #import "QuartzUtils.h"
-
+#import "Grid.h"
 
 @implementation Bit
 
@@ -124,16 +124,31 @@
     return (self.pickedUp ? NO : [super containsPoint:p]);
 }
 
-- (void) destroy
+- (void) destroyWithAnimation:(BOOL)animated
 {
-    // "Pop" the Bit by expanding it 5x as it fades away:
-    self.scale = 5;
-    self.opacity = 0.0;
-    // Removing the view from its superlayer right now would cancel the animations.
-    // Instead, defer the removal until sometime shortly after the animations finish:
-    [self performSelector: @selector(removeFromSuperlayer) withObject: nil afterDelay: 1.0];
+    if (animated) {
+        // "Pop" the Bit by expanding it 4x as it fades away:
+        self.scale = 4;
+        self.opacity = 0.0;
+        // Removing the view from its superlayer right now would cancel the animations.
+        // Instead, defer the removal until sometime shortly after the animations finish:
+        [self performSelector: @selector(removeFromSuperlayer) withObject:nil afterDelay:1.0];
+    }
+    else {
+        [self removeFromSuperlayer];
+    }
 }
 
+- (void) putbackInLayer:(CALayer*)superLayer
+{
+    // Temporarily disabling a layer’s actions
+    [CATransaction begin];
+    [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+    self.scale = 1.0;
+    self.opacity = 1.0;
+    [superLayer addSublayer:self];
+    [CATransaction commit];
+}
 
 @end
 
@@ -197,5 +212,8 @@
     [self setImage:GetCGImageNamed(name)];
     _imageName = name;
 }
+
+- (BOOL) highlighted { return holder._highlighted; }
+- (void) setHighlighted:(BOOL)highlighted { holder._highlighted = highlighted; }
 
 @end
