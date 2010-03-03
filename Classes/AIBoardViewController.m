@@ -156,7 +156,7 @@ enum ActionSheetEnum
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
     if ( alertView.tag == NC_ALERT_END_GAME ) {
-        [_aiRobot runResetRobot];
+        //[_aiRobot runResetRobot];
     }
     else if (    alertView.tag == NC_ALERT_RESUME_GAME
               && buttonIndex != [alertView cancelButtonIndex] )
@@ -199,17 +199,24 @@ enum ActionSheetEnum
 
 - (IBAction)resetPressed:(id)sender
 {
-    if ([_game getMoveCount] == 0) return;  // Do nothing if game not yet started.
-
-    UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:nil
-                                   message:NSLocalizedString(@"New game?", @"")
-                                  delegate:self 
-                         cancelButtonTitle:NSLocalizedString(@"No", @"")
-                         otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = NC_ALERT_RESET_GAME;
-    [alert show];
-    [alert release];
+    if ([_game getMoveCount] == 0) {
+        return;  // Do nothing if game not yet started.
+    }
+    else if (_game.gameResult != NC_GAME_STATUS_IN_PROGRESS) // Game Over?
+    {
+        [_aiRobot runResetRobot];
+    }
+    else {
+        UIAlertView *alert =
+            [[UIAlertView alloc] initWithTitle:nil
+                                       message:NSLocalizedString(@"New game?", @"")
+                                      delegate:self 
+                             cancelButtonTitle:NSLocalizedString(@"No", @"")
+                             otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
+        alert.tag = NC_ALERT_RESET_GAME;
+        [alert show];
+        [alert release];
+    }
 }
 
 - (IBAction)actionPressed:(id)sender

@@ -84,6 +84,7 @@
 "Tables" = "游戏棋桌";
 "Messages" = "聊天消息";
 "Table #%@" = "棋桌 #%@";
+"Preview Mode" = "预览模式";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "一般设置";
