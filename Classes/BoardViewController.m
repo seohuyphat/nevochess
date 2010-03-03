@@ -43,6 +43,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _showHighlightOfMove:(int)move;
+- (void) _clearAllHighlight;
 - (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer;
@@ -271,6 +272,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 }
 
+- (void) _clearAllHighlight
+{
+    [self _setHighlightCells:NO];
+    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    _selectedPiece.highlighted = NO;
+    _selectedPiece = nil;
+}
+
 - (NSString*) _allocStringFrom:(int)seconds
 {
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
@@ -285,7 +294,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 
     MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
-    //NSLog(@"%s: Add new move [%@].", __FUNCTION__, pMove);
     [_moves addObject:pMove];
 
     // Delay update the UI if in Preview mode.
@@ -308,7 +316,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     Piece* piece = [_game getPieceAtRow:row1 col:col1];
 
     if (capture) {
-        [capture removeFromSuperlayer];
+        [capture destroyWithAnimation:(bSetup ? NO : YES)];
         sound = (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2" );
     }
 
@@ -325,6 +333,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (void) onGameOver
 {
     _game_over_msg.text = NSLocalizedString(@"Game Over", @"");
+    _game_over_msg.alpha = 1.0;
     _game_over_msg.hidden = NO;
 }
 
@@ -336,6 +345,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     if (on && _game_over_msg.hidden) {
         _game_over_msg.text = NSLocalizedString(@"Review Mode", @"");
+        _game_over_msg.alpha = 0.5;
         _game_over_msg.hidden = NO;
     } else if (!on) {
         _game_over_msg.hidden = YES;
@@ -449,6 +459,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (IBAction) previewPrevious_UP:(id)sender
 {
     self._previewLastTouched = [NSDate date];
+    if (![self _isInReview]) {
+        NSLog(@"%s: Clear old highlight.", __FUNCTION__);
+        [self _clearAllHighlight];
+    }
 
     NSTimeInterval timeInterval = - [_previewLastTouched_prev timeIntervalSinceNow]; // in seconds.
     if (timeInterval > 0.9) { // do "go-BEGIN" if older than 1 seconds?
@@ -487,7 +501,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_audioHelper playSound:@"MOVE"];  // TODO: mono-type "move" sound
     Piece *capture = [_game getPieceAtRow:row2 col:col2];
     if (capture) {
-        [capture removeFromSuperlayer];
+        [capture destroyWithAnimation:NO];
     }
     if (!pMove.srcPiece) { // not yet processed?
         NSLog(@"%s: Process pending move [%@]...", __FUNCTION__, pMove);
@@ -556,7 +570,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     if (piece) {
         // Generate moves for the selected piece.
-        holder = (GridCell*)piece.holder;
+        holder = piece.holder;
         if (!_selectedPiece || (_selectedPiece.color == piece.color)) {
             //*******************
             int row = holder._row;
@@ -570,7 +584,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             int sqSrc = TOSQUARE(row, col);
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
             [self _setHighlightCells:YES];
+            _selectedPiece.highlighted = NO;
             _selectedPiece = piece;
+            _selectedPiece.highlighted = YES;
             [self playSound:@"CLICK"];
             return;
         }
@@ -579,10 +595,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
     
     // Make a Move from the last selected cell to the current selected cell.
-    if (holder && holder._highlighted && _selectedPiece) {
-        [self _setHighlightCells:NO];
-        
-        GridCell *cell = (GridCell*)_selectedPiece.holder;
+    _selectedPiece.highlighted = NO;
+    if (holder && holder._highlighted && _selectedPiece)
+    {
+        GridCell *cell = _selectedPiece.holder;
         //*******************
         int row1 = cell._row;
         int col1 = cell._column;
@@ -604,18 +620,15 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             [self onNewMove:move inSetupMode:NO];
             [_boardOwner onLocalMoveMade:move gameResult:_game.gameResult];
         }
-    } else {
-        [self _setHighlightCells:NO];
     }
 
+    [self _setHighlightCells:NO];
     _selectedPiece = nil;  // Reset selected state.
 }
 
 - (void) resetBoard
 {
-    [self _setHighlightCells:NO];
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
-    _selectedPiece = nil;
+    [self _clearAllHighlight];
 
     [_redTime release];
     _redTime = [[TimeInfo alloc] initWithTime:_initialTime];

@@ -82,7 +82,10 @@ enum {
 @property (nonatomic, retain) GridCell *holder;
 
 /** Removes this Bit while running a explosion/fade-out animation */
-- (void) destroy;
+- (void) destroyWithAnimation:(BOOL)animated;
+
+/** Adds this Bit back ("un-destroy") to a given layer without animation */
+- (void) putbackInLayer:(CALayer*)superLayer;
 
 @end
 
@@ -107,5 +110,6 @@ enum {
 
 @property (nonatomic)         ColorEnum color;
 @property (nonatomic, retain) NSString* _imageName;
+@property (nonatomic)         BOOL highlighted;
 
 @end
