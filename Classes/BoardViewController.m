@@ -43,7 +43,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _showHighlightOfMove:(int)move;
-- (void) _setPreviewMode:(BOOL)on;
+- (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer;
 - (NSString*) _allocStringFrom:(int)seconds;
@@ -328,14 +328,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _game_over_msg.hidden = NO;
 }
 
-- (void) _setPreviewMode:(BOOL)on
+- (void) _setReviewMode:(BOOL)on
 {
     if (_game.gameResult != NC_GAME_STATUS_IN_PROGRESS) {
         return;  // Do nothing if Game Over.
     }
 
     if (on && _game_over_msg.hidden) {
-        _game_over_msg.text = NSLocalizedString(@"Preview Mode", @"");
+        _game_over_msg.text = NSLocalizedString(@"Review Mode", @"");
         _game_over_msg.hidden = NO;
     } else if (!on) {
         _game_over_msg.hidden = YES;
@@ -457,7 +457,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         [self _doPreviewPREV];
     }
 
-    [self _setPreviewMode:[self _isInReview]];
+    [self _setReviewMode:[self _isInReview]];
 }
 
 - (BOOL) _doPreviewNEXT
@@ -523,7 +523,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         [self _doPreviewNEXT];
     }
 
-    [self _setPreviewMode:[self _isInReview]];
+    [self _setReviewMode:[self _isInReview]];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
