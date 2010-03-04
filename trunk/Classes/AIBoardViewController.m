@@ -294,13 +294,19 @@ enum ActionSheetEnum
     int  move = [moveInfo integerValue];
     int sqSrc = SRC(move);
     int sqDst = DST(move);
-    [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc) toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    [self handleNewMove:move];
+    Position from, to;
+    from.row = ROW(sqSrc);
+    from.col = COLUMN(sqSrc);
+    to.row = ROW(sqDst);
+    to.col = COLUMN(sqDst);
+
+    [_game doMoveFrom:from toPosition:to];
+    [self handleNewMoveFrom:from toPosition:to];
 }
 
-- (void) handleNewMove:(int)move
+- (void) handleNewMoveFrom:(Position)from toPosition:(Position)to
 {
-    [_board onNewMove:move inSetupMode:NO];
+    [_board onNewMoveFrom:from toPosition:to inSetupMode:NO];
 
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
@@ -309,16 +315,12 @@ enum ActionSheetEnum
     [self _onAfterDidMove];
 }
 
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
+- (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to
 {
     [self _onAfterDidMove];
 
-    // Inform the AI if the game is not over.
-    if ( nGameResult == NC_GAME_STATUS_IN_PROGRESS ) {
-        int sqSrc = SRC(move);
-        int sqDst = DST(move);
-        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
+        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
         [self _askAIToGenerateMove];
     }
 }
@@ -436,17 +438,20 @@ enum ActionSheetEnum
     int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
-
+    Position from, to;
+    
     for (NSNumber *pMove in moves) {
         move  = [pMove integerValue];
         sqSrc = SRC(move);
         sqDst = DST(move);
+        from.row = ROW(sqSrc);
+        from.col = COLUMN(sqSrc);
+        to.row = ROW(sqDst);
+        to.col = COLUMN(sqDst);
 
-        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [self handleNewMove:move];
+        [_game doMoveFrom:from toPosition:to];
+        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
+        [self handleNewMoveFrom:from toPosition:to];
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
@@ -485,19 +490,22 @@ enum ActionSheetEnum
     int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
-
+    Position from, to;
+    
     for (int i = 0; i < myLastMoveIndex; ++i)
     {
         pMove = [moves objectAtIndex:i]; 
         move = [pMove.move integerValue];
         sqSrc = SRC(move);
         sqDst = DST(move);
+        from.row = ROW(sqSrc);
+        from.col = COLUMN(sqSrc);
+        to.row = ROW(sqDst);
+        to.col = COLUMN(sqDst);
 
-        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [_aiRobot onMove_sync:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                        toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [self handleNewMove:move];
+        [_game doMoveFrom:from toPosition:to];
+        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
+        [self handleNewMoveFrom:from toPosition:to];
     }
 
     // Handle the special case if the game is reset to the beginning.

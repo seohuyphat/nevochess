@@ -258,10 +258,10 @@
     _board.hidden = !visible;
 }
 
-- (int) doMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
+- (int) doMoveFrom:(Position)from toPosition:(Position)to
 {
-    int sqSrc = TOSQUARE(row1, col1);
-    int sqDst = TOSQUARE(row2, col2);
+    int sqSrc = TOSQUARE(from.row, from.col);
+    int sqDst = TOSQUARE(to.row, to.col);
     int move = MOVE(sqSrc, sqDst);
     int captured = 0;
 
@@ -271,14 +271,18 @@
     return captured;
 }
 
-- (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs
+- (int) generateMoveFrom:(Position)from moves:(int*)mvs
 {
+    int sqSrc = TOSQUARE(from.row, from.col);
     return [_referee generateMoveFrom:sqSrc moves:mvs];
 }
 
-- (BOOL) isLegalMove:(int)mv
+- (BOOL) isMoveLegalFrom:(Position)from toPosition:(Position)to
 {
-    return [_referee isLegalMove:mv];
+    int sqSrc = TOSQUARE(from.row, from.col);
+    int sqDst = TOSQUARE(to.row, to.col);
+    int move = MOVE(sqSrc, sqDst);
+    return [_referee isLegalMove:move];
 }
 
 - (int) _checkGameStatus
@@ -343,6 +347,18 @@
         }
     }
     _blackAtTopSide = !_blackAtTopSide;
+}
+
+- (Position) getActualPositionAt:(int)row column:(int)col
+{
+    if (!self.blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    Position position;
+    position.row = row;
+    position.col = col;
+    return position;
 }
 
 - (void) _resetPieces

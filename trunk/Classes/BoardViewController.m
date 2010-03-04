@@ -285,8 +285,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
-- (void) onNewMove:(int)move inSetupMode:(BOOL)bSetup
+- (void) onNewMoveFrom:(Position)from toPosition:(Position)to
+           inSetupMode:(BOOL)bSetup
 {
+    int sqSrc = TOSQUARE(from.row, from.col);
+    int sqDst = TOSQUARE(to.row, to.col);
+    int move = MOVE(sqSrc, sqDst);
+
     ColorEnum moveColor = (_game.nextColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
 
     if (!bSetup) {
@@ -303,17 +308,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         return;
     }
 
-    int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    int row1 = ROW(sqSrc);
-    int col1 = COLUMN(sqSrc);
-    int row2 = ROW(sqDst);
-    int col2 = COLUMN(sqDst);
-
     NSString* sound = @"MOVE";
 
-    Piece* capture = [_game getPieceAtRow:row2 col:col2];
-    Piece* piece = [_game getPieceAtRow:row1 col:col1];
+    Piece* piece = [_game getPieceAtRow:from.row col:from.col];
+    Piece* capture = [_game getPieceAtRow:to.row col:to.col];
 
     if (capture) {
         [capture destroyWithAnimation:(bSetup ? NO : YES)];
@@ -322,7 +320,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     [_audioHelper playSound:sound];
 
-    [_game movePiece:piece toRow:row2 toCol:col2];
+    [_game movePiece:piece toRow:to.row toCol:to.col];
     [self _showHighlightOfMove:move];
 
     // Add this new Move to the Move-History.
@@ -546,11 +544,11 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         return;
     }
     
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
+    UITouch* touch = [[touches allObjects] objectAtIndex:0];
     CGPoint p = [touch locationInView:self.view];
     //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);    
 
-    Piece *piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+    Piece* piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
      if (!piece && p.y > 382) // ... near the y-coordinate of Review buttons.
      {
@@ -566,24 +564,16 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         return;
     }
     
-    GridCell *holder = nil;
+    GridCell* holder = nil;
     
     if (piece) {
         holder = piece.holder;
         if (   (!_selectedPiece && piece.color == _game.nextColor) 
             || (_selectedPiece && piece.color == _selectedPiece.color) )
         {
-            //*******************
-            int row = holder._row;
-            int col = holder._column;
-            if (!_game.blackAtTopSide) {
-                row = 9 - row;
-                col = 8 - col;
-            }
-            //*******************  Generate moves for the selected piece.
+            Position from = [_game getActualPositionAt:holder._row column:holder._column];
             [self _setHighlightCells:NO];
-            int sqSrc = TOSQUARE(row, col);
-            _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];
+            _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
             _selectedPiece.highlighted = NO;
             _selectedPiece = piece;
@@ -599,27 +589,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _selectedPiece.highlighted = NO;
     if (holder && holder._highlighted && _selectedPiece)
     {
-        GridCell *cell = _selectedPiece.holder;
-        //*******************
-        int row1 = cell._row;
-        int col1 = cell._column;
-        int row2 = holder._row;
-        int col2 = holder._column;
-        if (!_game.blackAtTopSide) {
-            row1 = 9 - row1;
-            col1 = 8 - col1;
-            row2 = 9 - row2;
-            col2 = 8 - col2;
-        }
-        //*******************
-        int sqSrc = TOSQUARE(row1, col1);
-        int sqDst = TOSQUARE(row2, col2);
-        int move = MOVE(sqSrc, sqDst);
-        if ([_game isLegalMove:move])
+        GridCell* cell = _selectedPiece.holder;
+        Position from = [_game getActualPositionAt:cell._row column:cell._column];
+        Position to = [_game getActualPositionAt:holder._row column:holder._column];
+        if ([_game isMoveLegalFrom:from toPosition:to])
         {
-            [_game doMove:row1 fromCol:col1 toRow:row2 toCol:col2];
-            [self onNewMove:move inSetupMode:NO];
-            [_boardOwner onLocalMoveMade:move gameResult:_game.gameResult];
+            [_game doMoveFrom:from toPosition:to];
+            [self onNewMoveFrom:from toPosition:to inSetupMode:NO];
+            [_boardOwner onLocalMoveMadeFrom:from toPosition:to];
         }
     }
 

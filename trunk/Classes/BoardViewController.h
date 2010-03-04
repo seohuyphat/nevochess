@@ -27,7 +27,7 @@
 @protocol BoardOwner <NSObject>
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
+- (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to;
 @end
 
 // --------------------------------------
@@ -95,7 +95,8 @@
 - (void) setBlackTime:(NSString*)times;
 - (void) rescheduleTimer;
 - (void) destroyTimer;
-- (void) onNewMove:(int)move inSetupMode:(BOOL)bSetup;
+- (void) onNewMoveFrom:(Position)from toPosition:(Position)to
+           inSetupMode:(BOOL)bSetup;
 - (void) onGameOver;
 - (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;

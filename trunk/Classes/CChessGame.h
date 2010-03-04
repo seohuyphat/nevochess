@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #import "Enums.h"
+#import "Types.h"
 #import "Grid.h"
 #import "Referee.h"
 
@@ -41,13 +42,13 @@
 - (GridCell*) getCellAt:(int)square;
 - (void) highlightCell:(int)cell highlight:(BOOL)bHighlight;
 
-- (int) doMove:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
-
-- (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
-- (BOOL) isLegalMove:(int)mv;
+- (int) doMoveFrom:(Position)from toPosition:(Position)to;
+- (int) generateMoveFrom:(Position)from moves:(int*)mvs;
+- (BOOL) isMoveLegalFrom:(Position)from toPosition:(Position)to;
 - (int) getMoveCount;
 - (void) resetGame;
 - (void) reverseView;
+- (Position) getActualPositionAt:(int)row column:(int)col;
 
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) GameStatusEnum gameResult;
