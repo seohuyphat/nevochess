@@ -85,7 +85,6 @@ BOOL layerIsGridCell( CALayer* layer );
 @property CGColorRef lineColor;      // Cell background color, line color (or nil)
 @property CGColorRef highlightColor;
 @property CGColorRef animateColor;
-@property (nonatomic, retain) GridCell* _river;
 
 /** Returns the GridCell at the given coordinates, or nil if there is no cell there.
     It's OK to call this with off-the-board coordinates; it will just return nil.*/
@@ -108,7 +107,6 @@ BOOL layerIsGridCell( CALayer* layer );
 /** A single cell in a grid (customized for Xiangqi). */
 @interface GridCell : CALayer
 {
-    Bit*     _bit;
     BOOL     _highlighted;
     BOOL     _animated;
     Grid*    _grid;
@@ -120,17 +118,10 @@ BOOL layerIsGridCell( CALayer* layer );
 - (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
               frame:(CGRect)frame;
 
-/** Current Bit, or nil if empty */
-@property (nonatomic, retain) Bit* _bit;
+@property (nonatomic, setter=setHighlighted:) BOOL highlighted;
+@property (nonatomic, setter=setAnimated:) BOOL animated;
 
-/** Conveniences for comparing self.bit with nil */
-@property (nonatomic, readonly, getter=isEmpty) BOOL empty;
-
-/** BitHolders will be highlighted while the target of a drag operation */
-@property (nonatomic, setter=setHighlighted:) BOOL _highlighted;
-@property (nonatomic, setter=setAnimated:) BOOL _animated;
-
-@property (nonatomic) unsigned _row, _column;
+@property (nonatomic) unsigned row, column;
 @property (nonatomic) BOOL dotted;
 @property (nonatomic) BOOL cross;
 @property (readonly) GridCell *nw, *n, *ne, *e, *se, *s, *sw, *w; // Absolute directions (n = increasing row#)

@@ -208,7 +208,7 @@
     [self setImage:image scale:MAX(size.width,size.height)];
 }
 
-- (BOOL) highlighted { return holder._highlighted; }
-- (void) setHighlighted:(BOOL)highlighted { holder._highlighted = highlighted; }
+- (BOOL) highlighted { return holder.highlighted; }
+- (void) setHighlighted:(BOOL)highlighted { holder.highlighted = highlighted; }
 
 @end
