@@ -45,14 +45,12 @@
 
 - (int) generateMoveFrom:(int)sqSrc moves:(int*)mvs;
 - (BOOL) isLegalMove:(int)mv;
-- (ColorEnum) getNextColor;
 - (int) getMoveCount;
 - (void) resetGame;
 - (void) reverseView;
 
-@property (nonatomic, retain) CALayer* _board;
-@property (nonatomic, readonly) Grid* _grid;
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) GameStatusEnum gameResult;
+@property (readonly, getter=getNextColor) ColorEnum nextColor;
 
 @end

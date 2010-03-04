@@ -321,7 +321,7 @@
 
 - (BOOL) isMyTurnNext
 {
-    return ([_game getNextColor] == _myColor);
+    return (_game.nextColor == _myColor);
 }
 
 - (BOOL) isGameReady

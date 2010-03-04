@@ -54,8 +54,6 @@
 
 @implementation CChessGame
 
-@synthesize _board;
-@synthesize _grid;
 @synthesize gameResult=_gameResult;
 @synthesize blackAtTopSide=_blackAtTopSide;
 
@@ -160,7 +158,8 @@
     [_grid release];
     [_pieceBox release];
     [_referee release];
-    self._board = nil;    
+    [_board release];
+    _board = nil;    
     [super dealloc];
 }
 
@@ -168,7 +167,7 @@
 {
     if (self = [super init])
     {
-        self._board = board;
+        _board = [board retain];
 
         CGFloat    cellSize = 33;
         CGPoint    cellOffset = CGPointMake(2, 3);
@@ -285,7 +284,7 @@
 - (int) _checkGameStatus
 {
     GameStatusEnum nGameResult = NC_GAME_STATUS_UNKNOWN;
-    BOOL redMoved = ([self getNextColor] == NC_COLOR_BLACK); // Red just moved?
+    BOOL redMoved = (self.nextColor == NC_COLOR_BLACK); // Red just moved?
 
     if ( [_referee isMate] ) {
         nGameResult = (redMoved ? NC_GAME_STATUS_RED_WIN : NC_GAME_STATUS_BLACK_WIN);
