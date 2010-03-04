@@ -70,7 +70,6 @@ BOOL layerIsGridCell( CALayer* layer );
     CGColorRef      _animateColor;
     CGPoint         _cellOffset;
     NSMutableArray* _cells; // Really a 2D array, in row-major order.
-    GridCell*       _river;
 }
 
 /** Initializes a new Grid with the given dimensions and cell size, and position in superview.

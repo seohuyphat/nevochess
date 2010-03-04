@@ -88,21 +88,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         id null = [NSNull null];
         while( n-- > 0 ) { [_cells addObject:null]; }
         [self setNeedsDisplay];
-        
-        // Create the River if required.
-        if (!self.backgroundColor)
-        {
-            CGRect frame;
-            frame.origin.x = _cellOffset.x + 4.5 * _spacing.width;
-            frame.origin.y = _cellOffset.y + 5.0 * _spacing.height;
-            frame.size.height = _spacing.height;
-            frame.size.width = _spacing.width * 8;
-            _river = [[GridCell alloc] initWithGrid:self row:nRows column:nColumns frame:frame];
-            [self addSublayer:_river];
-            _river.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-            _river.borderColor = kRedColor;
-            _river.borderWidth = 1.0;
-        }
     }
     return self;
 }
@@ -114,7 +99,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     CGColorRelease(_highlightColor);
     CGColorRelease(_animateColor);
     [_cells release];
-    [_river release];
     [super dealloc];
 }
 
@@ -277,36 +261,49 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     CGRect frame = self.frame;
     const CGFloat midx = floor(CGRectGetMidX(frame)) + 0.5;
     const CGFloat midy = floor(CGRectGetMidY(frame)) + 0.5;
+
     CGPoint p[4] = { { CGRectGetMinX(frame), midy }, // From Right
                      { CGRectGetMaxX(frame), midy }, // ... to Left. 
                      { midx, CGRectGetMinY(frame) },   // From Top
                      { midx, CGRectGetMaxY(frame) } }; // ... to Bottom.
-    if ( ! self.s )  p[2].y = midy;
-    if ( ! self.n )  p[3].y = midy;
+    if (   ! self.s 
+        || ( _row == 5 && (_column != 0 && _column != 8) ) )
+    {
+        p[2].y = midy;
+    }
+    if (   ! self.n 
+        || ( _row == 4 && (_column != 0 && _column != 8) ) )
+    {
+        p[3].y = midy;
+    }
     if ( ! self.w )  p[0].x = midx;
     if ( ! self.e )  p[1].x = midx;
     CGContextStrokeLineSegments(ctx, p, 4);
     
     if ( dotted )
     {
-        const CGFloat midx_offset = CGRectGetWidth(frame)/4;
-        const CGFloat midy_offset = CGRectGetHeight(frame)/4;
-        CGPoint pos[16] = {{midx - 2, midy + 2}, {midx - 2, midy + 2 + midy_offset}, {midx - 2, midy + 2}, {midx - 2 - midx_offset, midy + 2},
-            {midx + 2, midy + 2}, {midx + 2, midy + 2 + midy_offset}, {midx + 2, midy + 2}, {midx + 2 + midx_offset, midy + 2},
-            {midx - 2, midy - 2}, {midx - 2, midy - 2 - midy_offset}, {midx - 2, midy - 2}, {midx - 2 - midx_offset, midy - 2},
-            {midx + 2, midy - 2}, {midx + 2, midy - 2 - midy_offset}, {midx + 2, midy - 2}, {midx + 2 + midx_offset, midy - 2}};
-        if( ! self.s ) {pos[8].x = pos[9].x = pos[10].x = pos[11].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
-            pos[8].y = pos[9].y = pos[10].y = pos[11].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
-        
-        if( ! self.n ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[4].x = pos[5].x = pos[6].x = pos[7].x = midx;
-            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[4].y = pos[5].y = pos[6].y = pos[7].y = midy;}
-        
-        if( ! self.w ) {pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[8].x = pos[9].x = pos[10].x = pos[11].x = midx;
-            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[8].y = pos[9].y = pos[10].y = pos[11].y = midy;}
-        
-        if( ! self.e ) {pos[4].x = pos[5].x = pos[6].x = pos[7].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
-            pos[4].y = pos[5].y = pos[6].y = pos[7].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;}
-        
+        const CGFloat mid_offset = 5;
+        CGPoint pos[16] = {
+            {midx - 2, midy + 2}, {midx - 2, midy + 2 + mid_offset}, {midx - 2, midy + 2}, {midx - 2 - mid_offset, midy + 2},
+            {midx + 2, midy + 2}, {midx + 2, midy + 2 + mid_offset}, {midx + 2, midy + 2}, {midx + 2 + mid_offset, midy + 2},
+            {midx - 2, midy - 2}, {midx - 2, midy - 2 - mid_offset}, {midx - 2, midy - 2}, {midx - 2 - mid_offset, midy - 2},
+            {midx + 2, midy - 2}, {midx + 2, midy - 2 - mid_offset}, {midx + 2, midy - 2}, {midx + 2 + mid_offset, midy - 2}};
+        if ( ! self.s ) {
+            pos[8].x = pos[9].x = pos[10].x = pos[11].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
+            pos[8].y = pos[9].y = pos[10].y = pos[11].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;
+        }
+        if ( ! self.n ) {
+            pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[4].x = pos[5].x = pos[6].x = pos[7].x = midx;
+            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[4].y = pos[5].y = pos[6].y = pos[7].y = midy;
+        }
+        if ( ! self.w ) {
+            pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[8].x = pos[9].x = pos[10].x = pos[11].x = midx;
+            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[8].y = pos[9].y = pos[10].y = pos[11].y = midy;
+        }
+        if ( ! self.e ) {
+            pos[4].x = pos[5].x = pos[6].x = pos[7].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
+            pos[4].y = pos[5].y = pos[6].y = pos[7].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;
+        }
         CGContextStrokeLineSegments(ctx, pos, 16);
     }
 
@@ -357,13 +354,13 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [self setNeedsDisplay];
 }
 
-- (GridCell*) nw { return [_grid cellAtRow: _row+1 column: _column-1]; }
-- (GridCell*) n  { return [_grid cellAtRow: _row+1 column: _column  ]; }
-- (GridCell*) ne { return [_grid cellAtRow: _row+1 column: _column+1]; }
-- (GridCell*) e  { return [_grid cellAtRow: _row   column: _column+1]; }
-- (GridCell*) se { return [_grid cellAtRow: _row-1 column: _column+1]; }
-- (GridCell*) s  { return [_grid cellAtRow: _row-1 column: _column  ]; }
-- (GridCell*) sw { return [_grid cellAtRow: _row-1 column: _column-1]; }
-- (GridCell*) w  { return [_grid cellAtRow: _row   column: _column-1]; }
+- (GridCell*) nw { return [_grid cellAtRow:_row+1 column:_column-1]; }
+- (GridCell*) n  { return [_grid cellAtRow:_row+1 column:_column  ]; }
+- (GridCell*) ne { return [_grid cellAtRow:_row+1 column:_column+1]; }
+- (GridCell*) e  { return [_grid cellAtRow:_row   column:_column+1]; }
+- (GridCell*) se { return [_grid cellAtRow:_row-1 column:_column+1]; }
+- (GridCell*) s  { return [_grid cellAtRow:_row-1 column:_column  ]; }
+- (GridCell*) sw { return [_grid cellAtRow:_row-1 column:_column-1]; }
+- (GridCell*) w  { return [_grid cellAtRow:_row   column:_column-1]; }
 
 @end
