@@ -305,17 +305,11 @@
     [_messageListController setTableId:_tableId];
 }
 
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult
+- (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to
 {
-    int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    int row1 = ROW(sqSrc);
-    int col1 = COLUMN(sqSrc);
-    int row2 = ROW(sqDst);
-    int col2 = COLUMN(sqDst);
-
     // Send over the network.
-    NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d", col1, row1, col2, row2];
+    NSString* moveStr = [NSString stringWithFormat:@"%d%d%d%d",
+                         from.col, from.row, to.col, to.row];
     [_connection send_MOVE:_tableId move:moveStr];
 }
 
@@ -679,22 +673,17 @@
     NSString* tableId = [components objectAtIndex:0];
     NSString* movesStr = [components objectAtIndex:1];
     NSLog(@"%s: [#%@: %@].", __FUNCTION__, tableId, movesStr);
+    Position from, to;
     NSArray* moves = [movesStr componentsSeparatedByString:@"/"];
     for (NSString *moveStr in moves) {
         
-        int row1 = [moveStr characterAtIndex:1] - '0';
-        int col1 = [moveStr characterAtIndex:0] - '0';
-        int row2 = [moveStr characterAtIndex:3] - '0';
-        int col2 = [moveStr characterAtIndex:2] - '0';
-        //NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
-        
-        int sqSrc = TOSQUARE(row1, col1);
-        int sqDst = TOSQUARE(row2, col2);
-        int move = MOVE(sqSrc, sqDst);
-        
-        [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-                toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-        [_board onNewMove:move inSetupMode:YES];
+        from.row = [moveStr characterAtIndex:1] - '0';
+        from.col = [moveStr characterAtIndex:0] - '0';
+        to.row = [moveStr characterAtIndex:3] - '0';
+        to.col = [moveStr characterAtIndex:2] - '0';
+
+        [_game doMoveFrom:from toPosition:to];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
     }
 }
 
@@ -708,19 +697,15 @@
         NSLog(@"%s: Move:[%@] from table:[%@] ignored.", __FUNCTION__, moveStr, tableId);
         return;
     }
-    int row1 = [moveStr characterAtIndex:1] - '0';
-    int col1 = [moveStr characterAtIndex:0] - '0';
-    int row2 = [moveStr characterAtIndex:3] - '0';
-    int col2 = [moveStr characterAtIndex:2] - '0';
-    NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
-    
-    int sqSrc = TOSQUARE(row1, col1);
-    int sqDst = TOSQUARE(row2, col2);
-    int move = MOVE(sqSrc, sqDst);
-    
-    [_game doMove:ROW(sqSrc) fromCol:COLUMN(sqSrc)
-            toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    [_board onNewMove:move inSetupMode:NO];
+    Position from, to;
+    from.row = [moveStr characterAtIndex:1] - '0';
+    from.col = [moveStr characterAtIndex:0] - '0';
+    to.row = [moveStr characterAtIndex:3] - '0';
+    to.col = [moveStr characterAtIndex:2] - '0';
+    //NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
+
+    [_game doMoveFrom:from toPosition:to];
+    [_board onNewMoveFrom:from toPosition:to inSetupMode:NO];
 }
 
 - (void) _handleNetworkEvent_E_END:(NSString*)event

@@ -79,7 +79,7 @@
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)messagesPressed:(id)sender;
 
-- (void) onLocalMoveMade:(int)move gameResult:(int)nGameResult;
+- (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to;
 - (void) goBackToHomeMenu;
 
 @end
