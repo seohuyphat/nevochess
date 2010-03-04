@@ -130,7 +130,6 @@ BOOL layerIsGridCell( CALayer* layer );
 @property (nonatomic, setter=setHighlighted:) BOOL _highlighted;
 @property (nonatomic, setter=setAnimated:) BOOL _animated;
 
-@property (nonatomic, retain) Grid* _grid;
 @property (nonatomic) unsigned _row, _column;
 @property (nonatomic) BOOL dotted;
 @property (nonatomic) BOOL cross;

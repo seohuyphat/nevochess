@@ -110,6 +110,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void) dealloc
 {
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     CGColorRelease(_lineColor);
     CGColorRelease(_highlightColor);
     CGColorRelease(_animateColor);
@@ -235,7 +236,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 @synthesize _highlighted, _animated;
 @synthesize _bit;
-@synthesize _grid, _row, _column;
+@synthesize _row, _column;
 @synthesize dotted, cross;
 
 - (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
@@ -259,7 +260,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (void) dealloc
 {
     [_bit release];
-    [_grid release];
+    _grid  = nil;
     [super dealloc];
 }
 

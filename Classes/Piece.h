@@ -106,10 +106,8 @@ enum {
 
 - (void) setImage:(CGImageRef)image scale:(CGFloat)scale;
 - (void) setImage:(CGImageRef)image;
-- (void) setImageNamed:(NSString*)name;
 
 @property (nonatomic)         ColorEnum color;
-@property (nonatomic, retain) NSString* _imageName;
 @property (nonatomic)         BOOL highlighted;
 
 @end
