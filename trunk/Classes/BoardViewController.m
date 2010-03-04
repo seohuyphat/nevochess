@@ -29,6 +29,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     HISTORY_INDEX_BEGIN = -1
 };
 
+// The threshold (in seconds) to "go-BEGIN" or "go-END".
+#define REVIEW_BEGIN_END_THRESHOLD 0.7
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    BoardViewController
@@ -245,7 +248,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (_hl_lastMove != INVALID_MOVE) {
         GridCell* lastCell = [_game getCellAt:DST(_hl_lastMove)];
         [lastCell removeAnimationForKey:@"animateBounds"];
-        lastCell._animated = NO;
+        lastCell.animated = NO;
         _hl_lastMove = INVALID_MOVE;
     }
 
@@ -267,7 +270,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
 
         [currentCell addAnimation:boundsAnimation forKey:@"animateBounds"];
-        currentCell._animated = YES;
+        currentCell.animated = YES;
         currentCell.bounds = oriBounds;  // Restore!!!
     }
 }
@@ -463,7 +466,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 
     NSTimeInterval timeInterval = - [_reviewLastTouched_prev timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > 0.9) { // do "go-BEGIN" if older than 1 seconds?
+    if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
         [self _doPreviewBEGIN];
     } else {
         [self _doPreviewPREV];
@@ -529,7 +532,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     self._reviewLastTouched = [NSDate date];
 
     NSTimeInterval timeInterval = - [_reviewLastTouched_next timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > 0.9) { // do "go-END" if older than 1 seconds?
+    if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
         [self _doPreviewEND];
     } else {
         [self _doPreviewNEXT];
@@ -571,7 +574,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         if (   (!_selectedPiece && piece.color == _game.nextColor) 
             || (_selectedPiece && piece.color == _selectedPiece.color) )
         {
-            Position from = [_game getActualPositionAt:holder._row column:holder._column];
+            Position from = [_game getActualPositionAt:holder.row column:holder.column];
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
@@ -587,11 +590,11 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     // Make a Move from the last selected cell to the current selected cell.
     _selectedPiece.highlighted = NO;
-    if (holder && holder._highlighted && _selectedPiece)
+    if (holder && holder.highlighted && _selectedPiece)
     {
         GridCell* cell = _selectedPiece.holder;
-        Position from = [_game getActualPositionAt:cell._row column:cell._column];
-        Position to = [_game getActualPositionAt:holder._row column:holder._column];
+        Position from = [_game getActualPositionAt:cell.row column:cell.column];
+        Position to = [_game getActualPositionAt:holder.row column:holder.column];
         if ([_game isMoveLegalFrom:from toPosition:to])
         {
             [_game doMoveFrom:from toPosition:to];

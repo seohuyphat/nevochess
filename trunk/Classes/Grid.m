@@ -59,7 +59,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 @implementation Grid
 
 @synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
-@synthesize _river;
 
 - (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
             spacing:(CGSize)spacing position:(CGPoint)pos
@@ -119,23 +118,23 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [super dealloc];
 }
 
-- (void)setcolor:(CGColorRef *)var withNewColor:(CGColorRef)color
+- (void) _setColor:(CGColorRef *)var withNewColor:(CGColorRef)color
 {
-    if( color != *var ) {
+    if ( color != *var ) {
         // Garbage collection does not apply to CF objects like CGColors!
         CGColorRelease(*var);
         *var = CGColorRetain(color);
     }
 }
 
-- (CGColorRef) lineColor                    { return _lineColor; }
-- (void) setLineColor:(CGColorRef)lineColor { [self setcolor:&_lineColor withNewColor:lineColor]; }
+- (CGColorRef) lineColor                { return _lineColor; }
+- (void) setLineColor:(CGColorRef)color { [self _setColor:&_lineColor withNewColor:color]; }
 
 - (CGColorRef) highlightColor                { return _highlightColor; }
-- (void) setHighlightColor:(CGColorRef)color { [self setcolor:&_highlightColor withNewColor:color]; }
+- (void) setHighlightColor:(CGColorRef)color { [self _setColor:&_highlightColor withNewColor:color]; }
 
 - (CGColorRef) animateColor                { return _animateColor; }
-- (void) setAnimateColor:(CGColorRef)color { [self setcolor:&_animateColor withNewColor:color]; }
+- (void) setAnimateColor:(CGColorRef)color { [self _setColor:&_animateColor withNewColor:color]; }
 
 #pragma mark -
 #pragma mark GEOMETRY:
@@ -143,10 +142,11 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (GridCell*) cellAtRow:(unsigned)row column:(unsigned)col
 {
-    if( row < _nRows && col < _nColumns ) {
+    if ( row < _nRows && col < _nColumns ) {
         id cell = [_cells objectAtIndex: row*_nColumns+col];
-        if( cell != [NSNull null] )
+        if ( cell != [NSNull null] ) {
             return cell;
+        }
     }
     return nil;
 }
@@ -156,8 +156,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     NSParameterAssert(row<_nRows);
     NSParameterAssert(col<_nColumns);
     unsigned index = row*_nColumns+col;
-    GridCell *cell = [_cells objectAtIndex: index];
-    if( (id)cell == [NSNull null] ) {
+    GridCell *cell = [_cells objectAtIndex:index];
+    if ( (id)cell == [NSNull null] ) {
         CGRect frame = CGRectMake(_cellOffset.x + (col + 0.5)*_spacing.width,
                                   _cellOffset.y + (row + 0.5)*_spacing.height,
                                   _spacing.width,_spacing.height);
@@ -171,31 +171,33 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     return cell;
 }
 
-
 - (void) addAllCells
 {
-    for( int row=_nRows-1; row>=0; row-- )  // makes 'upper' cells be in 'back'
-        for( int col=0; col<_nColumns; col++ ) 
-            [self addCellAtRow: row column: col];
+    for (int row = _nRows-1; row >= 0; --row) { // makes 'upper' cells be in 'back'
+        for (int col = 0; col < _nColumns; ++col) {
+            [self addCellAtRow:row column:col];
+        }
+    }
 }
 
 - (void) removeAllCells
 {
-    for( int row=_nRows-1; row>=0; row-- )   // makes 'upper' cells be in 'back'
-        for( int col=0; col<_nColumns; col++ ) 
-            [self removeCellAtRow: row column: col];
+    for (int row = _nRows-1; row >= 0; --row) {
+        for (int col = 0; col < _nColumns; ++col) {
+            [self removeCellAtRow:row column:col];
+        }
+    }
 }
-
 
 - (void) removeCellAtRow:(unsigned)row column:(unsigned)col
 {
     NSParameterAssert(row<_nRows);
     NSParameterAssert(col<_nColumns);
     unsigned index = row*_nColumns+col;
-    id cell = [_cells objectAtIndex: index];
+    id cell = [_cells objectAtIndex:index];
     if( cell != [NSNull null] )
         [cell removeFromSuperlayer];
-    [_cells replaceObjectAtIndex: index withObject: [NSNull null]];
+    [_cells replaceObjectAtIndex:index withObject:[NSNull null]];
     [self setNeedsDisplay];
 }
 
@@ -207,12 +209,14 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (void) drawCellsInContext:(CGContextRef)ctx
 {
     // Subroutine of -drawInContext:. Draws all the cells, with or without a fill.
-    for( unsigned row=0; row<_nRows; row++ )
-        for( unsigned col=0; col<_nColumns; col++ ) {
-            GridCell *cell = [self cellAtRow: row column: col];
-            if( cell )
-                [cell drawInParentContext: ctx];
+    for (unsigned row = 0; row < _nRows; ++row) {
+        for (unsigned col = 0; col < _nColumns; ++col) {
+            GridCell *cell = [self cellAtRow:row column:col];
+            if (cell) {
+                [cell drawInParentContext:ctx];
+            }
         }
+    }
 }
 
 - (void)drawInContext:(CGContextRef)ctx
@@ -229,14 +233,14 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 @end
 
 
-
+// ---------------------------------------------------------------------------
 #pragma mark -
 
 @implementation GridCell
 
-@synthesize _highlighted, _animated;
-@synthesize _bit;
-@synthesize _row, _column;
+@synthesize highlighted=_highlighted;
+@synthesize animated=_animated;
+@synthesize row=_row, column=_column;
 @synthesize dotted, cross;
 
 - (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
@@ -259,54 +263,32 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void) dealloc
 {
-    [_bit release];
     _grid  = nil;
     [super dealloc];
 }
-
-- (Bit*) bit
-{
-    if( _bit && _bit.superlayer != self && !_bit.pickedUp )
-        _bit = nil;
-    return _bit;
-}
-
-- (BOOL) isEmpty { return self._bit == nil; }
 
 - (NSString*) description
 {
     return [NSString stringWithFormat: @"%@(%u,%u)", [self class],_column,_row];
 }
 
-- (void) setBit: (Bit*)bit
-{
-    if( bit != self._bit ) {
-        self._bit = bit;
-        if( bit ) {
-            // Center it:
-            CGSize size = self.bounds.size;
-            bit.position = CGPointMake(floor(size.width/2.0), floor(size.height/2.0));
-        }
-    }
-}
-
 - (void) drawInParentContext:(CGContextRef)ctx
 {
     CGRect frame = self.frame;
-    const CGFloat midx=floor(CGRectGetMidX(frame))+0.5, 
-    midy=floor(CGRectGetMidY(frame))+0.5;
-    CGPoint p[4] = {{CGRectGetMinX(frame),midy},
-        {CGRectGetMaxX(frame),midy},
-        {midx,CGRectGetMinY(frame)},
-        {midx,CGRectGetMaxY(frame)}};
-    if( ! self.s )  p[2].y = midy;
-    if( ! self.n )  p[3].y = midy;
-    if( ! self.w )  p[0].x = midx;
-    if( ! self.e )  p[1].x = midx;
+    const CGFloat midx = floor(CGRectGetMidX(frame)) + 0.5;
+    const CGFloat midy = floor(CGRectGetMidY(frame)) + 0.5;
+    CGPoint p[4] = { { CGRectGetMinX(frame), midy }, // From Right
+                     { CGRectGetMaxX(frame), midy }, // ... to Left. 
+                     { midx, CGRectGetMinY(frame) },   // From Top
+                     { midx, CGRectGetMaxY(frame) } }; // ... to Bottom.
+    if ( ! self.s )  p[2].y = midy;
+    if ( ! self.n )  p[3].y = midy;
+    if ( ! self.w )  p[0].x = midx;
+    if ( ! self.e )  p[1].x = midx;
     CGContextStrokeLineSegments(ctx, p, 4);
     
-    if( dotted ) {
-        
+    if ( dotted )
+    {
         const CGFloat midx_offset = CGRectGetWidth(frame)/4;
         const CGFloat midy_offset = CGRectGetHeight(frame)/4;
         CGPoint pos[16] = {{midx - 2, midy + 2}, {midx - 2, midy + 2 + midy_offset}, {midx - 2, midy + 2}, {midx - 2 - midx_offset, midy + 2},
@@ -327,12 +309,13 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         
         CGContextStrokeLineSegments(ctx, pos, 16);
     }
-    
-    if( cross ) {
-        CGPoint crossp[4] = {{midx - CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}, 
-            {midx + CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
-            {midx - CGRectGetWidth(frame), midy + CGRectGetHeight(frame)},
-            {midx + CGRectGetWidth(frame), midy - CGRectGetHeight(frame)}};
+
+    if ( cross )
+    {
+        CGPoint crossp[4] = { { midx - CGRectGetWidth(frame), midy - CGRectGetHeight(frame) }, 
+                              { midx + CGRectGetWidth(frame), midy + CGRectGetHeight(frame) },
+                              { midx - CGRectGetWidth(frame), midy + CGRectGetHeight(frame) },
+                              { midx + CGRectGetWidth(frame), midy - CGRectGetHeight(frame) } };
         CGContextStrokeLineSegments(ctx, crossp, 4);
     }
 }
@@ -374,13 +357,13 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [self setNeedsDisplay];
 }
 
-- (GridCell*) nw     { return [_grid cellAtRow: _row+1 column: _column-1]; }
-- (GridCell*) n      { return [_grid cellAtRow: _row+1 column: _column  ]; }
-- (GridCell*) ne     { return [_grid cellAtRow: _row+1 column: _column+1]; }
-- (GridCell*) e      { return [_grid cellAtRow: _row   column: _column+1]; }
-- (GridCell*) se     { return [_grid cellAtRow: _row-1 column: _column+1]; }
-- (GridCell*) s      { return [_grid cellAtRow: _row-1 column: _column  ]; }
-- (GridCell*) sw     { return [_grid cellAtRow: _row-1 column: _column-1]; }
-- (GridCell*) w      { return [_grid cellAtRow: _row   column: _column-1]; }
+- (GridCell*) nw { return [_grid cellAtRow: _row+1 column: _column-1]; }
+- (GridCell*) n  { return [_grid cellAtRow: _row+1 column: _column  ]; }
+- (GridCell*) ne { return [_grid cellAtRow: _row+1 column: _column+1]; }
+- (GridCell*) e  { return [_grid cellAtRow: _row   column: _column+1]; }
+- (GridCell*) se { return [_grid cellAtRow: _row-1 column: _column+1]; }
+- (GridCell*) s  { return [_grid cellAtRow: _row-1 column: _column  ]; }
+- (GridCell*) sw { return [_grid cellAtRow: _row-1 column: _column-1]; }
+- (GridCell*) w  { return [_grid cellAtRow: _row   column: _column-1]; }
 
 @end

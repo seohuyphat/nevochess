@@ -148,7 +148,7 @@
 
 - (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
 {
-    [self getCellAtRow:ROW(cell) col:COLUMN(cell)]._highlighted = bHighlight;
+    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
 }
 
 - (void)dealloc
@@ -336,13 +336,10 @@
 - (void) reverseView
 {
     for (Piece* piece in _pieceBox) {
-        if(piece.superlayer != nil) { // not captured?
-            GridCell *holder = (GridCell*)piece.holder;
-            
-            unsigned row = 9 - holder._row;
-            unsigned column = 8 - holder._column;
-            //NSLog(@"%s: Convert [%d%d -> %d%d].", __FUNCTION__, holder._row, holder._column, row, column);
-            
+        if (piece.superlayer) { // not captured?
+            GridCell* holder = piece.holder;
+            unsigned row = 9 - holder.row;
+            unsigned column = 8 - holder.column;
             [self _setPiece:piece toRow:row toCol:column];
         }
     }
