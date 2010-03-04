@@ -54,8 +54,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 @synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
-@synthesize _timer, _previewLastTouched;
-@synthesize _previewLastTouched_prev, _previewLastTouched_next;
+@synthesize _timer, _reviewLastTouched;
+@synthesize _reviewLastTouched_prev, _reviewLastTouched_next;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -98,9 +98,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _hl_lastMove = INVALID_MOVE;
         _selectedPiece = nil;
 
-        self._previewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
-        self._previewLastTouched_prev = nil;
-        self._previewLastTouched_next = nil;
+        self._reviewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
+        self._reviewLastTouched_prev = nil;
+        self._reviewLastTouched_next = nil;
         self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
     }
 
@@ -113,9 +113,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_boardOwner release];
     [_timer release];
     [_moves release];
-    [_previewLastTouched release];
-    [_previewLastTouched_prev release];
-    [_previewLastTouched_next release];
+    [_reviewLastTouched release];
+    [_reviewLastTouched_prev release];
+    [_reviewLastTouched_next release];
     [_audioHelper release];
     [_game release];
     [_gameboard removeFromSuperlayer];
@@ -287,7 +287,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) onNewMove:(int)move inSetupMode:(BOOL)bSetup
 {
-    ColorEnum moveColor = ([_game getNextColor] == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+    ColorEnum moveColor = (_game.nextColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
 
     if (!bSetup) {
         [self resetMoveTime:moveColor];
@@ -296,7 +296,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
     [_moves addObject:pMove];
 
-    // Delay update the UI if in Preview mode.
+    // Delay update the UI if in Review mode.
     if ([self _isInReview]) {
         // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
         //       to signal that it is NOT yet processed.
@@ -354,7 +354,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) _updateTimer
 {
-    if ([_game getNextColor] == NC_COLOR_BLACK) {
+    if (_game.nextColor == NC_COLOR_BLACK) {
         _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
         _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
         [_blackTime decrement];
@@ -367,10 +367,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) _ticked:(NSTimer*)timer
 {
-    NSTimeInterval timeInterval = - [_previewLastTouched timeIntervalSinceNow]; // in seconds.
+    NSTimeInterval timeInterval = - [_reviewLastTouched timeIntervalSinceNow]; // in seconds.
     if (![self _isInReview] && timeInterval > 5) { // hide if older than 5 seconds?
-        _preview_prev.hidden = YES;
-        _preview_next.hidden = YES;
+        _review_prev.hidden = YES;
+        _review_next.hidden = YES;
     }
     
     // NOTE: On networked games, at least one Move made by EACH player before
@@ -451,20 +451,20 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (IBAction) previewPrevious_DOWN:(id)sender
+- (IBAction) reviewPrevious_DOWN:(id)sender
 {
-    self._previewLastTouched_prev = [NSDate date];
+    self._reviewLastTouched_prev = [NSDate date];
 }
 
-- (IBAction) previewPrevious_UP:(id)sender
+- (IBAction) reviewPrevious_UP:(id)sender
 {
-    self._previewLastTouched = [NSDate date];
+    self._reviewLastTouched = [NSDate date];
     if (![self _isInReview]) {
         NSLog(@"%s: Clear old highlight.", __FUNCTION__);
         [self _clearAllHighlight];
     }
 
-    NSTimeInterval timeInterval = - [_previewLastTouched_prev timeIntervalSinceNow]; // in seconds.
+    NSTimeInterval timeInterval = - [_reviewLastTouched_prev timeIntervalSinceNow]; // in seconds.
     if (timeInterval > 0.9) { // do "go-BEGIN" if older than 1 seconds?
         [self _doPreviewBEGIN];
     } else {
@@ -521,16 +521,16 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (IBAction) previewNext_DOWN:(id)sender
+- (IBAction) reviewNext_DOWN:(id)sender
 {
-    self._previewLastTouched_next = [NSDate date];
+    self._reviewLastTouched_next = [NSDate date];
 }
 
-- (IBAction) previewNext_UP:(id)sender
+- (IBAction) reviewNext_UP:(id)sender
 {
-    self._previewLastTouched = [NSDate date];
+    self._reviewLastTouched = [NSDate date];
 
-    NSTimeInterval timeInterval = - [_previewLastTouched_next timeIntervalSinceNow]; // in seconds.
+    NSTimeInterval timeInterval = - [_reviewLastTouched_next timeIntervalSinceNow]; // in seconds.
     if (timeInterval > 0.9) { // do "go-END" if older than 1 seconds?
         [self _doPreviewEND];
     } else {
@@ -552,11 +552,11 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     Piece *piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
 
-     if (!piece && p.y > 382)
+     if (!piece && p.y > 382) // ... near the y-coordinate of Review buttons.
      {
-         _preview_prev.hidden = NO;
-         _preview_next.hidden = NO;
-         self._previewLastTouched = [NSDate date]; // now.
+         _review_prev.hidden = NO;
+         _review_next.hidden = NO;
+         self._reviewLastTouched = [NSDate date]; // now.
      }
     
     if (    [self _isInReview]   // Do nothing if in the middle of Move-Review.
@@ -569,9 +569,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     GridCell *holder = nil;
     
     if (piece) {
-        // Generate moves for the selected piece.
         holder = piece.holder;
-        if (!_selectedPiece || (_selectedPiece.color == piece.color)) {
+        if (   (!_selectedPiece && piece.color == _game.nextColor) 
+            || (_selectedPiece && piece.color == _selectedPiece.color) )
+        {
             //*******************
             int row = holder._row;
             int col = holder._column;
@@ -579,7 +580,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
                 row = 9 - row;
                 col = 8 - col;
             }
-            //*******************
+            //*******************  Generate moves for the selected piece.
             [self _setHighlightCells:NO];
             int sqSrc = TOSQUARE(row, col);
             _hl_nMoves = [_game generateMoveFrom:sqSrc moves:_hl_moves];

@@ -228,7 +228,7 @@ enum ActionSheetEnum
 
     UIActionSheet* actionSheet = nil;
 
-    if (_myColor != [_game getNextColor]) // Robot is thinking?
+    if (_myColor != _game.nextColor) // Robot is thinking?
     {
         actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                   delegate:self
@@ -450,7 +450,7 @@ enum ActionSheetEnum
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
-    if (   _myColor != [_game getNextColor]  // AI's turn?
+    if (   _myColor != _game.nextColor  // AI's turn?
         && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
         [self _askAIToGenerateMove];
@@ -512,7 +512,7 @@ enum ActionSheetEnum
         }
     }
     // If it is AI's turn after the game is loaded, then inform the AI.
-    else if (   _myColor != [_game getNextColor]
+    else if (   _myColor != _game.nextColor
              && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
         [self _askAIToGenerateMove];
@@ -528,7 +528,6 @@ enum ActionSheetEnum
 
 - (void) _askAIToGenerateMove
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     _aiThinkingActivity.hidden = NO;
     [_aiThinkingActivity startAnimating];
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
@@ -554,7 +553,7 @@ enum ActionSheetEnum
 
 - (BOOL) isMyTurnNext
 {
-    return ([_game getNextColor] == _myColor);
+    return (_game.nextColor == _myColor);
 }
 
 - (BOOL) isGameReady

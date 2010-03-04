@@ -51,11 +51,11 @@
 
     IBOutlet UILabel*     _game_over_msg;
 
-    IBOutlet UIButton*    _preview_prev;
-    IBOutlet UIButton*    _preview_next;
-    NSDate*               _previewLastTouched;
-    NSDate*               _previewLastTouched_prev;
-    NSDate*               _previewLastTouched_next;
+    IBOutlet UIButton*    _review_prev;
+    IBOutlet UIButton*    _review_next;
+    NSDate*               _reviewLastTouched;
+    NSDate*               _reviewLastTouched_prev;
+    NSDate*               _reviewLastTouched_next;
     
     NSTimer*              _timer;
     
@@ -79,14 +79,14 @@
 @property (readonly) CChessGame* game;
 @property (nonatomic, retain) id <BoardOwner> boardOwner;
 @property (nonatomic, retain) NSTimer* _timer;
-@property (nonatomic, retain) NSDate* _previewLastTouched;
-@property (nonatomic, retain) NSDate* _previewLastTouched_prev;
-@property (nonatomic, retain) NSDate* _previewLastTouched_next;
+@property (nonatomic, retain) NSDate* _reviewLastTouched;
+@property (nonatomic, retain) NSDate* _reviewLastTouched_prev;
+@property (nonatomic, retain) NSDate* _reviewLastTouched_next;
 
-- (IBAction) previewPrevious_DOWN:(id)sender;
-- (IBAction) previewPrevious_UP:(id)sender;
-- (IBAction) previewNext_DOWN:(id)sender;
-- (IBAction) previewNext_UP:(id)sender;
+- (IBAction) reviewPrevious_DOWN:(id)sender;
+- (IBAction) reviewPrevious_UP:(id)sender;
+- (IBAction) reviewNext_DOWN:(id)sender;
+- (IBAction) reviewNext_UP:(id)sender;
 
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;
