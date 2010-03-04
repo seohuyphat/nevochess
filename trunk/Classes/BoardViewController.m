@@ -109,10 +109,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void)dealloc
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    [_gameboard removeFromSuperlayer];
-    [_gameboard release];
-    [_game release];
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [_boardOwner release];
     [_timer release];
     [_moves release];
@@ -120,6 +117,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_previewLastTouched_prev release];
     [_previewLastTouched_next release];
     [_audioHelper release];
+    [_game release];
+    [_gameboard removeFromSuperlayer];
+    [_gameboard release];
     [super dealloc];
 }
 

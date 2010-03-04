@@ -155,11 +155,12 @@
 
 - (void)dealloc
 {
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [_grid removeAllCells];
     [_grid release];
     [_pieceBox release];
     [_referee release];
-    [_board release];
+    self._board = nil;    
     [super dealloc];
 }
 

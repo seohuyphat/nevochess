@@ -63,8 +63,6 @@ enum ActionSheetEnum
 
 @implementation AIBoardViewController
 
-@synthesize _board;
-@synthesize _game;
 @synthesize _tableId;
 @synthesize _idleTimer;
 
@@ -87,7 +85,7 @@ enum ActionSheetEnum
     [self.view bringSubviewToFront:_toolbar];
     [self.view bringSubviewToFront:_activity];
 
-    self._game = _board.game;    
+    _game = _board.game;    
     self._tableId = nil;
 
     self._idleTimer = nil;
@@ -116,7 +114,7 @@ enum ActionSheetEnum
 
 - (void)dealloc
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [_aiRobot release];
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
@@ -125,7 +123,8 @@ enum ActionSheetEnum
         [_idleTimer invalidate];
         self._idleTimer = nil;
     }
-    self._board = nil;
+    _game = nil;
+    _board = nil;
     [super dealloc];
 }
 
@@ -134,7 +133,8 @@ enum ActionSheetEnum
     NSLog(@"%s: ENTER.", __FUNCTION__);
     [self saveGame];
     [_board.view removeFromSuperview];
-    self._board = nil;
+    [_board release];
+    _board = nil;
 }
 
 - (void) onAIRobotStopped

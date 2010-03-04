@@ -141,7 +141,7 @@
 
 - (void) putbackInLayer:(CALayer*)superLayer
 {
-    // Temporarily disabling a layer’s actions
+    // Temporarily disabling a layer's actions
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     self.scale = 1.0;
@@ -161,13 +161,12 @@
 #pragma mark -
 @implementation Piece
 
-@synthesize color=_color;
-@synthesize _imageName;
+@synthesize color=_color;;
 
 - (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale
 {
     if (self = [super init]) {
-        _imageName = imageName;
+        _imageName = [imageName retain];
         [self setImage:GetCGImageNamed(imageName) scale: scale];
         self.zPosition = kPieceZ;
     }
@@ -176,7 +175,9 @@
 
 - (void) dealloc
 {
+     //NSLog(@"%s: ENTER. [%@]", __FUNCTION__, self);
     [_imageName release];
+    _imageName = nil;
     [super dealloc];
 }
 
@@ -205,12 +206,6 @@
 {
     CGSize size = self.bounds.size;
     [self setImage:image scale:MAX(size.width,size.height)];
-}
-
-- (void) setImageNamed:(NSString*)name
-{
-    [self setImage:GetCGImageNamed(name)];
-    _imageName = name;
 }
 
 - (BOOL) highlighted { return holder._highlighted; }

@@ -43,8 +43,6 @@
     UIBarButtonItem*         _aiThinkingButton;
 }
 
-@property (nonatomic, retain) BoardViewController* _board;
-@property (nonatomic, retain) CChessGame* _game;
 @property (nonatomic, retain) NSString* _tableId;
 @property (nonatomic, retain) NSTimer* _idleTimer;
 
