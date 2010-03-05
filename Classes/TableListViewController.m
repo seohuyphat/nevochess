@@ -107,7 +107,7 @@ enum CellLabelEnum {
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     [_activity setHidden:NO];
     [_activity startAnimating];
@@ -115,7 +115,7 @@ enum CellLabelEnum {
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [_activity stopAnimating];
 }
 
@@ -222,13 +222,13 @@ enum CellLabelEnum {
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
+    //NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
     [self tableView:tableView didSelectRowAtIndexPath:indexPath];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
+    //NSLog(@"%s: ENTER. indexPath.row = [%d]", __FUNCTION__, indexPath.row);
     TableInfo* table = [_tables objectAtIndex:indexPath.row];
 
     if (_viewOnly || [table.tableId isEqualToString:_selectedTableId]) {

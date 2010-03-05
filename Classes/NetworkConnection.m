@@ -267,7 +267,7 @@
 {
     const int dataLen = [_outData length];
     if (dataLen == 0) {
-        NSLog(@"No more data to send.");
+        //NSLog(@"No more data to send.");
         return 0;
     }
     
@@ -280,7 +280,7 @@
     uint8_t buf[len];
     (void)memcpy(buf, readBytes, len);
     len = [_outStream write:(const uint8_t *)buf maxLength:len];
-    NSLog(@"Sent [%d]", len);
+    //NSLog(@"Sent [%d]", len);
     _outByteIndex += len;
     if (_outByteIndex == dataLen) {
         _outByteIndex = 0;
@@ -302,7 +302,7 @@
         return 0;
     }
     [_inData appendBytes:(const void *)buf length:len];
-    NSLog(@"Received [%d]", len);
+    //NSLog(@"Received [%d]", len);
     
     // Note: Each event is separated by an "\n\n" token.
     //   - Start processing event by event.
@@ -340,7 +340,7 @@
     if (_inByteIndex == dataLen) {
         _inByteIndex = 0;
         [_inData setLength:0];
-        NSLog(@"%s: ... RESET buffer.", __FUNCTION__);
+        //NSLog(@"%s: ... RESET buffer.", __FUNCTION__);
     }
     return len;
 }
