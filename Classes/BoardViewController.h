@@ -67,7 +67,7 @@
     int                   _hl_moves[MAX_GEN_MOVES];
     int                   _hl_nMoves;
     int                   _hl_lastMove; // The last Move that was highlighted.    
-    Piece*                _selectedPiece;
+    Piece*                _pickedUpPiece;
 
     NSMutableArray*       _moves;       // MOVE history
     int                   _nthMove;     // pivot for the Move Review

@@ -99,7 +99,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
         _hl_nMoves = 0;
         _hl_lastMove = INVALID_MOVE;
-        _selectedPiece = nil;
+        _pickedUpPiece = nil;
 
         self._reviewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
         self._reviewLastTouched_prev = nil;
@@ -254,7 +254,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     if (move != INVALID_MOVE) {
         _hl_lastMove = move;
-        GridCell* currentCell = [_game getCellAt:DST(move)];
+        GridCell* currentCell = [_game getCellAt:DST(_hl_lastMove)];
         CGFloat ds = 5.0;
         CGRect oriBounds = currentCell.bounds;
         CGRect ubounds = oriBounds;
@@ -279,8 +279,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
     [self _setHighlightCells:NO];
     [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
-    _selectedPiece.highlighted = NO;
-    _selectedPiece = nil;
+    _pickedUpPiece.pickedUp = NO;
+    _pickedUpPiece = nil;
 }
 
 - (NSString*) _allocStringFrom:(int)seconds
@@ -553,7 +553,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     CGPoint p = [touch locationInView:self.view];
     //NSLog(@"%s: p = [%f, %f].", __FUNCTION__, p.x, p.y);    
 
-    Piece* piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsBit offset:NULL];
+    Piece* piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsPiece offset:NULL];
 
      if (!piece && p.y > 382) // ... near the y-coordinate of Review buttons.
      {
@@ -563,6 +563,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
      }
     
     if (    [self _isInReview]   // Do nothing if in the middle of Move-Review.
+        ||  _game.gameResult != NC_GAME_STATUS_IN_PROGRESS
         || ![_boardOwner isMyTurnNext] // Ignore when it is not my turn.
         || ![_boardOwner isGameReady] )
     { 
@@ -573,16 +574,16 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     if (piece) {
         holder = piece.holder;
-        if (   (!_selectedPiece && piece.color == _game.nextColor) 
-            || (_selectedPiece && piece.color == _selectedPiece.color) )
+        if (   (!_pickedUpPiece && piece.color == _game.nextColor) 
+            || (_pickedUpPiece && piece.color == _pickedUpPiece.color) )
         {
             Position from = [_game getActualPositionAt:holder.row column:holder.column];
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
-            _selectedPiece.highlighted = NO;
-            _selectedPiece = piece;
-            _selectedPiece.highlighted = YES;
+            _pickedUpPiece.pickedUp = NO;
+            _pickedUpPiece = piece;
+            _pickedUpPiece.pickedUp = YES;
             [self playSound:@"CLICK"];
             return;
         }
@@ -591,10 +592,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
     
     // Make a Move from the last selected cell to the current selected cell.
-    _selectedPiece.highlighted = NO;
-    if (holder && holder.highlighted && _selectedPiece)
+    _pickedUpPiece.pickedUp = NO;
+    if (holder && holder.highlighted && _pickedUpPiece)
     {
-        GridCell* cell = _selectedPiece.holder;
+        GridCell* cell = _pickedUpPiece.holder;
         Position from = [_game getActualPositionAt:cell.row column:cell.column];
         Position to = [_game getActualPositionAt:holder.row column:holder.column];
         if ([_game isMoveLegalFrom:from toPosition:to])
@@ -606,7 +607,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 
     [self _setHighlightCells:NO];
-    _selectedPiece = nil;  // Reset selected state.
+    _pickedUpPiece = nil;
 }
 
 - (void) resetBoard

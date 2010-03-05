@@ -51,10 +51,10 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 #import "Piece.h"
 @class GridCell;
 
-// Hit-testing callbacks (to identify which layers caller is interested in):
+// Hit-testing callbacks (to identify which layers caller is interested in).
 typedef BOOL (*LayerMatchCallback)(CALayer*);
 
-BOOL layerIsBit( CALayer* layer );
+BOOL layerIsPiece( CALayer* layer );
 BOOL layerIsGridCell( CALayer* layer );
 // ----------------------------------------------------------------------------
 

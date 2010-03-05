@@ -55,47 +55,37 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 
 /** Standard Z positions */
 enum {
-    kBoardZ = 1,
-    kCardZ  = 2,
-    kPieceZ = 3,
-    
+    kBoardZ    = 1,
+    kPieceZ    = 2,
+
     kPickedUpZ = 100
 };
 
-
-/** A moveable item in a card/board game.
- Abstract superclass of Card and Piece. */
-@interface Bit : CALayer
+/** A playing piece that displays an image. */
+@interface Piece : CALayer
 {
-    int         _restingZ;  // Original z position, saved while pickedUp
     GridCell*   holder;
+    int        _restingZ;  // Original z position, saved while pickedUp
+    ColorEnum  _color;
+    NSString*  _imageName;
 }
 
 /** Conveniences for getting/setting the layer's scale and rotation */
 @property CGFloat scale;
 @property int rotation;         // in degrees! Positive = clockwise
 
-/** "Picking up" a Bit makes it larger, translucent, and in front of everything else */
+/** "Picking up" a Piece makes it larger, translucent, and in front of everything else */
 @property BOOL pickedUp;
 
-/** Current holder (or nil) */
 @property (nonatomic, retain) GridCell *holder;
+@property (nonatomic)         ColorEnum color;
+@property (nonatomic)         BOOL highlighted;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroyWithAnimation:(BOOL)animated;
 
 /** Adds this Bit back ("un-destroy") to a given layer without animation */
 - (void) putbackInLayer:(CALayer*)superLayer;
-
-@end
-
-
-/** A playing piece. A concrete subclass of Bit that displays an image. */
-@interface Piece : Bit
-{
-    ColorEnum  _color;
-    NSString*  _imageName;
-}
 
 /** Initialize a Piece from an image file.
     imageName can be a resource name from the app bundle, or an absolute path.
@@ -106,8 +96,5 @@ enum {
 
 - (void) setImage:(CGImageRef)image scale:(CGFloat)scale;
 - (void) setImage:(CGImageRef)image;
-
-@property (nonatomic)         ColorEnum color;
-@property (nonatomic)         BOOL highlighted;
 
 @end
