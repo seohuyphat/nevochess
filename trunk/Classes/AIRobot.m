@@ -147,9 +147,9 @@
     [_delegate performSelectorOnMainThread:@selector(onResetDoneByAI) withObject:nil waitUntilDone:NO];
 }
 
-- (void) onMove_sync:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2
+- (void) onMove_sync:(Position)from toPosition:(Position)to
 {
-    [_aiEngine onHumanMove:row1 fromCol:col1 toRow:row2 toCol:col2];
+    [_aiEngine onHumanMove:from.row fromCol:from.col toRow:to.row toCol:to.col];
 }
 
 - (void) runGenerateMove

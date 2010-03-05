@@ -284,7 +284,12 @@ enum ActionSheetEnum
     switch (buttonIndex)
     {
         case 0:  // Undo Move
-            [self _undoLastMove];
+            if ([_game getMoveCount])
+            {
+                [_activity setHidden:NO];
+                [_activity startAnimating];
+                [self performSelector:@selector(_undoLastMove) withObject:nil afterDelay:0];
+            }
             break;
     }
 }
@@ -320,7 +325,7 @@ enum ActionSheetEnum
     [self _onAfterDidMove];
 
     if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
-        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
+        [_aiRobot onMove_sync:from toPosition:to];
         [self _askAIToGenerateMove];
     }
 }
@@ -413,9 +418,8 @@ enum ActionSheetEnum
     if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
         NSMutableArray* moves = [_board getMoves];
         for (MoveAtom *pMove in moves) {
-            NSNumber *move = pMove.move;
             if ([sMoves length]) [sMoves appendString:@","];
-            [sMoves appendFormat:@"%d",[move integerValue]];
+            [sMoves appendFormat:@"%d",pMove.move];
         }
     }
 
@@ -440,7 +444,8 @@ enum ActionSheetEnum
     int sqDst = 0;
     Position from, to;
     
-    for (NSNumber *pMove in moves) {
+    for (NSNumber *pMove in moves)
+    {
         move  = [pMove integerValue];
         sqSrc = SRC(move);
         sqDst = DST(move);
@@ -450,12 +455,18 @@ enum ActionSheetEnum
         to.col = COLUMN(sqDst);
 
         [_game doMoveFrom:from toPosition:to];
-        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
-        [self handleNewMoveFrom:from toPosition:to];
+        [_aiRobot onMove_sync:from toPosition:to];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
+    }
+
+    if ([_game getMoveCount]) {
+        _reverseRoleButton.enabled = NO;
+        _resetButton.enabled = YES;
+        _actionButton.enabled = YES;
     }
 
     // If it is AI's turn after the game is loaded, then inform the AI.
-    if (   _myColor != _game.nextColor  // AI's turn?
+    if (   _myColor != _game.nextColor
         && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
     {
         [self _askAIToGenerateMove];
@@ -464,48 +475,38 @@ enum ActionSheetEnum
 
 - (void) _undoLastMove
 {
-    NSArray* moves = [[[NSArray alloc] initWithArray:[_board getMoves]] autorelease]; // Make a copy
+    NSArray* moves = [NSArray arrayWithArray:[_board getMoves]];
     NSUInteger moveCount = [moves count];
-    if (moveCount == 0) return;
 
-    // Determine the index of my last Move.
     int myLastMoveIndex = (_myColor == NC_COLOR_RED
                            ? ( (moveCount % 2) ? moveCount-1 : moveCount-2 )
                            : ( (moveCount % 2) ? moveCount-2 : moveCount-1 ));
 
     // NOTE: We know that at this time AI is not thinking.
     //       Therefore, we directly reset the Game to avoid race conditions.
-    //
-    [_activity setHidden:NO];
-    [_activity startAnimating];
     [_board rescheduleTimer];
-
     [_aiRobot resetRobot_sync];
     [_board resetBoard];
-    
-    [_activity stopAnimating];
 
     // Re-load the moves before my last Move.
     MoveAtom* pMove = nil;
-    int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
     Position from, to;
     
     for (int i = 0; i < myLastMoveIndex; ++i)
     {
-        pMove = [moves objectAtIndex:i]; 
-        move = [pMove.move integerValue];
-        sqSrc = SRC(move);
-        sqDst = DST(move);
+        pMove = [moves objectAtIndex:i];
+        sqSrc = SRC(pMove.move);
+        sqDst = DST(pMove.move);
         from.row = ROW(sqSrc);
         from.col = COLUMN(sqSrc);
         to.row = ROW(sqDst);
         to.col = COLUMN(sqDst);
 
         [_game doMoveFrom:from toPosition:to];
-        [_aiRobot onMove_sync:from.row fromCol:from.col toRow:to.row toCol:to.col];
-        [self handleNewMoveFrom:from toPosition:to];
+        [_aiRobot onMove_sync:from toPosition:to];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
     }
 
     // Handle the special case if the game is reset to the beginning.
@@ -525,6 +526,8 @@ enum ActionSheetEnum
     {
         [self _askAIToGenerateMove];
     }
+
+    [_activity stopAnimating];
 }
 
 - (void) _countDownToAIMove

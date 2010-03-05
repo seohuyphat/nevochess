@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import "Types.h"
 
 @class AIEngine;
 
@@ -52,7 +53,7 @@
 - (void) runGenerateMove;
 
 /** The following (synchronous) APIs are performed within the caller's thread. */
-- (void) onMove_sync:(int)row1 fromCol:(int)col1 toRow:(int)row2 toCol:(int)col2;
+- (void) onMove_sync:(Position)from toPosition:(Position)to;
 - (void) resetRobot_sync;
 
 @end

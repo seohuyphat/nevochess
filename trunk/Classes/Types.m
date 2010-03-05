@@ -90,10 +90,10 @@
 
 - (NSInteger) valueOfClickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == closeIndex) { return ACTION_INDEX_CLOSE; }
+    if (buttonIndex == closeIndex)  { return ACTION_INDEX_CLOSE;  }
     if (buttonIndex == resignIndex) { return ACTION_INDEX_RESIGN; }
-    if (buttonIndex == drawIndex) { return ACTION_INDEX_DRAW; }
-    if (buttonIndex == resetIndex) { return ACTION_INDEX_RESET; }
+    if (buttonIndex == drawIndex)   { return ACTION_INDEX_DRAW;   }
+    if (buttonIndex == resetIndex)  { return ACTION_INDEX_RESET;  }
     if (buttonIndex == logoutIndex) { return ACTION_INDEX_LOGOUT; }
     return ACTION_INDEX_CANCEL;
 }
@@ -115,24 +115,22 @@
 - (id)initWithMove:(int)mv
 {
     if (self = [super init]) {
-        self.move = [NSNumber numberWithInteger:mv];
-        self.srcPiece = nil;
-        self.capturedPiece = nil;
+        move = mv;
+        srcPiece = nil;
+        capturedPiece = nil;
     }
     return self;
 }
 
 - (NSString*) description
 {
-    int m = [(NSNumber*)self.move intValue];
-    int sqSrc = SRC(m);
-    int sqDst = DST(m);
+    int sqSrc = SRC(move);
+    int sqDst = DST(move);
     return [NSString stringWithFormat: @"%u%u -> %u%u)", ROW(sqSrc), COLUMN(sqSrc), ROW(sqDst), COLUMN(sqDst)];
 }
 
 - (void)dealloc
 {
-    [move release];
     [srcPiece release];
     [capturedPiece release];
     [super dealloc];
