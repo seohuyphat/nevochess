@@ -101,7 +101,6 @@
 - (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;
 - (void) resetBoard;
-- (void) displayEmptyBoard;
 - (void) reverseBoardView;
 - (void) reverseRole;
 

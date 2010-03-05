@@ -51,7 +51,6 @@
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)reverseRolePressed:(id)sender;
 
-- (void) handleNewMoveFrom:(Position)from toPosition:(Position)to;
 - (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to;
 - (void) saveGame;
 

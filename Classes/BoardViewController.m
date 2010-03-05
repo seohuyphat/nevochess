@@ -145,7 +145,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
                           @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
-                          @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
+                          @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL", @"PROMOTE",
                           nil];
     for (NSString* sound in soundList) {
         [audioHelper loadSound:sound];
@@ -311,17 +311,17 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         return;
     }
 
-    NSString* sound = @"MOVE";
-
     Piece* piece = [_game getPieceAtRow:from.row col:from.col];
     Piece* capture = [_game getPieceAtRow:to.row col:to.col];
 
     if (capture) {
         [capture destroyWithAnimation:(bSetup ? NO : YES)];
-        sound = (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2" );
     }
 
     if (!bSetup) {
+        NSString* sound =
+            ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
+                      : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") );
         [_audioHelper playSound:sound];
     }
 
@@ -625,13 +625,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _game_over_msg.hidden = YES;
 
     [_game resetGame];
-    [_moves removeAllObjects];
-    _nthMove = HISTORY_INDEX_END;
-}
-
-- (void) displayEmptyBoard
-{
-    _game_over_msg.hidden = YES;
     [_moves removeAllObjects];
     _nthMove = HISTORY_INDEX_END;
 }

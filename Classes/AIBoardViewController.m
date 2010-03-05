@@ -306,11 +306,6 @@ enum ActionSheetEnum
     to.col = COLUMN(sqDst);
 
     [_game doMoveFrom:from toPosition:to];
-    [self handleNewMoveFrom:from toPosition:to];
-}
-
-- (void) handleNewMoveFrom:(Position)from toPosition:(Position)to
-{
     [_board onNewMoveFrom:from toPosition:to inSetupMode:NO];
 
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
@@ -332,10 +327,15 @@ enum ActionSheetEnum
 
 - (void) onResetDoneByAI
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    [_board resetBoard];
     [_activity stopAnimating];
-    
+
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:NC_TABLE_ANIMATION_DURATION];
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
+                           forView:self.view cache:YES];
+    [_board resetBoard];
+    [UIView commitAnimations];
+
     _reverseRoleButton.enabled = YES;
     _resetButton.enabled = NO;
     _actionButton.enabled = NO;
@@ -528,6 +528,7 @@ enum ActionSheetEnum
     }
 
     [_activity stopAnimating];
+    [_board playSound:@"PROMOTE"];
 }
 
 - (void) _countDownToAIMove
