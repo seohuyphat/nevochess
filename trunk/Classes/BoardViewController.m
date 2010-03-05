@@ -146,7 +146,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
                           @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
                           @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL", @"PROMOTE",
-                          nil];
+                          @"Review", nil];
     for (NSString* sound in soundList) {
         [audioHelper loadSound:sound];
     }
@@ -426,7 +426,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     int move = pMove.move;
     int sqSrc = SRC(move);
     int sqDst = DST(move);
-    [_audioHelper playSound:@"MOVE"]; // TODO: mono-type "move" sound
+    [_audioHelper playSound:@"Review"];
     
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
@@ -501,7 +501,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     int sqDst = DST(move);
     int row2 = ROW(sqDst);
     int col2 = COLUMN(sqDst);
-    [_audioHelper playSound:@"MOVE"];  // TODO: mono-type "move" sound
+    [_audioHelper playSound:@"Review"];
     Piece *capture = [_game getPieceAtRow:row2 col:col2];
     if (capture) {
         [capture destroyWithAnimation:NO];
