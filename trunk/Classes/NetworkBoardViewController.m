@@ -121,7 +121,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewWillAppear:animated];
 
     [self.navigationController setNavigationBarHidden:YES animated:YES];
@@ -130,7 +130,7 @@
 
 - (void)viewDidAppear:(BOOL)animated 
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     [super viewDidAppear:animated];
 
     if (!_loginAuthenticated && !_loginCanceled)
@@ -418,7 +418,7 @@
 
 - (void) _showLoginView:(NSString*)errorStr
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_loginController) {
         NSLog(@"%s: Creating new Login view...", __FUNCTION__);
         _loginController = [[LoginViewController alloc] initWithNibName:@"LoginView" bundle:nil];
@@ -436,7 +436,7 @@
 
 - (void) _showListTableView:(NSString*)event
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_tableListController) {
         _tableListController = [[TableListViewController alloc] initWithDelegate:self];
     }
@@ -506,7 +506,7 @@
         }
         case NC_CONN_EVENT_DATA:
         {
-            NSLog(@"%s: A new event [%@].", __FUNCTION__, event);
+            //NSLog(@"%s: A new event [%@].", __FUNCTION__, event);
             NSMutableDictionary* newEvent = [self _allocNewEvent:event];
             NSString* op = [newEvent objectForKey:@"op"];
             int code = [[newEvent objectForKey:@"code"] integerValue];
@@ -670,9 +670,9 @@
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
-    NSString* tableId = [components objectAtIndex:0];
+    //NSString* tableId = [components objectAtIndex:0];
     NSString* movesStr = [components objectAtIndex:1];
-    NSLog(@"%s: [#%@: %@].", __FUNCTION__, tableId, movesStr);
+    //NSLog(@"%s: [#%@: %@].", __FUNCTION__, tableId, movesStr);
     Position from, to;
     NSArray* moves = [movesStr componentsSeparatedByString:@"/"];
     for (NSString *moveStr in moves) {
