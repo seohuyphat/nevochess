@@ -321,7 +321,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         sound = (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2" );
     }
 
-    [_audioHelper playSound:sound];
+    if (!bSetup) {
+        [_audioHelper playSound:sound];
+    }
 
     [_game movePiece:piece toRow:to.row toCol:to.col];
     [self _showHighlightOfMove:move];
@@ -421,7 +423,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
     
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
-    int move = [(NSNumber*)pMove.move intValue];
+    int move = pMove.move;
     int sqSrc = SRC(move);
     int sqDst = DST(move);
     [_audioHelper playSound:@"MOVE"]; // TODO: mono-type "move" sound
@@ -430,9 +432,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
     //
-    [_game movePiece:(Piece*)pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
+    [_game movePiece:pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
     if (pMove.capturedPiece) {
-        [_game movePiece:(Piece*)pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+        [_game movePiece:pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     }
     
     // Highlight the Piece (if any) of the "next-PREV" Move.
@@ -440,7 +442,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     int prevMove = INVALID_MOVE;
     if (_nthMove >= 0) {
         pMove = [_moves objectAtIndex:_nthMove];
-        prevMove = [(NSNumber*)pMove.move intValue];
+        prevMove = pMove.move;
     }
     [self _showHighlightOfMove:prevMove];
     return YES;
@@ -495,7 +497,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _nthMove = HISTORY_INDEX_END;
     }
     
-    int move = [(NSNumber*)pMove.move intValue];
+    int move = pMove.move;
     int sqDst = DST(move);
     int row2 = ROW(sqDst);
     int col2 = COLUMN(sqDst);
@@ -511,7 +513,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
         pMove.capturedPiece = capture;
     }
-    [_game movePiece:(Piece*)pMove.srcPiece toRow:row2 toCol:col2];
+    [_game movePiece:pMove.srcPiece toRow:row2 toCol:col2];
     [self _showHighlightOfMove:move];
     return YES;
 }

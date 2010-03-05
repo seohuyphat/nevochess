@@ -67,16 +67,18 @@ typedef struct Position {
 //
 ////////////////////////////////////////////////////////////////////
 
+@class Piece;
+
 @interface MoveAtom : NSObject
 {
-    id move;
-    id srcPiece;
-    id capturedPiece;
+    int    move;
+    Piece* srcPiece;
+    Piece* capturedPiece;
 }
 
-@property(nonatomic,retain) id move;
-@property(nonatomic,retain) id srcPiece;
-@property(nonatomic,retain) id capturedPiece;
+@property(nonatomic) int move;
+@property(nonatomic, retain) Piece* srcPiece;
+@property(nonatomic, retain) Piece* capturedPiece;
 
 - (id)initWithMove:(int)mv;
 
