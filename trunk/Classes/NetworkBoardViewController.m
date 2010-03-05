@@ -30,6 +30,7 @@
 - (void) _dismissLoginView;
 - (void) _dismissListTableView;
 - (void) _resetAndClearTable;
+- (void) _animateEmptyBoard;
 - (void) _onNewMessage:(NSString*)msg from:(NSString*)pid;
 - (void) _onMyRatingUpdated:(NSString*)newRating;
 - (NSString*) _getLocalizedLoginError:(int)code defaultError:(NSString*)error;
@@ -236,8 +237,7 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    NSLog(@"%s: ENTER. buttonIndex = [%d].", __FUNCTION__, buttonIndex);
-
+    //NSLog(@"%s: ENTER. buttonIndex = [%d].", __FUNCTION__, buttonIndex);
     BoardActionSheet* boardActionSheet = (BoardActionSheet*)actionSheet;
     NSInteger buttonValue = [boardActionSheet valueOfClickedButtonAtIndex:buttonIndex];
 
@@ -253,12 +253,7 @@
     switch (buttonValue)
     {
         case ACTION_INDEX_CLOSE:
-            NSLog(@"%s: Leave table [%@].", __FUNCTION__, _tableId);
             [_connection send_LEAVE:_tableId];
-            self._tableId = nil; 
-            [_board.view removeFromSuperview];
-            [_board displayEmptyBoard];
-            _actionButton.enabled = NO;
             break;
         case ACTION_INDEX_RESIGN:
             [_connection send_RESIGN:_tableId];
@@ -350,27 +345,15 @@
 - (void) handeNewFromList
 {
     [self _dismissListTableView];
-
     if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
-        self._tableId = nil; 
-        [_board displayEmptyBoard];
     }
     [_connection send_NEW:@"900/180/20"];
-}
-
-- (void) handeRefreshFromList
-{
-    NSLog(@"%s: ENTER.", __FUNCTION__);
-    // DO NOT dismiss the existing List-of-Tables view!
-
-    [_connection send_LIST];
 }
 
 - (void) handeTableJoin:(TableInfo *)table color:(NSString*)joinColor
 {
     [self _dismissListTableView];
-
     if ([_tableId isEqualToString:table.tableId]) {
         NSLog(@"%s: Same table [%@]. Ignore request.", __FUNCTION__, table.tableId);
         return;
@@ -378,10 +361,14 @@
 
     if (_tableId) {
         [_connection send_LEAVE:_tableId]; // Leave the old table.
-        self._tableId = nil; 
-        [_board displayEmptyBoard];
     }
     [_connection send_JOIN:table.tableId color:joinColor];
+}
+
+- (void) handeRefreshFromList
+{
+    // DO NOT dismiss the existing List-of-Tables view!
+    [_connection send_LIST];
 }
 
 - (void) handeNewMessageFromList:(NSString*)msg
@@ -468,14 +455,34 @@
 
 - (void) _resetAndClearTable
 {
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:NC_TABLE_ANIMATION_DURATION];
+    [UIView setAnimationTransition:(_board.view.superview ? UIViewAnimationTransitionFlipFromRight
+                                                          : UIViewAnimationTransitionCurlDown)
+                           forView:self.view cache:YES];
     if (!_board.view.superview)
     {
         [self.view addSubview:_board.view];
         [self.view bringSubviewToFront:_toolbar];
         [self.view bringSubviewToFront:_activity];
     }
+    [UIView commitAnimations];
+
     [_board resetBoard];
     _isGameOver = NO;
+}
+
+- (void) _animateEmptyBoard
+{
+    self._tableId = nil;
+    _actionButton.enabled = NO;
+
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:NC_TABLE_ANIMATION_DURATION];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp
+                           forView:self.view cache:YES];
+    [_board.view removeFromSuperview];
+    [UIView commitAnimations];
 }
 
 - (void) _onNewMessage:(NSString*)msg from:(NSString*)pid
@@ -517,7 +524,7 @@
                 [self _handleNetworkEvent_LOGIN:code withContent:content];
             }
             else if (code != 0) {  // Error
-                NSLog(@"%s: Received an ERROR event: [%@].", __FUNCTION__, content);
+                NSLog(@"%s: Received an ERROR event: [%d: %@].", __FUNCTION__, code, content);
             }
             else {
                 if ([op isEqualToString:@"LIST"]) {
@@ -772,10 +779,15 @@
     NSString* tableId = [components objectAtIndex:0];
     NSString* pid = [components objectAtIndex:1];
 
-    if ( ! [_tableId isEqualToString:tableId] ) {
+    // Check if I just left the Table.
+    if ([_tableId isEqualToString:tableId] && [_username isEqualToString:pid]) {
+        return [self _animateEmptyBoard];
+    }
+    else if (![_tableId isEqualToString:tableId]) {
         NSLog(@"%s: E_LEAVE:[%@] from table:[%@] ignored.", __FUNCTION__, pid, tableId);
         return;
     }
+
     if ([pid isEqualToString:self._redId]) {
         self._redId = nil;
         [_board setRedLabel:@"*"];

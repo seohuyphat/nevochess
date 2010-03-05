@@ -36,6 +36,8 @@
 
 #define NC_SOUND_PATH            @"sounds/xqwizard-wave"
 
+#define NC_TABLE_ANIMATION_DURATION 1.0 /* Table switching duration (sec)    */
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    Network (PlayXiangqi server) constants
