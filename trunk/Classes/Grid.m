@@ -52,7 +52,7 @@
 #import "Piece.h"
 #import "QuartzUtils.h"
 
-BOOL layerIsBit( CALayer* layer )      { return [layer isKindOfClass: [Bit class]]; }
+BOOL layerIsPiece( CALayer* layer )    { return [layer isKindOfClass: [Piece class]]; }
 BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell class]]; }
 
 // ---------------------------------------------------------------------------

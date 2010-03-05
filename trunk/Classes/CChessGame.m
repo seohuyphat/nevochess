@@ -57,125 +57,19 @@
 @synthesize gameResult=_gameResult;
 @synthesize blackAtTopSide=_blackAtTopSide;
 
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
-{
-    GridCell *s = [_grid cellAtRow:row column:col]; 
-    CGRect frame = s.frame;
-    CGPoint position;
-    position.x = CGRectGetMidX(frame);
-    position.y = CGRectGetMidY(frame); 
-    CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
-    // Western or Chinese?
-    NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
-    NSString* pieceFolder = nil;
-    switch (pieceType) {
-        case 0: pieceFolder = @"pieces/xqwizard_31x31"; break;
-        case 1: pieceFolder = @"pieces/alfaerie_31x31"; break;
-        case 2: pieceFolder = @"pieces/HOXChess"; break;
-        default: pieceFolder = @"pieces/iXiangQi"; break;
-    }
-    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:pieceFolder];
-
-    Piece *piece = [[Piece alloc] initWithImageNamed: imageName scale: pieceSize];
-    piece.color = color;
-    piece.holder = [_grid cellAtRow:row column:col];
-    [_board addSublayer:piece];
-    position = [s.superlayer convertPoint:position toLayer:_board];
-    piece.position = position;
-    [_pieceBox addObject:piece];
-    [piece release];
-}
-
-- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
-{
-    if (!_blackAtTopSide) {
-        row = 9 - row;
-        col = 8 - col;
-    }
-    [self _setPiece:piece toRow:row toCol:col];
-}
-
-- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
-{
-    GridCell *s = [_grid cellAtRow: row column: col]; 
-    CGRect frame = s.frame;
-    CGPoint position;
-    position.x = floor(CGRectGetMidX(frame))+0.5;
-    position.y = floor(CGRectGetMidY(frame))+0.5;
-    position = [s.superlayer convertPoint:position toLayer:_board];
-    piece.position = position;
-    piece.holder = s;
-    if (!piece.superlayer) {
-        [piece putbackInLayer:_board]; // Restore the captured piece.
-    }
-}
-
-- (Piece*) getPieceAtRow:(int)row col:(int)col
-{
-    if (!_blackAtTopSide) {
-        row = 9 - row;
-        col = 8 - col;
-    }
-    GridCell *s = [_grid cellAtRow: row column: col]; 
-    CGRect frame = s.frame;
-    CGPoint position;
-    position.x = floor(CGRectGetMidX(frame))+0.5;
-    position.y = floor(CGRectGetMidY(frame))+0.5;
-    position = [s.superlayer convertPoint:position toLayer:_board];
-    CALayer *piece = [_board hitTest:position];
-    if(piece && [piece isKindOfClass:[Piece class]]) {
-        return (Piece*)piece;
-    }
-    
-    return nil;
-}
-
-- (GridCell*) getCellAtRow:(int)row col:(int)col
-{
-    if (!_blackAtTopSide) {
-        row = 9 - row;
-        col = 8 - col;
-    }
-    GridCell *s = [_grid cellAtRow:row column:col];
-    return s;
-}
-
-- (GridCell*) getCellAt:(int)square
-{
-    return [self getCellAtRow:ROW(square) col:COLUMN(square)];
-}
-
-- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
-{
-    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
-}
-
-- (void)dealloc
-{
-    //NSLog(@"%s: ENTER.", __FUNCTION__);
-    [_grid removeAllCells];
-    [_grid release];
-    [_pieceBox release];
-    [_referee release];
-    [_board release];
-    _board = nil;    
-    [super dealloc];
-}
-
 - (id) initWithBoard:(CALayer*)board boardType:(int)boardType
 {
     if (self = [super init])
     {
         _board = [board retain];
-
+        
         CGFloat    cellSize = 33;
         CGPoint    cellOffset = CGPointMake(2, 3);
         CGPoint    boardOffset = CGPointMake(5, 32);
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kLightBlueColor;
         CGColorRef animateColor    = kLightBlueColor;
-
+        
         switch (boardType)
         {
             case 1:  // SKELETON background.
@@ -205,20 +99,20 @@
                 break;
             }
         }
-
+        
         CGSize spacing = CGSizeMake(cellSize, cellSize);
         CGPoint pos = CGPointMake(board.bounds.origin.x + boardOffset.x, board.bounds.origin.y + boardOffset.y);
-
+        
         _grid = [[Grid alloc] initWithRows:10 columns:9
                                    spacing:spacing position:pos
                                 cellOffset:cellOffset
                            backgroundColor:backgroundColor];
         _grid.highlightColor = highlightColor;
         _grid.animateColor = animateColor;
-
+        
         //_grid.borderColor = kTranslucentLightGrayColor;
         //_grid.borderWidth = 2;
-
+        
         [_grid addAllCells];
         [_board addSublayer:_grid];
         
@@ -242,7 +136,7 @@
         
         [_grid cellAtRow: 1 column: 4].cross = YES;
         [_grid cellAtRow: 8 column: 4].cross = YES;
-
+        
         _blackAtTopSide = YES;
         _gameResult = NC_GAME_STATUS_IN_PROGRESS;
         
@@ -251,6 +145,112 @@
         [_referee initGame];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    //NSLog(@"%s: ENTER.", __FUNCTION__);
+    [_grid removeAllCells];
+    [_grid release];
+    [_pieceBox release];
+    [_referee release];
+    [_board release];
+    _board = nil;    
+    [super dealloc];
+}
+
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
+{
+    GridCell* cell = [_grid cellAtRow:row column:col]; 
+    CGRect frame = cell.frame;
+    CGPoint position;
+    position.x = CGRectGetMidX(frame);
+    position.y = CGRectGetMidY(frame); 
+    CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
+
+    NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
+    NSString* pieceFolder = nil;
+    switch (pieceType) {
+        case 0: pieceFolder = @"pieces/xqwizard_31x31"; break;
+        case 1: pieceFolder = @"pieces/alfaerie_31x31"; break;
+        case 2: pieceFolder = @"pieces/HOXChess"; break;
+        default: pieceFolder = @"pieces/iXiangQi"; break;
+    }
+    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
+                                           inDirectory:pieceFolder];
+
+    Piece* piece = [[Piece alloc] initWithImageNamed:imageName scale:pieceSize];
+    piece.color = color;
+    piece.holder = [_grid cellAtRow:row column:col];
+    [_board addSublayer:piece];
+    position = [cell.superlayer convertPoint:position toLayer:_board];
+    piece.position = position;
+    [_pieceBox addObject:piece];
+    [piece release];
+}
+
+- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
+{
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    [self _setPiece:piece toRow:row toCol:col];
+}
+
+- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
+{
+    GridCell* cell = [_grid cellAtRow:row column:col]; 
+    CGRect frame = cell.frame;
+    CGPoint position;
+    position.x = floor(CGRectGetMidX(frame))+0.5;
+    position.y = floor(CGRectGetMidY(frame))+0.5;
+    position = [cell.superlayer convertPoint:position toLayer:_board];
+    piece.position = position;
+    piece.holder = cell;
+    if (!piece.superlayer) {
+        [piece putbackInLayer:_board]; // Restore the captured piece.
+    }
+}
+
+- (Piece*) getPieceAtRow:(int)row col:(int)col
+{
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    GridCell* cell = [_grid cellAtRow:row column:col]; 
+    CGRect frame = cell.frame;
+    CGPoint position;
+    position.x = floor(CGRectGetMidX(frame))+0.5;
+    position.y = floor(CGRectGetMidY(frame))+0.5;
+    position = [cell.superlayer convertPoint:position toLayer:_board];
+    CALayer* piece = [_board hitTest:position];
+    if (piece && [piece isKindOfClass:[Piece class]]) {
+        return (Piece*)piece;
+    }
+    
+    return nil;
+}
+
+- (GridCell*) getCellAtRow:(int)row col:(int)col
+{
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    GridCell* cell = [_grid cellAtRow:row column:col];
+    return cell;
+}
+
+- (GridCell*) getCellAt:(int)square
+{
+    return [self getCellAtRow:ROW(square) col:COLUMN(square)];
+}
+
+- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
+{
+    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
 }
 
 - (void) showBoard:(BOOL)visible

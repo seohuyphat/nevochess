@@ -52,19 +52,37 @@
 #import "QuartzUtils.h"
 #import "Grid.h"
 
-@implementation Bit
+// ---------------------------------------------------------------------------
+#pragma mark -
+@implementation Piece
 
 @synthesize holder;
+@synthesize color=_color;
+
+- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale
+{
+    if (self = [super init])
+    {
+        _imageName = [imageName retain];
+        [self setImage:GetCGImageNamed(imageName) scale:scale];
+        self.zPosition = kPieceZ;
+    }
+    return self;
+}
 
 - (void) dealloc
 {
+    //NSLog(@"%s: ENTER. [%@]", __FUNCTION__, self);
     [holder release];
+    [_imageName release];
+    _imageName = nil;
     [super dealloc];
 }
 
 - (NSString*) description
 {
-    return [NSString stringWithFormat:@"%@[(%g,%g)]", self.class,self.position.x,self.position.y];
+    return [NSString stringWithFormat:@"%@[%@]", [self class],
+            _imageName.lastPathComponent.stringByDeletingPathExtension];
 }
 
 - (CGFloat) scale
@@ -97,31 +115,23 @@
 
 - (void) setPickedUp: (BOOL)up
 {
-    if( up != self.pickedUp ) {
-        CGFloat opacity, z, scale;
-        if( up ) {
-            opacity = 0.9;
-            scale = 1.2;
-            z = kPickedUpZ;
-            _restingZ = self.zPosition;
-        } else {
-            opacity = 1.0;
-            scale = 1.0/1.2;
-            z = _restingZ;
-        }
-        
-        self.zPosition = z;
-        self.opacity = opacity;
-        self.scale *= scale;
+    if ( up == self.pickedUp ) return;
+    
+    CGFloat opacity, z, scale;
+    if( up ) {
+        opacity = 0.9;
+        scale = 1.1;
+        z = kPickedUpZ;
+        _restingZ = self.zPosition;
+    } else {
+        opacity = 1.0;
+        scale = 1.0/1.1;
+        z = _restingZ;
     }
-}
-
-- (BOOL) containsPoint:(CGPoint)p
-{
-    // Make picked-up pieces invisible to hit-testing.
-    // Otherwise, while dragging a Bit, hit-testing the cursor position would always return
-    // that Bit, since it's directly under the cursor...
-    return (self.pickedUp ? NO : [super containsPoint:p]);
+    
+    self.zPosition = z;
+    self.opacity = opacity;
+    self.scale *= scale;
 }
 
 - (void) destroyWithAnimation:(BOOL)animated
@@ -150,43 +160,6 @@
     [CATransaction commit];
 }
 
-@end
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//    Piece
-//
-///////////////////////////////////////////////////////////////////////////////
-
-#pragma mark -
-@implementation Piece
-
-@synthesize color=_color;;
-
-- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale
-{
-    if (self = [super init]) {
-        _imageName = [imageName retain];
-        [self setImage:GetCGImageNamed(imageName) scale: scale];
-        self.zPosition = kPieceZ;
-    }
-    return self;
-}
-
-- (void) dealloc
-{
-     //NSLog(@"%s: ENTER. [%@]", __FUNCTION__, self);
-    [_imageName release];
-    _imageName = nil;
-    [super dealloc];
-}
-
-- (NSString*) description
-{
-    return [NSString stringWithFormat:@"%@[%@]", [self class],
-            _imageName.lastPathComponent.stringByDeletingPathExtension];
-}
-
 - (void) setImage:(CGImageRef)image scale:(CGFloat)scale
 {
     self.contents = (id) image;
@@ -194,8 +167,9 @@
     self.minificationFilter = kCAFilterLinear;
     int width = CGImageGetWidth(image), height = CGImageGetHeight(image);
     if( scale > 0 ) {
-        if( scale >= 4.0 )
+        if( scale >= 4.0 ) {
             scale /= MAX(width,height); // interpret scale as target dimensions
+        }
         width = ceil( width * scale);
         height= ceil( height* scale);
     }
