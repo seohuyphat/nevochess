@@ -207,7 +207,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     // in me; this is more efficient than having each cell have its own drawing.
     if (!self.backgroundColor) {
         CGContextSetStrokeColorWithColor(ctx, _lineColor);
-        CGContextSetLineWidth(ctx, 1.5);
+        CGContextSetLineWidth(ctx, 1.2);
         [self drawCellsInContext:ctx];
     }
 }
