@@ -45,7 +45,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (CGRect) _gameBoardFrame;
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
-- (void) _showHighlightOfMove:(int)move;
+- (void) _animatePiece:(Piece*)piece;
 - (void) _clearAllHighlight;
 - (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
@@ -93,12 +93,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _red_label.text = @"";
         _black_label.text = @"";
         _game_over_msg.hidden = YES;
+        _gameOver = NO;
 
         _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
         _nthMove = HISTORY_INDEX_END;
-
         _hl_nMoves = 0;
-        _hl_lastMove = INVALID_MOVE;
+
+        _animatedPiece = nil;
         _pickedUpPiece = nil;
 
         self._reviewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
@@ -243,42 +244,23 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 }
 
-- (void) _showHighlightOfMove:(int)move
+- (void) _animatePiece:(Piece*)piece
 {
-    if (_hl_lastMove != INVALID_MOVE) {
-        GridCell* lastCell = [_game getCellAt:DST(_hl_lastMove)];
-        [lastCell removeAnimationForKey:@"animateBounds"];
-        lastCell.animated = NO;
-        _hl_lastMove = INVALID_MOVE;
+    if (_animatedPiece) {
+        _animatedPiece.animated = NO;
+        _animatedPiece = nil;
     }
 
-    if (move != INVALID_MOVE) {
-        _hl_lastMove = move;
-        GridCell* currentCell = [_game getCellAt:DST(_hl_lastMove)];
-        CGFloat ds = 5.0;
-        CGRect oriBounds = currentCell.bounds;
-        CGRect ubounds = oriBounds;
-        ubounds.size.width += ds*2;
-        ubounds.size.height += ds*2;
-
-        // 'bounds' animation
-        CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
-        boundsAnimation.duration=1.0;
-        boundsAnimation.repeatCount=1000;
-        boundsAnimation.autoreverses=YES;
-        boundsAnimation.fromValue=[NSValue valueWithCGRect:oriBounds];
-        boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
-
-        [currentCell addAnimation:boundsAnimation forKey:@"animateBounds"];
-        currentCell.animated = YES;
-        currentCell.bounds = oriBounds;  // Restore!!!
+    if (piece) {
+        _animatedPiece = piece;
+        _animatedPiece.animated = YES;
     }
 }
 
 - (void) _clearAllHighlight
 {
     [self _setHighlightCells:NO];
-    [self _showHighlightOfMove:INVALID_MOVE];  // Clear the last highlight.
+    [self _animatePiece:nil];
     _pickedUpPiece.pickedUp = NO;
     _pickedUpPiece = nil;
 }
@@ -326,7 +308,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 
     [_game movePiece:piece toRow:to.row toCol:to.col];
-    [self _showHighlightOfMove:move];
+    [self _animatePiece:piece];
 
     // Add this new Move to the Move-History.
     pMove.srcPiece = piece;
@@ -338,6 +320,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _game_over_msg.text = NSLocalizedString(@"Game Over", @"");
     _game_over_msg.alpha = 1.0;
     _game_over_msg.hidden = NO;
+    _gameOver = YES;
 }
 
 - (void) _setReviewMode:(BOOL)on
@@ -381,7 +364,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     //       this App (with AI only) to start the timer right after one Move
     //       is made (by RED).
     //
-    if (_game_over_msg.hidden == YES && [_moves count] > 0) {
+    if (!_gameOver && [_moves count] > 0) {
         [self _updateTimer];
     }
 }
@@ -411,14 +394,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (BOOL) _doPreviewPREV
 {    
     if ([_moves count] == 0) {
-        NSLog(@"%s: No Moves made yet.", __FUNCTION__);
+        //NSLog(@"%s: No Moves made yet.", __FUNCTION__);
         return NO;
     }
     else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
         _nthMove = [_moves count] - 1; // Get the latest move.
     }
     else if (_nthMove == HISTORY_INDEX_BEGIN) {
-        NSLog(@"%s: The index is already at BEGIN. Do nothing.", __FUNCTION__);
+        //NSLog(@"%s: The index is already at BEGIN. Do nothing.", __FUNCTION__);
         return NO;
     }
     
@@ -432,19 +415,21 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
     //
+    [self _animatePiece:nil];
     [_game movePiece:pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
+
     if (pMove.capturedPiece) {
         [_game movePiece:pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
     }
     
     // Highlight the Piece (if any) of the "next-PREV" Move.
     --_nthMove;
-    int prevMove = INVALID_MOVE;
+    Piece* prevPiece = nil;
     if (_nthMove >= 0) {
         pMove = [_moves objectAtIndex:_nthMove];
-        prevMove = pMove.move;
+        prevPiece = [_game getPieceAtCell:DST(pMove.move)];
     }
-    [self _showHighlightOfMove:prevMove];
+    [self _animatePiece:prevPiece];
     return YES;
 }
 
@@ -463,7 +448,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
     self._reviewLastTouched = [NSDate date];
     if (![self _isInReview]) {
-        NSLog(@"%s: Clear old highlight.", __FUNCTION__);
+        //NSLog(@"%s: Clear old highlight.", __FUNCTION__);
         [self _clearAllHighlight];
     }
 
@@ -480,14 +465,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (BOOL) _doPreviewNEXT
 {
     if ([_moves count] == 0) {
-        NSLog(@"%s: No Moves made yet.", __FUNCTION__);
+        //NSLog(@"%s: No Moves made yet.", __FUNCTION__);
         return NO;
     }
     else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
-        NSLog(@"%s: No PREV done. Do nothing.", __FUNCTION__);
+        //NSLog(@"%s: No PREV done. Do nothing.", __FUNCTION__);
         return NO;
     }
-    
+
     ++_nthMove;
     NSAssert1(_nthMove >= 0 && _nthMove < [_moves count], @"Invalid index [%d]", _nthMove);
     
@@ -514,7 +499,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         pMove.capturedPiece = capture;
     }
     [_game movePiece:pMove.srcPiece toRow:row2 toCol:col2];
-    [self _showHighlightOfMove:move];
+    [self _animatePiece:pMove.srcPiece];
     return YES;
 }
 
@@ -624,6 +609,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
     _game_over_msg.hidden = YES;
+    _gameOver = NO;
 
     [_game resetGame];
     [_moves removeAllObjects];

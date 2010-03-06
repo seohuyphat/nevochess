@@ -80,6 +80,7 @@ enum {
 @property (nonatomic, retain) GridCell *holder;
 @property (nonatomic)         ColorEnum color;
 @property (nonatomic)         BOOL highlighted;
+@property (nonatomic)         BOOL animated;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroyWithAnimation:(BOOL)animated;

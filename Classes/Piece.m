@@ -185,4 +185,38 @@
 - (BOOL) highlighted { return holder.highlighted; }
 - (void) setHighlighted:(BOOL)highlighted { holder.highlighted = highlighted; }
 
+- (BOOL) animated
+{
+    return holder.animated;
+}
+
+- (void) setAnimated:(BOOL)animated
+{
+    if (holder.animated == animated) return;
+
+    holder.animated = animated;
+    if (animated)
+    {
+        CGFloat ds = 5.0;
+        CGRect oriBounds = holder.bounds;
+        CGRect ubounds = oriBounds;
+        ubounds.size.width += ds*2;
+        ubounds.size.height += ds*2;
+
+        // 'bounds' animation
+        CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
+        boundsAnimation.duration=1.0;
+        boundsAnimation.repeatCount=10000;
+        boundsAnimation.autoreverses=YES;
+        boundsAnimation.fromValue=[NSValue valueWithCGRect:oriBounds];
+        boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
+
+        [holder addAnimation:boundsAnimation forKey:@"animateBounds"];
+        holder.bounds = oriBounds;  // Restore!!!
+    }
+    else {
+        [holder removeAnimationForKey:@"animateBounds"];
+    }
+}
+
 @end

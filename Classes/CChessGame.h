@@ -38,6 +38,7 @@
 - (void) showBoard:(BOOL)visible;
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
+- (Piece*) getPieceAtCell:(int)square;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAt:(int)square;
 - (void) highlightCell:(int)cell highlight:(BOOL)bHighlight;

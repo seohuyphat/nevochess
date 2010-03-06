@@ -50,6 +50,7 @@
     IBOutlet UILabel*     _black_move_time;
 
     IBOutlet UILabel*     _game_over_msg;
+    BOOL                  _gameOver;
 
     IBOutlet UIButton*    _review_prev;
     IBOutlet UIButton*    _review_next;
@@ -65,8 +66,8 @@
 
     // Members to keep track of (H)igh(L)ight moves (e.g., move-hints).
     int                   _hl_moves[MAX_GEN_MOVES];
-    int                   _hl_nMoves;
-    int                   _hl_lastMove; // The last Move that was highlighted.    
+    int                   _hl_nMoves;    
+    Piece*                _animatedPiece; // The last Piece that was animated.
     Piece*                _pickedUpPiece;
 
     NSMutableArray*       _moves;       // MOVE history

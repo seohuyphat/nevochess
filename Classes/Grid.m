@@ -236,8 +236,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         _column = col;
         self.position = frame.origin;
         CGRect bounds = frame;
-        bounds.origin.x -= floor(bounds.origin.x);  // make sure my coords fall on pixel boundaries
-        bounds.origin.y -= floor(bounds.origin.y);
+        bounds.origin.x = 0; // -= floor(bounds.origin.x);  // make sure my coords fall on pixel boundaries
+        bounds.origin.y = 0; // -= floor(bounds.origin.y);
         self.bounds = bounds;
         self.anchorPoint = CGPointMake(0.5, 0.5);
         self.borderColor = _grid.highlightColor; // Used when highlighting (see -setHighlighted:)
