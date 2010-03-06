@@ -163,6 +163,20 @@
 #pragma mark -
 #pragma mark Piece/Cell Public API
 
+- (void) movePiece:(Piece*)piece toPosition:(Position)position
+          animated:(BOOL)animated;
+{
+    int row = position.row, col = position.col;
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    GridCell* newCell = [_grid cellAtRow:row column:col];
+    CGPoint newPosition = [newCell getMidInLayer:_board];
+    piece.holder = newCell;
+    [piece movePieceTo:newPosition animated:animated];
+}
+
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
     if (!_blackAtTopSide) {

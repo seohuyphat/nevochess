@@ -434,7 +434,6 @@ enum ActionSheetEnum
 
 - (void) _loadPendingGame:(NSString *)sPendingGame
 {
-    NSLog(@"%s: ENTER.", __FUNCTION__);
     if (_myColor == NC_COLOR_BLACK) {
         [_board reverseRole];
     }
@@ -444,10 +443,13 @@ enum ActionSheetEnum
     int sqSrc = 0;
     int sqDst = 0;
     Position from, to;
-    
-    for (NSNumber *pMove in moves)
+
+    const int moveCount = [moves count];
+    const int lastResumedIndex = moveCount - 1;
+
+    for (int i = 0; i < moveCount; ++i)
     {
-        move  = [pMove integerValue];
+        move = [(NSNumber*)[moves objectAtIndex:i] integerValue];
         sqSrc = SRC(move);
         sqDst = DST(move);
         from.row = ROW(sqSrc);
@@ -457,7 +459,7 @@ enum ActionSheetEnum
 
         [_game doMoveFrom:from toPosition:to];
         [_aiRobot onMove_sync:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
     }
 
     if ([_game getMoveCount]) {
@@ -494,7 +496,9 @@ enum ActionSheetEnum
     int sqSrc = 0;
     int sqDst = 0;
     Position from, to;
-    
+
+    const int lastResumedIndex = myLastMoveIndex - 1;
+
     for (int i = 0; i < myLastMoveIndex; ++i)
     {
         pMove = [moves objectAtIndex:i];
@@ -507,7 +511,7 @@ enum ActionSheetEnum
 
         [_game doMoveFrom:from toPosition:to];
         [_aiRobot onMove_sync:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
     }
 
     // Handle the special case if the game is reset to the beginning.

@@ -67,6 +67,7 @@ enum {
     GridCell*   holder;
     int        _restingZ;  // Original z position, saved while pickedUp
     ColorEnum  _color;
+    BOOL       _animated;
     NSString*  _imageName;
 }
 
@@ -97,5 +98,7 @@ enum {
 
 - (void) setImage:(CGImageRef)image scale:(CGFloat)scale;
 - (void) setImage:(CGImageRef)image;
+
+- (void) movePieceTo:(CGPoint)newPosition animated:(BOOL)animated;
 
 @end
