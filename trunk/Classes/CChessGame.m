@@ -203,8 +203,8 @@
     GridCell* cell = [_grid cellAtRow:row column:col]; 
     CGRect frame = cell.frame;
     CGPoint position;
-    position.x = floor(CGRectGetMidX(frame))+0.5;
-    position.y = floor(CGRectGetMidY(frame))+0.5;
+    position.x = CGRectGetMidX(frame); //floor(CGRectGetMidX(frame))+0.5;
+    position.y = CGRectGetMidY(frame); //floor(CGRectGetMidY(frame))+0.5;
     position = [cell.superlayer convertPoint:position toLayer:_board];
     piece.position = position;
     piece.holder = cell;
@@ -222,8 +222,8 @@
     GridCell* cell = [_grid cellAtRow:row column:col]; 
     CGRect frame = cell.frame;
     CGPoint position;
-    position.x = floor(CGRectGetMidX(frame))+0.5;
-    position.y = floor(CGRectGetMidY(frame))+0.5;
+    position.x = CGRectGetMidX(frame); //floor(CGRectGetMidX(frame))+0.5;
+    position.y = CGRectGetMidY(frame); //floor(CGRectGetMidY(frame))+0.5;
     position = [cell.superlayer convertPoint:position toLayer:_board];
     CALayer* piece = [_board hitTest:position];
     if (piece && [piece isKindOfClass:[Piece class]]) {
@@ -231,6 +231,11 @@
     }
     
     return nil;
+}
+
+- (Piece*) getPieceAtCell:(int)square
+{
+    return [self getPieceAtRow:ROW(square) col:COLUMN(square)];
 }
 
 - (GridCell*) getCellAtRow:(int)row col:(int)col
