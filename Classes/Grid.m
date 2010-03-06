@@ -344,6 +344,13 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     [self setNeedsDisplay];
 }
 
+- (CGPoint) getMidInLayer:(CALayer*)layer
+{
+    CGRect frame = self.frame;
+    CGPoint point = { CGRectGetMidX(frame), CGRectGetMidY(frame) };
+    return [self.superlayer convertPoint:point toLayer:layer];
+}
+
 - (GridCell*) nw { return [_grid cellAtRow:_row+1 column:_column-1]; }
 - (GridCell*) n  { return [_grid cellAtRow:_row+1 column:_column  ]; }
 - (GridCell*) ne { return [_grid cellAtRow:_row+1 column:_column+1]; }

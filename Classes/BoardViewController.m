@@ -391,6 +391,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return _moves;
 }
 
+#pragma mark -
+#pragma mark UI-Event Handlers:
+
 - (BOOL) _doPreviewPREV
 {    
     if ([_moves count] == 0) {
@@ -562,14 +565,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         if (   (!_pickedUpPiece && piece.color == _game.nextColor) 
             || (_pickedUpPiece && piece.color == _pickedUpPiece.color) )
         {
-            Position from = [_game getActualPositionAt:holder.row column:holder.column];
+            Position from = [_game getActualPositionAtCell:holder];
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
             _pickedUpPiece.pickedUp = NO;
             _pickedUpPiece = piece;
             _pickedUpPiece.pickedUp = YES;
-            [self playSound:@"CLICK"];
+            [_audioHelper playSound:@"CLICK"];
             return;
         }
     } else {
@@ -580,15 +583,19 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _pickedUpPiece.pickedUp = NO;
     if (holder && holder.highlighted && _pickedUpPiece)
     {
-        GridCell* cell = _pickedUpPiece.holder;
-        Position from = [_game getActualPositionAt:cell.row column:cell.column];
-        Position to = [_game getActualPositionAt:holder.row column:holder.column];
+        GridCell* fromCell = _pickedUpPiece.holder;
+        Position from = [_game getActualPositionAtCell:fromCell];
+        Position to = [_game getActualPositionAtCell:holder];
         if ([_game isMoveLegalFrom:from toPosition:to])
         {
             [_game doMoveFrom:from toPosition:to];
             [self onNewMoveFrom:from toPosition:to inSetupMode:NO];
             [_boardOwner onLocalMoveMadeFrom:from toPosition:to];
         }
+        else {
+            [_audioHelper playSound:@"ILLEGAL"];
+        }
+
     }
 
     [self _setHighlightCells:NO];

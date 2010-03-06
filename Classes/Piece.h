@@ -77,23 +77,23 @@ enum {
 /** "Picking up" a Piece makes it larger, translucent, and in front of everything else */
 @property BOOL pickedUp;
 
-@property (nonatomic, retain) GridCell *holder;
-@property (nonatomic)         ColorEnum color;
-@property (nonatomic)         BOOL highlighted;
-@property (nonatomic)         BOOL animated;
+@property (nonatomic, retain)   GridCell* holder;
+@property (nonatomic, readonly) ColorEnum color;
+@property (nonatomic)           BOOL highlighted;
+@property (nonatomic)           BOOL animated;
+
+/** Initialize a Piece with a given Color and from an image file.
+ imageName can be a resource name from the app bundle, or an absolute path.
+ If scale is 0.0, the image's natural size will be used.
+ If 0.0 < scale < 4.0, the image will be scaled by that factor.
+ If scale >= 4.0, it will be used as the size to scale the maximum dimension to. */
+- (id) initWithColor:(ColorEnum)color imageName:(NSString*)imageName scale:(CGFloat)scale;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroyWithAnimation:(BOOL)animated;
 
 /** Adds this Bit back ("un-destroy") to a given layer without animation */
 - (void) putbackInLayer:(CALayer*)superLayer;
-
-/** Initialize a Piece from an image file.
-    imageName can be a resource name from the app bundle, or an absolute path.
-    If scale is 0.0, the image's natural size will be used.
-    If 0.0 < scale < 4.0, the image will be scaled by that factor.
-    If scale >= 4.0, it will be used as the size to scale the maximum dimension to. */
-- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale;
 
 - (void) setImage:(CGImageRef)image scale:(CGFloat)scale;
 - (void) setImage:(CGImageRef)image;

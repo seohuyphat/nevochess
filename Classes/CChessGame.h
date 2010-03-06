@@ -35,7 +35,6 @@
 }
 
 - (id) initWithBoard:(CALayer*)board boardType:(int)boardType;
-- (void) showBoard:(BOOL)visible;
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (Piece*) getPieceAtCell:(int)square;
@@ -49,7 +48,7 @@
 - (int) getMoveCount;
 - (void) resetGame;
 - (void) reverseView;
-- (Position) getActualPositionAt:(int)row column:(int)col;
+- (Position) getActualPositionAtCell:(GridCell*)cell;
 
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) GameStatusEnum gameResult;
