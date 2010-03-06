@@ -228,7 +228,8 @@ enum ActionSheetEnum
 
     UIActionSheet* actionSheet = nil;
 
-    if (_myColor != _game.nextColor) // Robot is thinking?
+    if (   _myColor != _game.nextColor // Robot is thinking?
+        && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS)
     {
         actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                   delegate:self
