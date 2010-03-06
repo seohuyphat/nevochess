@@ -64,6 +64,7 @@
     if (self = [super init])
     {
         _color = color;
+        _animated = NO;
         _imageName = [imageName retain];
         [self setImage:GetCGImageNamed(imageName) scale:scale];
         self.zPosition = kPieceZ;
@@ -143,7 +144,7 @@
         self.opacity = 0.0;
         // Removing the view from its superlayer right now would cancel the animations.
         // Instead, defer the removal until sometime shortly after the animations finish:
-        [self performSelector: @selector(removeFromSuperlayer) withObject:nil afterDelay:1.0];
+        [self performSelector:@selector(removeFromSuperlayer) withObject:nil afterDelay:1.0];
     }
     else {
         [self removeFromSuperlayer];
@@ -193,14 +194,14 @@
 
 - (BOOL) animated
 {
-    return holder.animated;
+    return _animated;
 }
 
 - (void) setAnimated:(BOOL)animated
 {
-    if (holder.animated == animated) return;
-
+    _animated = animated;
     holder.animated = animated;
+
     if (animated)
     {
         CGFloat ds = 5.0;
@@ -212,17 +213,39 @@
         // 'bounds' animation
         CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
         boundsAnimation.duration=1.0;
-        boundsAnimation.repeatCount=10000;
+        boundsAnimation.repeatCount=HUGE_VALF;
         boundsAnimation.autoreverses=YES;
         boundsAnimation.fromValue=[NSValue valueWithCGRect:oriBounds];
         boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
-
-        [holder addAnimation:boundsAnimation forKey:@"animateBounds"];
-        holder.bounds = oriBounds;  // Restore!!!
+        [holder addAnimation:boundsAnimation forKey:@"animate_bounds"];
     }
     else {
-        [holder removeAnimationForKey:@"animateBounds"];
+        [holder removeAnimationForKey:@"animate_bounds"];
     }
+}
+
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    if (_animated) {
+        self.animated = YES; // Resume "position" animation with "bounds" animation.
+    } else {
+        //NSLog(@"%s: ENTER. [%@] Animationed canceled!!!!", __FUNCTION__, self);
+    }
+}
+
+- (void) movePieceTo:(CGPoint)newPosition animated:(BOOL)animated;
+{
+    if (animated) {
+        _animated = YES; // ... to be continued with "bounds" animation!
+        CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"position"];
+        animation.delegate = self;
+        animation.duration = 0.4;
+        animation.fromValue = [NSValue valueWithCGPoint:self.position];
+        animation.toValue = [NSValue valueWithCGPoint:newPosition];
+        [self addAnimation:animation forKey:@"animate_position"];
+        
+    }
+    self.position = newPosition;
 }
 
 @end

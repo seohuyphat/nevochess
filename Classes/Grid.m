@@ -234,11 +234,12 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         _column = col;
         self.position = frame.origin;
         CGRect bounds = frame;
-        bounds.origin.x = 0; // -= floor(bounds.origin.x);  // make sure my coords fall on pixel boundaries
-        bounds.origin.y = 0; // -= floor(bounds.origin.y);
+        bounds.origin.x = 0;
+        bounds.origin.y = 0;
         self.bounds = bounds;
         self.anchorPoint = CGPointMake(0.5, 0.5);
-        self.borderColor = _grid.highlightColor; // Used when highlighting (see -setHighlighted:)
+        self.borderColor = _grid.highlightColor;
+        self.cornerRadius = 9;
     }
     return self;
 }
@@ -334,8 +335,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 - (void) setHighlighted:(BOOL)highlighted
 {
     _highlighted = highlighted;
-    self.cornerRadius = ceil(_grid.spacing.width / 4);
-    self.borderWidth = (highlighted ? 2 :0);
+    self.borderWidth = (highlighted ? 2 : 0);
 }
 
 - (void) setAnimated:(BOOL)animated

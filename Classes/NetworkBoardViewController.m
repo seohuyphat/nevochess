@@ -677,20 +677,29 @@
 - (void) _handleNetworkEvent_I_MOVES:(NSString*)event
 {
     NSArray* components = [event componentsSeparatedByString:@";"];
-    //NSString* tableId = [components objectAtIndex:0];
+    NSString* tableId = [components objectAtIndex:0];
     NSString* movesStr = [components objectAtIndex:1];
-    //NSLog(@"%s: [#%@: %@].", __FUNCTION__, tableId, movesStr);
+
+    if ( ! [_tableId isEqualToString:tableId] ) {
+        NSLog(@"%s: I_MOVES:[%@] from table:[%@] ignored.", __FUNCTION__, movesStr, tableId);
+        return;
+    }
     Position from, to;
     NSArray* moves = [movesStr componentsSeparatedByString:@"/"];
-    for (NSString *moveStr in moves) {
-        
+
+    const int moveCount = [moves count];
+    const int lastResumedIndex = moveCount - 1;
+
+    for (int i = 0; i < moveCount; ++i)
+    {
+        NSString* moveStr = [moves objectAtIndex:i];
         from.row = [moveStr characterAtIndex:1] - '0';
         from.col = [moveStr characterAtIndex:0] - '0';
         to.row = [moveStr characterAtIndex:3] - '0';
         to.col = [moveStr characterAtIndex:2] - '0';
 
         [_game doMoveFrom:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:YES];
+        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
     }
 }
 

@@ -45,7 +45,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (CGRect) _gameBoardFrame;
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
-- (void) _animatePiece:(Piece*)piece;
+- (void) _animateLatestPiece:(Piece*)piece;
 - (void) _clearAllHighlight;
 - (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
@@ -244,7 +244,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 }
 
-- (void) _animatePiece:(Piece*)piece
+- (void) _animateLatestPiece:(Piece*)piece
 {
     if (_animatedPiece) {
         _animatedPiece.animated = NO;
@@ -260,7 +260,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (void) _clearAllHighlight
 {
     [self _setHighlightCells:NO];
-    [self _animatePiece:nil];
+    [self _animateLatestPiece:nil];
     _pickedUpPiece.pickedUp = NO;
     _pickedUpPiece = nil;
 }
@@ -296,19 +296,19 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     Piece* piece = [_game getPieceAtRow:from.row col:from.col];
     Piece* capture = [_game getPieceAtRow:to.row col:to.col];
 
-    if (capture) {
-        [capture destroyWithAnimation:(bSetup ? NO : YES)];
-    }
-
+    [_game movePiece:piece toPosition:to animated:(bSetup ? NO : YES)];
     if (!bSetup) {
-        NSString* sound =
-            ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
-                      : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") );
+        _animatedPiece.animated = NO;
+        _animatedPiece = piece;
+
+        NSString* sound = ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
+                                    : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") );
         [_audioHelper playSound:sound];
     }
 
-    [_game movePiece:piece toRow:to.row toCol:to.col];
-    [self _animatePiece:piece];
+    if (capture) {
+        [capture destroyWithAnimation:(bSetup ? NO : YES)];
+    }
 
     // Add this new Move to the Move-History.
     pMove.srcPiece = piece;
@@ -395,17 +395,15 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 #pragma mark UI-Event Handlers:
 
 - (BOOL) _doPreviewPREV
-{    
-    if ([_moves count] == 0) {
-        //NSLog(@"%s: No Moves made yet.", __FUNCTION__);
+{
+    if (    [_moves count] == 0              // No Moves made yet?
+        || _nthMove == HISTORY_INDEX_BEGIN ) // ... or already at BEGIN mark?
+    {
         return NO;
     }
-    else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
+
+    if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
         _nthMove = [_moves count] - 1; // Get the latest move.
-    }
-    else if (_nthMove == HISTORY_INDEX_BEGIN) {
-        //NSLog(@"%s: The index is already at BEGIN. Do nothing.", __FUNCTION__);
-        return NO;
     }
     
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
@@ -417,8 +415,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
-    //
-    [self _animatePiece:nil];
+
+    [self _animateLatestPiece:nil];
     [_game movePiece:pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
 
     if (pMove.capturedPiece) {
@@ -427,12 +425,11 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     // Highlight the Piece (if any) of the "next-PREV" Move.
     --_nthMove;
-    Piece* prevPiece = nil;
     if (_nthMove >= 0) {
         pMove = [_moves objectAtIndex:_nthMove];
-        prevPiece = [_game getPieceAtCell:DST(pMove.move)];
+        Piece* prevPiece = [_game getPieceAtCell:DST(pMove.move)];
+        [self _animateLatestPiece:prevPiece];
     }
-    [self _animatePiece:prevPiece];
     return YES;
 }
 
@@ -467,12 +464,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (BOOL) _doPreviewNEXT
 {
-    if ([_moves count] == 0) {
-        //NSLog(@"%s: No Moves made yet.", __FUNCTION__);
-        return NO;
-    }
-    else if (_nthMove == HISTORY_INDEX_END ) { // at the END mark?
-        //NSLog(@"%s: No PREV done. Do nothing.", __FUNCTION__);
+    if (    [_moves count] == 0             // No Moves made yet?
+         || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
+    {
         return NO;
     }
 
@@ -487,22 +481,19 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     
     int move = pMove.move;
     int sqDst = DST(move);
-    int row2 = ROW(sqDst);
-    int col2 = COLUMN(sqDst);
     [_audioHelper playSound:@"Review"];
-    Piece *capture = [_game getPieceAtRow:row2 col:col2];
+    Piece *capture = [_game getPieceAtCell:DST(move)];
     if (capture) {
         [capture destroyWithAnimation:NO];
     }
     if (!pMove.srcPiece) { // not yet processed?
         NSLog(@"%s: Process pending move [%@]...", __FUNCTION__, pMove);
-        int sqSrc = SRC(move);
-        pMove.srcPiece = [_game getPieceAtRow:ROW(sqSrc) col:COLUMN(sqSrc)];
+        pMove.srcPiece = [_game getPieceAtCell:SRC(move)];
         NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
         pMove.capturedPiece = capture;
     }
-    [_game movePiece:pMove.srcPiece toRow:row2 toCol:col2];
-    [self _animatePiece:pMove.srcPiece];
+    [_game movePiece:pMove.srcPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
+    [self _animateLatestPiece:pMove.srcPiece];
     return YES;
 }
 
