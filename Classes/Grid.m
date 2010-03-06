@@ -146,11 +146,9 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
                                   _cellOffset.y + (row + 0.5)*_spacing.height,
                                   _spacing.width,_spacing.height);
         cell = [[GridCell alloc] initWithGrid:self row:row column:col frame:frame];
-        if( cell ) {
-            [_cells replaceObjectAtIndex:index withObject:cell];
-            [self addSublayer:cell];
-            [self setNeedsDisplay];
-        }
+        [_cells replaceObjectAtIndex:index withObject:cell];
+        [self addSublayer:cell];
+        [self setNeedsDisplay];
     }
     return cell;
 }
@@ -288,14 +286,6 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
             {midx + 2, midy + 2}, {midx + 2, midy + 2 + mid_offset}, {midx + 2, midy + 2}, {midx + 2 + mid_offset, midy + 2},
             {midx - 2, midy - 2}, {midx - 2, midy - 2 - mid_offset}, {midx - 2, midy - 2}, {midx - 2 - mid_offset, midy - 2},
             {midx + 2, midy - 2}, {midx + 2, midy - 2 - mid_offset}, {midx + 2, midy - 2}, {midx + 2 + mid_offset, midy - 2}};
-        if ( ! self.s ) {
-            pos[8].x = pos[9].x = pos[10].x = pos[11].x = pos[12].x = pos[13].x = pos[14].x = pos[15].x = midx;
-            pos[8].y = pos[9].y = pos[10].y = pos[11].y = pos[12].y = pos[13].y = pos[14].y = pos[15].y = midy;
-        }
-        if ( ! self.n ) {
-            pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[4].x = pos[5].x = pos[6].x = pos[7].x = midx;
-            pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[4].y = pos[5].y = pos[6].y = pos[7].y = midy;
-        }
         if ( ! self.w ) {
             pos[0].x = pos[1].x = pos[2].x = pos[3].x = pos[8].x = pos[9].x = pos[10].x = pos[11].x = midx;
             pos[0].y = pos[1].y = pos[2].y = pos[3].y = pos[8].y = pos[9].y = pos[10].y = pos[11].y = midy;

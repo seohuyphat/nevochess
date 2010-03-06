@@ -165,15 +165,20 @@
     self.contents = (id) image;
     self.contentsGravity = kCAGravityResizeAspect;
     self.minificationFilter = kCAFilterLinear;
-    int width = CGImageGetWidth(image), height = CGImageGetHeight(image);
-    if( scale > 0 ) {
-        if( scale >= 4.0 ) {
-            scale /= MAX(width,height); // interpret scale as target dimensions
-        }
-        width = ceil( width * scale);
-        height= ceil( height* scale);
+    int width = 0, height = 0;
+    if( scale >= 4.0 ) {
+        width = scale;  // interpret scale as target dimensions
+        height = scale;
     }
-    self.bounds = CGRectMake(0,0,width,height);
+    else {
+        width = CGImageGetWidth(image);
+        height = CGImageGetHeight(image);
+        if( scale > 0 ) {
+            width = ceil( width * scale );
+            height= ceil( height* scale );
+        }
+    }
+    self.bounds = CGRectMake(0, 0, width, height);
 }
 
 - (void) setImage:(CGImageRef)image

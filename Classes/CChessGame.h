@@ -25,9 +25,9 @@
 @interface CChessGame : NSObject
 {
     CALayer*        _board;
-
     Grid*           _grid;
     NSMutableArray* _pieceBox;
+    NSString*       _pieceFolder;
     BOOL            _blackAtTopSide;
 
     Referee*        _referee;
