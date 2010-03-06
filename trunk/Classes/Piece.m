@@ -59,10 +59,11 @@
 @synthesize holder;
 @synthesize color=_color;
 
-- (id) initWithImageNamed:(NSString*)imageName scale:(CGFloat)scale
+- (id) initWithColor:(ColorEnum)color imageName:(NSString*)imageName scale:(CGFloat)scale
 {
     if (self = [super init])
     {
+        _color = color;
         _imageName = [imageName retain];
         [self setImage:GetCGImageNamed(imageName) scale:scale];
         self.zPosition = kPieceZ;

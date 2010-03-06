@@ -125,6 +125,8 @@ BOOL layerIsGridCell( CALayer* layer );
 @property (nonatomic) BOOL cross;
 @property (readonly) GridCell *nw, *n, *ne, *e, *se, *s, *sw, *w; // Absolute directions (n = increasing row#)
 
+- (CGPoint) getMidInLayer:(CALayer*)layer;
+
 // protected:
 - (void) drawInParentContext:(CGContextRef)ctx;
 @end

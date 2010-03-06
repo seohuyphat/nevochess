@@ -38,7 +38,7 @@
 - (void) _resetPieces;
 - (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color;
 - (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
-- (int) _checkGameStatus;
+- (void) _checkAndUpdateGameStatus;
 
 @end
 
@@ -159,26 +159,9 @@
     [super dealloc];
 }
 
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
-{
-    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:_pieceFolder];
-    GridCell* cell = [_grid cellAtRow:row column:col]; 
-    CGRect frame = cell.frame;
-    CGPoint position;
-    position.x = CGRectGetMidX(frame);
-    position.y = CGRectGetMidY(frame); 
-    CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
 
-    Piece* piece = [[Piece alloc] initWithImageNamed:imageName scale:pieceSize];
-    piece.color = color;
-    piece.holder = cell;
-    [_board addSublayer:piece];
-    position = [cell.superlayer convertPoint:position toLayer:_board];
-    piece.position = position;
-    [_pieceBox addObject:piece];
-    [piece release];
-}
+#pragma mark -
+#pragma mark Piece/Cell Public API
 
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
 {
@@ -189,21 +172,6 @@
     [self _setPiece:piece toRow:row toCol:col];
 }
 
-- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
-{
-    GridCell* cell = [_grid cellAtRow:row column:col]; 
-    CGRect frame = cell.frame;
-    CGPoint position;
-    position.x = CGRectGetMidX(frame); //floor(CGRectGetMidX(frame))+0.5;
-    position.y = CGRectGetMidY(frame); //floor(CGRectGetMidY(frame))+0.5;
-    position = [cell.superlayer convertPoint:position toLayer:_board];
-    piece.position = position;
-    piece.holder = cell;
-    if (!piece.superlayer) {
-        [piece putbackInLayer:_board]; // Restore the captured piece.
-    }
-}
-
 - (Piece*) getPieceAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
@@ -211,12 +179,7 @@
         col = 8 - col;
     }
     GridCell* cell = [_grid cellAtRow:row column:col]; 
-    CGRect frame = cell.frame;
-    CGPoint position;
-    position.x = CGRectGetMidX(frame); //floor(CGRectGetMidX(frame))+0.5;
-    position.y = CGRectGetMidY(frame); //floor(CGRectGetMidY(frame))+0.5;
-    position = [cell.superlayer convertPoint:position toLayer:_board];
-    CALayer* piece = [_board hitTest:position];
+    CALayer* piece = [_board hitTest:[cell getMidInLayer:_board]];
     if (piece && [piece isKindOfClass:[Piece class]]) {
         return (Piece*)piece;
     }
@@ -244,15 +207,19 @@
     return [self getCellAtRow:ROW(square) col:COLUMN(square)];
 }
 
-- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
+- (Position) getActualPositionAtCell:(GridCell*)cell
 {
-    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
+    int row = cell.row, col = cell.column;
+    if (!self.blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    Position position = { row, col };
+    return position;
 }
 
-- (void) showBoard:(BOOL)visible
-{
-    _board.hidden = !visible;
-}
+#pragma mark -
+#pragma mark Move/Game Public API
 
 - (int) doMoveFrom:(Position)from toPosition:(Position)to
 {
@@ -260,10 +227,10 @@
     int sqDst = TOSQUARE(to.row, to.col);
     int move = MOVE(sqSrc, sqDst);
     int captured = 0;
-
+    
     [_referee makeMove:move captured:&captured];
-    [self _checkGameStatus];
-
+    [self _checkAndUpdateGameStatus];
+    
     return captured;
 }
 
@@ -281,38 +248,11 @@
     return [_referee isLegalMove:move];
 }
 
-- (int) _checkGameStatus
+- (ColorEnum) getNextColor
 {
-    GameStatusEnum nGameResult = NC_GAME_STATUS_UNKNOWN;
-    BOOL redMoved = (self.nextColor == NC_COLOR_BLACK); // Red just moved?
-
-    if ( [_referee isMate] ) {
-        nGameResult = (redMoved ? NC_GAME_STATUS_RED_WIN : NC_GAME_STATUS_BLACK_WIN);
-    }
-    else {
-        // Check repeat status
-        int nRepVal = 0;
-        if( [_referee repStatus:3 repValue:&nRepVal] > 0) {
-            if (redMoved) {
-                nGameResult = nRepVal < -WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
-                    : (nRepVal > WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
-            } else {
-                nGameResult = nRepVal > WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
-                    : (nRepVal < -WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
-            }
-        } else if ([_referee get_nMoveNum] > NC_MAX_MOVES_PER_GAME) {
-            nGameResult = NC_GAME_STATUS_TOO_MANY_MOVES;
-        }
-    }
-
-    if ( nGameResult != NC_GAME_STATUS_UNKNOWN ) {  // Game Result changed?
-        _gameResult = nGameResult;
-    }
-
-    return nGameResult;
+    return [_referee get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED;
 }
 
-- (ColorEnum) getNextColor { return [_referee get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED; }
 - (int) getMoveCount { return [_referee get_nMoveNum]; }
 
 - (void) resetGame
@@ -342,16 +282,60 @@
     _blackAtTopSide = !_blackAtTopSide;
 }
 
-- (Position) getActualPositionAt:(int)row column:(int)col
+- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
 {
-    if (!self.blackAtTopSide) {
-        row = 9 - row;
-        col = 8 - col;
+    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
+}
+
+#pragma mark -
+#pragma mark Private API
+
+
+- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
+{
+    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
+                                           inDirectory:_pieceFolder];
+    GridCell* cell = [_grid cellAtRow:row column:col]; 
+    Piece* piece = [[Piece alloc] initWithColor:color imageName:imageName
+                                          scale:_grid.spacing.width];
+    piece.holder = cell;
+    [_board addSublayer:piece];
+    piece.position = [cell getMidInLayer:_board];
+    [_pieceBox addObject:piece];
+    [piece release];
+}
+
+- (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col
+{
+    GridCell* cell = [_grid cellAtRow:row column:col]; 
+    piece.position = [cell getMidInLayer:_board];
+    piece.holder = cell;
+    if (!piece.superlayer) {
+        [piece putbackInLayer:_board]; // Restore the captured piece.
     }
-    Position position;
-    position.row = row;
-    position.col = col;
-    return position;
+}
+
+- (void) _checkAndUpdateGameStatus
+{
+    BOOL redMoved = (self.nextColor == NC_COLOR_BLACK); // Red just moved?
+    int nRepVal = 0;
+
+    if ( [_referee isMate] ) {
+        _gameResult = (redMoved ? NC_GAME_STATUS_RED_WIN : NC_GAME_STATUS_BLACK_WIN);
+    }
+    else if ([_referee repStatus:3 repValue:&nRepVal] > 0) // Check repeat status
+    {
+        if (redMoved) {
+            _gameResult = nRepVal < -WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
+                : (nRepVal > WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
+        } else {
+            _gameResult = nRepVal > WIN_VALUE ? NC_GAME_STATUS_RED_WIN 
+                : (nRepVal < -WIN_VALUE ? NC_GAME_STATUS_BLACK_WIN : NC_GAME_STATUS_DRAWN);
+        }
+    }
+    else if ([_referee get_nMoveNum] > NC_MAX_MOVES_PER_GAME) {
+        _gameResult = NC_GAME_STATUS_TOO_MANY_MOVES;
+    }
 }
 
 - (void) _resetPieces
