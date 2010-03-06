@@ -101,8 +101,8 @@
         }
         
         CGSize spacing = CGSizeMake(cellSize, cellSize);
-        CGPoint pos = CGPointMake(board.bounds.origin.x + boardOffset.x, board.bounds.origin.y + boardOffset.y);
-        
+        CGPoint pos = CGPointMake(board.bounds.origin.x + boardOffset.x,
+                                  board.bounds.origin.y + boardOffset.y);
         _grid = [[Grid alloc] initWithRows:10 columns:9
                                    spacing:spacing position:pos
                                 cellOffset:cellOffset
@@ -161,6 +161,8 @@
 
 - (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
 {
+    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
+                                           inDirectory:_pieceFolder];
     GridCell* cell = [_grid cellAtRow:row column:col]; 
     CGRect frame = cell.frame;
     CGPoint position;
@@ -168,20 +170,9 @@
     position.y = CGRectGetMidY(frame); 
     CGFloat pieceSize = _grid.spacing.width;  // make sure it's even
 
-    NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
-    NSString* pieceFolder = nil;
-    switch (pieceType) {
-        case 0: pieceFolder = @"pieces/xqwizard_31x31"; break;
-        case 1: pieceFolder = @"pieces/alfaerie_31x31"; break;
-        case 2: pieceFolder = @"pieces/HOXChess"; break;
-        default: pieceFolder = @"pieces/iXiangQi"; break;
-    }
-    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:pieceFolder];
-
     Piece* piece = [[Piece alloc] initWithImageNamed:imageName scale:pieceSize];
     piece.color = color;
-    piece.holder = [_grid cellAtRow:row column:col];
+    piece.holder = cell;
     [_board addSublayer:piece];
     position = [cell.superlayer convertPoint:position toLayer:_board];
     piece.position = position;
@@ -415,6 +406,15 @@
 
 - (void) _setupPieces
 {
+    _pieceFolder = nil;
+    NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
+    switch (pieceType) {
+        case 0: _pieceFolder = @"pieces/xqwizard_31x31"; break;
+        case 1: _pieceFolder = @"pieces/alfaerie_31x31"; break;
+        case 2: _pieceFolder = @"pieces/HOXChess"; break;
+        default: _pieceFolder = @"pieces/iXiangQi"; break;
+    }
+
     // chariot      
     [self _createPiece:@"bchariot.png" row:0 col:0 color:NC_COLOR_BLACK];
     [self _createPiece:@"bchariot.png" row:0 col:8 color:NC_COLOR_BLACK];         
