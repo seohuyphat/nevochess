@@ -26,7 +26,6 @@
 enum AlertViewEnum
 {
     NC_ALERT_END_GAME,
-    NC_ALERT_RESUME_GAME,
     NC_ALERT_RESET_GAME
 };
 
@@ -45,7 +44,7 @@ enum ActionSheetEnum
 @interface AIBoardViewController (PrivateMethods)
 
 - (void) _handleEndGameInUI;
-- (void) _displayResumeGameAlert;
+- (void) _loadListOfMoves:(NSArray*)moves;
 - (void) _loadPendingGame:(NSString *)sPendingGame;
 - (void) _undoLastMove;
 - (void) _countDownToAIMove;
@@ -91,7 +90,6 @@ enum ActionSheetEnum
     self._idleTimer = nil;
     _aiRobot = [[AIRobot alloc] initWith:self];
 
-    _myColor = NC_COLOR_RED;
     [_board setRedLabel:NSLocalizedString(@"You", @"")];
     [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
 
@@ -99,14 +97,19 @@ enum ActionSheetEnum
     _aiThinkingActivity.hidden = YES;
     _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
+    NSString* color = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
+    _myColor = ([color isEqualToString:@"Black"] ? NC_COLOR_BLACK
+                                                 : NC_COLOR_RED );
+    if (_myColor == NC_COLOR_BLACK) {
+        [_board reverseRole];
+    }
+
     // Restore pending game, if any.
     NSString* sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
     if ([sPendingGame length]) {
-        //[self _displayResumeGameAlert];
-        NSString* colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
-        _myColor = ( !colorStr || [colorStr isEqualToString:@"Red"]
-                    ? NC_COLOR_RED : NC_COLOR_BLACK );
         [self _loadPendingGame:sPendingGame];
+    } else if (_myColor == NC_COLOR_BLACK) {
+        [self _countDownToAIMove];
     }
     
     [_activity stopAnimating];
@@ -156,18 +159,7 @@ enum ActionSheetEnum
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex
 {
     if ( alertView.tag == NC_ALERT_END_GAME ) {
-        //[_aiRobot runResetRobot];
-    }
-    else if (    alertView.tag == NC_ALERT_RESUME_GAME
-              && buttonIndex != [alertView cancelButtonIndex] )
-    {
-        NSString *sPendingGame = [[NSUserDefaults standardUserDefaults] stringForKey:@"pending_game"];
-        if ( sPendingGame && [sPendingGame length]) {
-            NSString* colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
-            _myColor = ( !colorStr || [colorStr isEqualToString:@"Red"]
-                        ? NC_COLOR_RED : NC_COLOR_BLACK );
-            [self _loadPendingGame:sPendingGame];
-        }
+        ; // Do nothing.
     }
     else if (    alertView.tag == NC_ALERT_RESET_GAME
              && buttonIndex != [alertView cancelButtonIndex] )
@@ -399,22 +391,9 @@ enum ActionSheetEnum
     [alert release];
 }
 
-- (void) _displayResumeGameAlert
-{
-    UIAlertView *alert =
-        [[UIAlertView alloc] initWithTitle:nil
-                                   message:NSLocalizedString(@"Resume game?", @"")
-                                  delegate:self 
-                         cancelButtonTitle:NSLocalizedString(@"No", @"")
-                         otherButtonTitles:NSLocalizedString(@"Yes", @""), nil];
-    alert.tag = NC_ALERT_RESUME_GAME;
-    [alert show];
-    [alert release];
-}
-
 - (void) saveGame
 {
-    NSMutableString *sMoves = [NSMutableString new];
+    NSMutableString* sMoves = [NSMutableString string];
 
     if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
         NSMutableArray* moves = [_board getMoves];
@@ -425,55 +404,22 @@ enum ActionSheetEnum
     }
 
     [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
-    [sMoves release];
-
-    [[NSUserDefaults standardUserDefaults]
-            setObject:(_myColor == NC_COLOR_RED ? @"Red" : @"Black")
-            forKey:@"my_color"];
+    [[NSUserDefaults standardUserDefaults] setObject:(_myColor == NC_COLOR_RED ? @"Red" : @"Black")
+                                              forKey:@"my_color"];
 }
 
 - (void) _loadPendingGame:(NSString *)sPendingGame
 {
-    if (_myColor == NC_COLOR_BLACK) {
-        [_board reverseRole];
-    }
-
-    NSArray *moves = [sPendingGame componentsSeparatedByString:@","];
-    int move = 0;
-    int sqSrc = 0;
-    int sqDst = 0;
-    Position from, to;
-
-    const int moveCount = [moves count];
-    const int lastResumedIndex = moveCount - 1;
-
-    for (int i = 0; i < moveCount; ++i)
+    NSArray* moves = [sPendingGame componentsSeparatedByString:@","];
+    const int size = [moves count];
+    NSMutableArray* moveList = [NSMutableArray arrayWithCapacity:size];
+    for (int i = 0; i < size; ++i)
     {
-        move = [(NSNumber*)[moves objectAtIndex:i] integerValue];
-        sqSrc = SRC(move);
-        sqDst = DST(move);
-        from.row = ROW(sqSrc);
-        from.col = COLUMN(sqSrc);
-        to.row = ROW(sqDst);
-        to.col = COLUMN(sqDst);
-
-        [_game doMoveFrom:from toPosition:to];
-        [_aiRobot onMove_sync:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
+        int mv = [(NSNumber*)[moves objectAtIndex:i] intValue];
+        [moveList addObject:[NSNumber numberWithInt:mv]];
     }
 
-    if ([_game getMoveCount]) {
-        _reverseRoleButton.enabled = NO;
-        _resetButton.enabled = YES;
-        _actionButton.enabled = YES;
-    }
-
-    // If it is AI's turn after the game is loaded, then inform the AI.
-    if (   _myColor != _game.nextColor
-        && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
-    {
-        [self _askAIToGenerateMove];
-    }
+    [self _loadListOfMoves:moveList];
 }
 
 - (void) _undoLastMove
@@ -492,32 +438,48 @@ enum ActionSheetEnum
     [_board resetBoard];
 
     // Re-load the moves before my last Move.
-    MoveAtom* pMove = nil;
+    const int size = myLastMoveIndex;
+    NSMutableArray* moveList = [NSMutableArray arrayWithCapacity:size];
+    for (int i = 0; i < size; ++i)
+    {
+        int mv = ((MoveAtom*)[moves objectAtIndex:i]).move;
+        [moveList addObject:[NSNumber numberWithInt:mv]];
+    }
+
+    [self _loadListOfMoves:moveList];
+
+    [_activity stopAnimating];
+    [_board playSound:@"PROMOTE"];
+}
+
+- (void) _loadListOfMoves:(NSArray*)moves
+{
+    int move = 0;
     int sqSrc = 0;
     int sqDst = 0;
     Position from, to;
-
-    const int lastResumedIndex = myLastMoveIndex - 1;
-
-    for (int i = 0; i < myLastMoveIndex; ++i)
+    
+    const int moveCount = [moves count];
+    const int lastResumedIndex = moveCount - 1;
+    
+    for (int i = 0; i < moveCount; ++i)
     {
-        pMove = [moves objectAtIndex:i];
-        sqSrc = SRC(pMove.move);
-        sqDst = DST(pMove.move);
+        move = [(NSNumber*)[moves objectAtIndex:i] intValue];
+        sqSrc = SRC(move);
+        sqDst = DST(move);
         from.row = ROW(sqSrc);
         from.col = COLUMN(sqSrc);
         to.row = ROW(sqDst);
         to.col = COLUMN(sqDst);
-
+        
         [_game doMoveFrom:from toPosition:to];
         [_aiRobot onMove_sync:from toPosition:to];
         [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
     }
-
-    // Handle the special case if the game is reset to the beginning.
+    
     if ([_game getMoveCount] == 0)
     {
-        NSLog(@"%s: Game reset to the beginning.", __FUNCTION__);
+        // Handle the special case if the game is reset to the beginning.
         _reverseRoleButton.enabled = YES;
         _resetButton.enabled = NO;
         _actionButton.enabled = NO;
@@ -525,15 +487,17 @@ enum ActionSheetEnum
             [self _countDownToAIMove];
         }
     }
-    // If it is AI's turn after the game is loaded, then inform the AI.
-    else if (   _myColor != _game.nextColor
-             && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
+    else
     {
-        [self _askAIToGenerateMove];
+        _reverseRoleButton.enabled = NO;
+        _resetButton.enabled = YES;
+        _actionButton.enabled = YES;
+        if (   _myColor != _game.nextColor
+            && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS )
+        {
+            [self _askAIToGenerateMove];
+        }
     }
-
-    [_activity stopAnimating];
-    [_board playSound:@"PROMOTE"];
 }
 
 - (void) _countDownToAIMove
