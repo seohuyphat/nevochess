@@ -63,9 +63,10 @@
     {
         _board = [board retain];
         
-        CGFloat    cellSize = 33;
+        CGFloat    cellSize = 34;
         CGPoint    cellOffset = CGPointMake(2, 3);
-        CGPoint    boardOffset = CGPointMake(5, 32);
+        CGPoint    boardPosition = CGPointMake(0, 28);
+        CGRect     boardFrame = CGRectMake(0, 0, 320, 352);
         CGColorRef backgroundColor = nil;
         CGColorRef highlightColor  = kLightBlueColor;
         CGColorRef animateColor    = kLightBlueColor;
@@ -75,25 +76,26 @@
             case 1:  // SKELETON background.
             {
                 backgroundColor = GetCGPatternNamed(@"SKELETON.png");
+                cellSize = 34.84;
+                cellOffset = CGPointMake(2.7, 1.5);
                 break;
             }
             case 2:  // HOXChess background.
             {
                 backgroundColor = GetCGPatternNamed(@"HOXChess.png");
-                cellSize = 34;
                 cellOffset = CGPointMake(7, 1);
-                boardOffset = CGPointMake(2, 28);
                 break;
             }
             case 3:  // WOOD background.
             {
                 backgroundColor = GetCGPatternNamed(@"WOOD.png");
+                cellSize = 34.84;
+                cellOffset = CGPointMake(2.7, 1.5);
                 break;
             }
             default: // The custom-drawn background.
             {
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-                cellSize = 34;
                 highlightColor  = kHighlightColor;
                 animateColor    = kHighlightColor;
                 break;
@@ -101,10 +103,10 @@
         }
         
         CGSize spacing = CGSizeMake(cellSize, cellSize);
-        CGPoint pos = CGPointMake(board.bounds.origin.x + boardOffset.x,
-                                  board.bounds.origin.y + boardOffset.y);
         _grid = [[Grid alloc] initWithRows:10 columns:9
-                                   spacing:spacing position:pos
+                             boardPosition:boardPosition
+                                boardFrame:boardFrame
+                                   spacing:spacing
                                 cellOffset:cellOffset
                            backgroundColor:backgroundColor];
         _grid.highlightColor = highlightColor;

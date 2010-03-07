@@ -39,7 +39,7 @@ enum ViewTagEnum
 
     // --- Piece Type.
     _pieceChoices = [[NSArray alloc] initWithObjects:
-                                        NSLocalizedString(@"Chinese", @""),
+                                        NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Western", @""),
                                         @"HOXChess",
                                         @"iXiangQi",

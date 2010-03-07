@@ -233,7 +233,7 @@
     }
 }
 
-- (void) movePieceTo:(CGPoint)newPosition animated:(BOOL)animated;
+- (void) movePieceTo:(CGPoint)newPosition animated:(BOOL)animated
 {
     if (animated) {
         _animated = YES; // ... to be continued with "bounds" animation!
