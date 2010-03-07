@@ -222,10 +222,10 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 @implementation GridCell
 
-@synthesize highlighted=_highlighted;
-@synthesize animated=_animated;
-@synthesize row=_row, column=_column;
-@synthesize dotted, cross;
+@synthesize row=_row;
+@synthesize column=_column;
+@synthesize highlightState=_highlightState;
+@synthesize dotted;
 
 - (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
               frame:(CGRect)frame
@@ -234,6 +234,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         _grid = grid;
         _row = row;
         _column = col;
+        _highlightState = NC_HL_NONE;
         self.position = frame.origin;
         CGRect bounds = frame;
         bounds.origin.x = 0;
@@ -300,7 +301,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         CGContextStrokeLineSegments(ctx, pos, 16);
     }
 
-    if ( cross )
+    if ( _column == 4 && (_row == 1 || _row == 8) ) // cross?
     {
         CGPoint crossp[4] = { { midx - CGRectGetWidth(frame), midy - CGRectGetHeight(frame) }, 
                               { midx + CGRectGetWidth(frame), midy + CGRectGetHeight(frame) },
@@ -312,15 +313,11 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 
 - (void)drawInContext:(CGContextRef)ctx
 {
-    if (!_animated) {
+    if (_highlightState < NC_HL_ANIMATED) {
         return;
     }
 
-    // ********************
-    self.borderWidth = 0;      // NOTE: Display the "border" highlight.
-    // ********************
-
-    CGFloat ds = 4.0;
+    const CGFloat ds = 4.0;
     CGRect newFrame = self.frame;
     newFrame.origin = CGPointMake(0, 0);
     newFrame.origin.x += ds/2;
@@ -328,22 +325,53 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     newFrame.size.width -= ds;
     newFrame.size.height -= ds;
 
-    CGContextSetStrokeColorWithColor(ctx, _grid.animateColor);
+    CGContextSetStrokeColorWithColor(ctx, self.borderColor);
     CGContextSetLineWidth(ctx, 3.0);
     CGContextAddEllipseInRect(ctx, newFrame);
     CGContextStrokePath(ctx);
 }
 
-- (void) setHighlighted:(BOOL)highlighted
+- (void) setHighlightState:(HighlightEnum)hlState
 {
-    _highlighted = highlighted;
-    self.borderWidth = (highlighted ? 2 : 0);
+    _highlightState = hlState;
+    switch (hlState)
+    {
+        case NC_HL_NONE:
+        {
+            self.borderColor = _grid.highlightColor;
+            self.borderWidth = 0;
+            break;
+        }
+        case NC_HL_NORMAL:
+        {
+            self.borderColor = _grid.highlightColor;
+            self.borderWidth = 2;
+            break;
+        }
+        case NC_HL_ANIMATED:
+        {
+            self.borderColor = _grid.animateColor;
+            self.borderWidth = 0;
+            break;
+        }
+        case NC_HL_CHECKED:
+        {
+            self.borderColor = kRedColor;
+            self.borderWidth = 0;
+            break;
+        }
+    }
+    [self setNeedsDisplay];
 }
 
-- (void) setAnimated:(BOOL)animated
+- (BOOL) highlighted
 {
-    _animated = animated;
-    [self setNeedsDisplay];
+    return (_highlightState == NC_HL_NORMAL);
+}
+
+- (void) setHighlighted:(BOOL)highlighted
+{
+    self.highlightState = (highlighted ? NC_HL_NORMAL : NC_HL_NONE);
 }
 
 - (CGPoint) getMidInLayer:(CALayer*)layer
@@ -353,13 +381,9 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     return [self.superlayer convertPoint:point toLayer:layer];
 }
 
-- (GridCell*) nw { return [_grid cellAtRow:_row+1 column:_column-1]; }
-- (GridCell*) n  { return [_grid cellAtRow:_row+1 column:_column  ]; }
-- (GridCell*) ne { return [_grid cellAtRow:_row+1 column:_column+1]; }
-- (GridCell*) e  { return [_grid cellAtRow:_row   column:_column+1]; }
-- (GridCell*) se { return [_grid cellAtRow:_row-1 column:_column+1]; }
-- (GridCell*) s  { return [_grid cellAtRow:_row-1 column:_column  ]; }
-- (GridCell*) sw { return [_grid cellAtRow:_row-1 column:_column-1]; }
-- (GridCell*) w  { return [_grid cellAtRow:_row   column:_column-1]; }
+- (GridCell*) n { return [_grid cellAtRow:_row+1 column:_column  ]; }
+- (GridCell*) e { return [_grid cellAtRow:_row   column:_column+1]; }
+- (GridCell*) s { return [_grid cellAtRow:_row-1 column:_column  ]; }
+- (GridCell*) w { return [_grid cellAtRow:_row   column:_column-1]; }
 
 @end

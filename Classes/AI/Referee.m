@@ -26,6 +26,7 @@ extern int  Referee_is_legal_move( int mv );
 
 extern void Referee_make_move( int mv, int* ppcCaptured );
 extern int  Referee_rep_status(int nRecur, int *repValue);
+extern int  Referee_is_checked();
 extern int  Referee_is_mate();
 extern int  Referee_get_nMoveNum();
 extern int  Referee_get_sdPlayer();
@@ -76,9 +77,14 @@ extern int  Referee_get_sdPlayer();
     return Referee_rep_status(nRecur, pRepVal);
 }
 
-- (int) isMate
+- (BOOL) isChecked
 {
-    return Referee_is_mate();
+    return (Referee_is_checked() ? YES : NO);
+}
+
+- (BOOL) isMate
+{
+    return (Referee_is_mate() ? YES : NO);
 }
 
 - (int) get_nMoveNum

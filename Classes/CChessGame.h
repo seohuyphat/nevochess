@@ -41,13 +41,14 @@
 - (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (Piece*) getPieceAtCell:(int)square;
+- (Piece*) getKingOfColor:(ColorEnum)color;
 - (GridCell*) getCellAtRow:(int)row col:(int)col;
 - (GridCell*) getCellAt:(int)square;
-- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight;
 
 - (int) doMoveFrom:(Position)from toPosition:(Position)to;
 - (int) generateMoveFrom:(Position)from moves:(int*)mvs;
 - (BOOL) isMoveLegalFrom:(Position)from toPosition:(Position)to;
+- (BOOL) isChecked;
 - (int) getMoveCount;
 - (void) resetGame;
 - (void) reverseView;
@@ -55,6 +56,6 @@
 
 @property (nonatomic, readonly) BOOL blackAtTopSide;
 @property (nonatomic, readonly) GameStatusEnum gameResult;
-@property (readonly, getter=getNextColor) ColorEnum nextColor;
+@property (readonly)            ColorEnum nextColor;
 
 @end

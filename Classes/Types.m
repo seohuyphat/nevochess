@@ -111,6 +111,7 @@
 @synthesize move;
 @synthesize srcPiece;
 @synthesize capturedPiece;
+@synthesize checkedKing;
 
 - (id)initWithMove:(int)mv
 {
@@ -118,6 +119,7 @@
         move = mv;
         srcPiece = nil;
         capturedPiece = nil;
+        checkedKing = nil;
     }
     return self;
 }
@@ -131,8 +133,9 @@
 
 - (void)dealloc
 {
-    [srcPiece release];
-    [capturedPiece release];
+    srcPiece = nil;
+    capturedPiece = nil;
+    checkedKing = nil;
     [super dealloc];
 }
 
