@@ -204,7 +204,7 @@
 
     if (animated)
     {
-        CGFloat ds = 5.0;
+        const CGFloat ds = 5.0;
         CGRect oriBounds = holder.bounds;
         CGRect ubounds = oriBounds;
         ubounds.size.width += ds*2;
