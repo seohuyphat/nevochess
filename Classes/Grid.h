@@ -75,7 +75,9 @@ BOOL layerIsGridCell( CALayer* layer );
 /** Initializes a new Grid with the given dimensions and cell size, and position in superview.
     Note that a new Grid has no cells! Either call -addAllCells, or -addCellAtRow:column:. */
 - (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
-            spacing:(CGSize)spacing position:(CGPoint)pos
+      boardPosition:(CGPoint)boardPosition
+         boardFrame:(CGRect)boardFrame
+            spacing:(CGSize)spacing
          cellOffset:(CGPoint)cellOffset
     backgroundColor:(CGColorRef)backgroundColor;
 

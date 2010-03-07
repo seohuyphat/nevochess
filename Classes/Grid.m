@@ -61,7 +61,9 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 @synthesize rows=_nRows, columns=_nColumns, spacing=_spacing;
 
 - (id) initWithRows:(unsigned)nRows columns:(unsigned)nColumns
-            spacing:(CGSize)spacing position:(CGPoint)pos
+      boardPosition:(CGPoint)boardPosition
+         boardFrame:(CGRect)boardFrame
+            spacing:(CGSize)spacing
          cellOffset:(CGPoint)cellOffset
     backgroundColor:(CGColorRef)backgroundColor
 {
@@ -77,8 +79,8 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         if (backgroundColor) {
             self.backgroundColor = CGColorRetain(backgroundColor);
         }
-        self.bounds = CGRectMake(-1, -1, nColumns*_spacing.width+10, nRows*_spacing.height+11);
-        self.position = pos;
+        self.bounds = boardFrame;
+        self.position = boardPosition;
         self.anchorPoint = CGPointMake(0,0);
         self.zPosition = kBoardZ;
         self.needsDisplayOnBoundsChange = YES;
