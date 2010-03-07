@@ -46,6 +46,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)bHighlight;
 - (void) _animateLatestPiece:(Piece*)piece;
+- (void) _setPickedUpPiece:(Piece*)piece;
 - (void) _clearAllHighlight;
 - (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
@@ -254,6 +255,26 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (piece) {
         _animatedPiece = piece;
         _animatedPiece.animated = YES;
+    }
+}
+
+- (void) _setPickedUpPiece:(Piece*)piece
+{
+    if (_pickedUpPiece) {
+        _pickedUpPiece.pickedUp = NO;
+    }
+
+    if (piece) {
+        _pickedUpPiece = piece;
+        _pickedUpPiece.pickedUp = YES;
+        // Temporarily stop the latest piece's animation.
+        if (_animatedPiece) _animatedPiece.animated = NO;
+    }
+    else {
+        // Restore the latest piece's animation.
+        if (_animatedPiece && !_animatedPiece.animated) {
+            _animatedPiece.animated = YES;
+        }
     }
 }
 
@@ -560,9 +581,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
-            _pickedUpPiece.pickedUp = NO;
-            _pickedUpPiece = piece;
-            _pickedUpPiece.pickedUp = YES;
+            [self _setPickedUpPiece:piece];
             [_audioHelper playSound:@"CLICK"];
             return;
         }
@@ -574,8 +593,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _pickedUpPiece.pickedUp = NO;
     if (holder && holder.highlighted && _pickedUpPiece)
     {
-        GridCell* fromCell = _pickedUpPiece.holder;
-        Position from = [_game getActualPositionAtCell:fromCell];
+        Position from = [_game getActualPositionAtCell:_pickedUpPiece.holder];
         Position to = [_game getActualPositionAtCell:holder];
         if ([_game isMoveLegalFrom:from toPosition:to])
         {
@@ -590,7 +608,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 
     [self _setHighlightCells:NO];
-    _pickedUpPiece = nil;
+    [self _setPickedUpPiece:nil];
 }
 
 - (void) resetBoard
