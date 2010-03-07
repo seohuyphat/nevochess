@@ -50,7 +50,8 @@
 
 - (void) makeMove:(int)move captured:(int*) ppcCaptured;
 - (int) repStatus:(int)nRecur repValue:(int*)pRepVal;
-- (int) isMate;
+- (BOOL) isChecked;
+- (BOOL) isMate;
 - (int) get_nMoveNum;
 - (int) get_sdPlayer;
 

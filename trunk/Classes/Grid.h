@@ -104,28 +104,26 @@ BOOL layerIsGridCell( CALayer* layer );
 
 @end
 
-
+// --------------------------------------------------------------------------
 /** A single cell in a grid (customized for Xiangqi). */
 @interface GridCell : CALayer
 {
-    BOOL     _highlighted;
-    BOOL     _animated;
-    Grid*    _grid;
-    unsigned _row, _column;
-    BOOL     dotted;
-    BOOL     cross;
+    Grid*          _grid;
+    unsigned       _row;
+    unsigned       _column;
+    HighlightEnum  _highlightState;  // Highlight state.
+    BOOL           dotted;
 }
 
 - (id) initWithGrid:(Grid*)grid row:(unsigned)row column:(unsigned)col
               frame:(CGRect)frame;
 
-@property (nonatomic, setter=setHighlighted:) BOOL highlighted;
-@property (nonatomic, setter=setAnimated:) BOOL animated;
-
-@property (nonatomic) unsigned row, column;
-@property (nonatomic) BOOL dotted;
-@property (nonatomic) BOOL cross;
-@property (readonly) GridCell *nw, *n, *ne, *e, *se, *s, *sw, *w; // Absolute directions (n = increasing row#)
+@property (nonatomic) unsigned      row;
+@property (nonatomic) unsigned      column;
+@property (nonatomic) HighlightEnum highlightState;
+@property (nonatomic) BOOL          highlighted;
+@property (nonatomic) BOOL          dotted;
+@property (readonly)  GridCell      *n, *e, *s, *w;
 
 - (CGPoint) getMidInLayer:(CALayer*)layer;
 

@@ -57,14 +57,18 @@
 @implementation Piece
 
 @synthesize holder;
+@synthesize type=_type;
 @synthesize color=_color;
+@synthesize highlightState=_highlightState;
 
-- (id) initWithColor:(ColorEnum)color imageName:(NSString*)imageName scale:(CGFloat)scale
+- (id) initWithType:(PieceEnum)type color:(ColorEnum)color
+          imageName:(NSString*)imageName scale:(CGFloat)scale
 {
     if (self = [super init])
     {
+        _type = type;
         _color = color;
-        _animated = NO;
+        _highlightState = NC_HL_NONE;
         _imageName = [imageName retain];
         [self setImage:GetCGImageNamed(imageName) scale:scale];
         self.zPosition = kPieceZ;
@@ -189,19 +193,9 @@
     [self setImage:image scale:MAX(size.width,size.height)];
 }
 
-- (BOOL) highlighted { return holder.highlighted; }
-- (void) setHighlighted:(BOOL)highlighted { holder.highlighted = highlighted; }
-
-- (BOOL) animated
+/** Helper API */
+- (void) _animateBounds:(BOOL)animated
 {
-    return _animated;
-}
-
-- (void) setAnimated:(BOOL)animated
-{
-    _animated = animated;
-    holder.animated = animated;
-
     if (animated)
     {
         const CGFloat ds = 5.0;
@@ -209,7 +203,7 @@
         CGRect ubounds = oriBounds;
         ubounds.size.width += ds*2;
         ubounds.size.height += ds*2;
-
+        
         // 'bounds' animation
         CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
         boundsAnimation.duration=1.0;
@@ -224,10 +218,42 @@
     }
 }
 
+- (void) setHighlightState:(HighlightEnum)hlState
+{
+    _highlightState = hlState;
+    holder.highlightState = hlState;
+
+    switch (hlState)
+    {
+        case NC_HL_NONE:
+        {
+            [self _animateBounds:NO];
+            break;
+        }
+        case NC_HL_NORMAL:
+        {
+            [self _animateBounds:NO];
+            break;
+        }
+        case NC_HL_ANIMATED:
+        {
+            [self _animateBounds:YES];
+            break;
+        }
+        case NC_HL_CHECKED:
+        {
+            [self _animateBounds:YES];
+            break;
+        }
+    }
+}
+
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
-    if (_animated) {
-        self.animated = YES; // Resume "position" animation with "bounds" animation.
+    if (   _highlightState == NC_HL_ANIMATED
+        || _highlightState == NC_HL_CHECKED)
+    {
+        self.highlightState = _highlightState; // Resume "position" animation with "bounds" animation.
     } else {
         //NSLog(@"%s: ENTER. [%@] Animationed canceled!!!!", __FUNCTION__, self);
     }
@@ -236,7 +262,8 @@
 - (void) movePieceTo:(CGPoint)newPosition animated:(BOOL)animated
 {
     if (animated) {
-        _animated = YES; // ... to be continued with "bounds" animation!
+        _highlightState = NC_HL_ANIMATED; // ... to be continued with "bounds" animation!
+        
         CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"position"];
         animation.delegate = self;
         animation.duration = 0.4;

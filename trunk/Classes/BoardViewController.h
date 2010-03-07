@@ -69,6 +69,7 @@
     int                   _hl_nMoves;    
     Piece*                _animatedPiece; // The last Piece that was animated.
     Piece*                _pickedUpPiece;
+    Piece*                _checkedKing;   // A King that is being checked.
 
     NSMutableArray*       _moves;       // MOVE history
     int                   _nthMove;     // pivot for the Move Review

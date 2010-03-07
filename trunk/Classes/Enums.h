@@ -90,6 +90,24 @@ typedef enum
 } GameStatusEnum;
 
 /**
+ * Piece's Type.
+ *
+ *  King (K), Advisor (A), Elephant (E), chaRiot (R), Horse (H), 
+ *  Cannons (C), Pawns (P).
+ */
+typedef enum
+{
+    NC_PIECE_INVALID = 0,
+    NC_PIECE_KING,                 // King (or General)
+    NC_PIECE_ADVISOR,              // Advisor (or Guard, or Mandarin)
+    NC_PIECE_ELEPHANT,             // Elephant (or Ministers)
+    NC_PIECE_CHARIOT,              // Chariot ( Rook, or Car)
+    NC_PIECE_HORSE,                // Horse ( Knight )
+    NC_PIECE_CANNON,               // Canon
+    NC_PIECE_PAWN                  // Pawn (or Soldier)
+} PieceEnum;
+
+/**
  * Possible AI engines.
  */
 typedef enum
@@ -98,6 +116,18 @@ typedef enum
     NC_AI_HaQiKiD,
     NC_AI_XQWLight_ObjC
 } AIEnum;
+
+/**
+ * Highlight states of a Piece/Cell.
+ */
+typedef enum
+{
+    // !!!! *** DO NOT CHANGE THE NUMERIC VALUES  ***!!! //
+    NC_HL_NONE     = 0,   // No highlight at all
+    NC_HL_NORMAL   = 1,   // Normal highlight 
+    NC_HL_ANIMATED = 2,   // Highlight after a piece has moved
+    NC_HL_CHECKED  = 3    // Highlight while a King is checked (or threatened)
+} HighlightEnum;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

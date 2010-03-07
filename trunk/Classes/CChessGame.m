@@ -34,11 +34,13 @@
 
 @interface CChessGame (PrivateMethods)
 
+- (void) _createPiece:(PieceEnum)type color:(ColorEnum)color
+                  row:(int)row col:(int)col;
 - (void) _setupPieces;
 - (void) _resetPieces;
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color;
 - (void) _setPiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (void) _checkAndUpdateGameStatus;
+- (NSString*) _pieceToString:(PieceEnum)type;
 
 @end
 
@@ -136,9 +138,6 @@
         [_grid cellAtRow: 3 column: 8].dotted = YES;
         [_grid cellAtRow: 6 column: 8].dotted = YES;
         
-        [_grid cellAtRow: 1 column: 4].cross = YES;
-        [_grid cellAtRow: 8 column: 4].cross = YES;
-        
         _blackAtTopSide = YES;
         _gameResult = NC_GAME_STATUS_IN_PROGRESS;
         
@@ -208,6 +207,16 @@
     return [self getPieceAtRow:ROW(square) col:COLUMN(square)];
 }
 
+- (Piece*) getKingOfColor:(ColorEnum)color
+{
+    for (Piece* piece in _pieceBox) {
+        if (piece.type == NC_PIECE_KING &&  piece.color == color) {
+            return piece;
+        }
+    }
+    return nil;
+}
+
 - (GridCell*) getCellAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
@@ -264,7 +273,12 @@
     return [_referee isLegalMove:move];
 }
 
-- (ColorEnum) getNextColor
+- (BOOL) isChecked
+{
+    return [_referee isChecked];
+}
+
+- (ColorEnum) nextColor
 {
     return [_referee get_sdPlayer] ? NC_COLOR_BLACK : NC_COLOR_RED;
 }
@@ -298,22 +312,21 @@
     _blackAtTopSide = !_blackAtTopSide;
 }
 
-- (void) highlightCell:(int)cell highlight:(BOOL)bHighlight
-{
-    [self getCellAtRow:ROW(cell) col:COLUMN(cell)].highlighted = bHighlight;
-}
 
 #pragma mark -
 #pragma mark Private API
-
-
-- (void) _createPiece:(NSString*)imageName row:(int)row col:(int)col color:(ColorEnum)color
+            
+- (void) _createPiece:(PieceEnum)type color:(ColorEnum)color
+                  row:(int)row col:(int)col 
 {
-    imageName = [[NSBundle mainBundle] pathForResource:imageName ofType:nil
-                                           inDirectory:_pieceFolder];
+    NSString* sType = [self _pieceToString:type];
+    NSString* sFile = [NSString stringWithFormat:@"%c%@.png",
+                       (color == NC_COLOR_RED ? 'r' : 'b'), sType];
+    NSString* imageName = [[NSBundle mainBundle] pathForResource:sFile ofType:nil
+                                                     inDirectory:_pieceFolder];
     GridCell* cell = [_grid cellAtRow:row column:col]; 
-    Piece* piece = [[Piece alloc] initWithColor:color imageName:imageName
-                                          scale:_grid.spacing.width];
+    Piece* piece = [[Piece alloc] initWithType:type color:color
+                                     imageName:imageName scale:_grid.spacing.width];
     piece.holder = cell;
     [_board addSublayer:piece];
     piece.position = [cell getMidInLayer:_board];
@@ -415,51 +428,65 @@
         default: _pieceFolder = @"pieces/iXiangQi"; break;
     }
 
-    // chariot      
-    [self _createPiece:@"bchariot.png" row:0 col:0 color:NC_COLOR_BLACK];
-    [self _createPiece:@"bchariot.png" row:0 col:8 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"rchariot.png" row:9 col:0 color:NC_COLOR_RED];     
-    [self _createPiece:@"rchariot.png" row:9 col:8 color:NC_COLOR_RED];  
+    // Chariot      
+    [self _createPiece:NC_PIECE_CHARIOT color:NC_COLOR_BLACK row:0 col:0 ];
+    [self _createPiece:NC_PIECE_CHARIOT color:NC_COLOR_BLACK row:0 col:8 ];         
+    [self _createPiece:NC_PIECE_CHARIOT color:NC_COLOR_RED row:9 col:0];     
+    [self _createPiece:NC_PIECE_CHARIOT color:NC_COLOR_RED row:9 col:8];  
 
-    // horse    
-    [self _createPiece:@"bhorse.png" row:0 col:1 color:NC_COLOR_BLACK];        
-    [self _createPiece:@"bhorse.png" row:0 col:7 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"rhorse.png" row:9 col:1 color:NC_COLOR_RED];      
-    [self _createPiece:@"rhorse.png" row:9 col:7 color:NC_COLOR_RED];
+    // Horse    
+    [self _createPiece:NC_PIECE_HORSE color:NC_COLOR_BLACK row:0 col:1];        
+    [self _createPiece:NC_PIECE_HORSE color:NC_COLOR_BLACK row:0 col:7];         
+    [self _createPiece:NC_PIECE_HORSE color:NC_COLOR_RED row:9 col:1];      
+    [self _createPiece:NC_PIECE_HORSE color:NC_COLOR_RED row:9 col:7];
     
-    // elephant      
-    [self _createPiece:@"belephant.png" row:0 col:2 color:NC_COLOR_BLACK];        
-    [self _createPiece:@"belephant.png" row:0 col:6 color:NC_COLOR_BLACK];        
-    [self _createPiece:@"relephant.png" row:9 col:2 color:NC_COLOR_RED];     
-    [self _createPiece:@"relephant.png" row:9 col:6 color:NC_COLOR_RED]; 
+    // Elephant      
+    [self _createPiece:NC_PIECE_ELEPHANT color:NC_COLOR_BLACK row:0 col:2];        
+    [self _createPiece:NC_PIECE_ELEPHANT color:NC_COLOR_BLACK row:0 col:6];        
+    [self _createPiece:NC_PIECE_ELEPHANT color:NC_COLOR_RED row:9 col:2];     
+    [self _createPiece:NC_PIECE_ELEPHANT color:NC_COLOR_RED row:9 col:6]; 
     
-    // advisor      
-    [self _createPiece:@"badvisor.png" row:0 col:3 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"badvisor.png" row:0 col:5 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"radvisor.png" row:9 col:3 color:NC_COLOR_RED];        
-    [self _createPiece:@"radvisor.png" row:9 col:5 color:NC_COLOR_RED];
+    // Advisor      
+    [self _createPiece:NC_PIECE_ADVISOR color:NC_COLOR_BLACK row:0 col:3];         
+    [self _createPiece:NC_PIECE_ADVISOR color:NC_COLOR_BLACK row:0 col:5];         
+    [self _createPiece:NC_PIECE_ADVISOR color:NC_COLOR_RED row:9 col:3];        
+    [self _createPiece:NC_PIECE_ADVISOR color:NC_COLOR_RED row:9 col:5];
     
-    // king       
-    [self _createPiece:@"bking.png" row:0 col:4 color:NC_COLOR_BLACK];       
-    [self _createPiece:@"rking.png" row:9 col:4 color:NC_COLOR_RED];
+    // King       
+    [self _createPiece:NC_PIECE_KING color:NC_COLOR_BLACK row:0 col:4];       
+    [self _createPiece:NC_PIECE_KING color:NC_COLOR_RED row:9 col:4];
     
-    // cannon     
-    [self _createPiece:@"bcannon.png" row:2 col:1 color:NC_COLOR_BLACK];       
-    [self _createPiece:@"bcannon.png" row:2 col:7 color:NC_COLOR_BLACK];          
-    [self _createPiece:@"rcannon.png" row:7 col:1 color:NC_COLOR_RED];        
-    [self _createPiece:@"rcannon.png" row:7 col:7 color:NC_COLOR_RED];
+    // Cannon     
+    [self _createPiece:NC_PIECE_CANNON color:NC_COLOR_BLACK row:2 col:1];       
+    [self _createPiece:NC_PIECE_CANNON color:NC_COLOR_BLACK row:2 col:7];          
+    [self _createPiece:NC_PIECE_CANNON color:NC_COLOR_RED row:7 col:1];        
+    [self _createPiece:NC_PIECE_CANNON color:NC_COLOR_RED row:7 col:7];
 
-    // pawn       
-    [self _createPiece:@"bpawn.png" row:3 col:0 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"bpawn.png" row:3 col:2 color:NC_COLOR_BLACK];         
-    [self _createPiece:@"bpawn.png" row:3 col:4 color:NC_COLOR_BLACK];        
-    [self _createPiece:@"bpawn.png" row:3 col:6 color:NC_COLOR_BLACK];      
-    [self _createPiece:@"bpawn.png" row:3 col:8 color:NC_COLOR_BLACK];     
-    [self _createPiece:@"rpawn.png" row:6 col:0 color:NC_COLOR_RED];      
-    [self _createPiece:@"rpawn.png" row:6 col:2 color:NC_COLOR_RED];         
-    [self _createPiece:@"rpawn.png" row:6 col:4 color:NC_COLOR_RED];       
-    [self _createPiece:@"rpawn.png" row:6 col:6 color:NC_COLOR_RED];      
-    [self _createPiece:@"rpawn.png" row:6 col:8 color:NC_COLOR_RED];
+    // Pawn       
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_BLACK row:3 col:0];         
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_BLACK row:3 col:2];         
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_BLACK row:3 col:4];        
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_BLACK row:3 col:6];      
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_BLACK row:3 col:8];     
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_RED row:6 col:0];      
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_RED row:6 col:2];         
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_RED row:6 col:4];       
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_RED row:6 col:6];      
+    [self _createPiece:NC_PIECE_PAWN color:NC_COLOR_RED row:6 col:8];
+}
+
+- (NSString*) _pieceToString:(PieceEnum)type
+{
+    switch (type) {
+        case NC_PIECE_KING:     return @"king";
+        case NC_PIECE_ADVISOR:  return @"advisor";
+        case NC_PIECE_ELEPHANT: return @"elephant";
+        case NC_PIECE_CHARIOT:  return @"chariot";
+        case NC_PIECE_HORSE:    return @"horse";
+        case NC_PIECE_CANNON:   return @"cannon";
+        case NC_PIECE_PAWN:     return @"pawn";
+    }
+    return nil;
 }
 
 @end

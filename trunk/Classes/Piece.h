@@ -64,11 +64,13 @@ enum {
 /** A playing piece that displays an image. */
 @interface Piece : CALayer
 {
-    GridCell*   holder;
-    int        _restingZ;  // Original z position, saved while pickedUp
-    ColorEnum  _color;
-    BOOL       _animated;
-    NSString*  _imageName;
+    GridCell*      holder;
+    PieceEnum     _type;
+    ColorEnum     _color;
+    HighlightEnum _highlightState;  // Highlight state.
+
+    NSString*     _imageName;
+    int           _restingZ;  // The original z-position, saved while pickedUp
 }
 
 /** Conveniences for getting/setting the layer's scale and rotation */
@@ -79,16 +81,19 @@ enum {
 @property BOOL pickedUp;
 
 @property (nonatomic, retain)   GridCell* holder;
+@property (nonatomic, readonly) PieceEnum type;
 @property (nonatomic, readonly) ColorEnum color;
-@property (nonatomic)           BOOL highlighted;
-@property (nonatomic)           BOOL animated;
+@property (nonatomic)           HighlightEnum highlightState;
 
-/** Initialize a Piece with a given Color and from an image file.
- imageName can be a resource name from the app bundle, or an absolute path.
- If scale is 0.0, the image's natural size will be used.
- If 0.0 < scale < 4.0, the image will be scaled by that factor.
- If scale >= 4.0, it will be used as the size to scale the maximum dimension to. */
-- (id) initWithColor:(ColorEnum)color imageName:(NSString*)imageName scale:(CGFloat)scale;
+/** Initialize a Piece with a given Type, Color, and an image file.
+ @param imageName a resource name from the app bundle, or an absolute path.
+ @param scale
+   - scale == 0.0, the image's natural size will be used.
+   - 0.0 < scale < 4.0, the image will be scaled by that factor.
+   - scale >= 4.0, it will be used as the size to scale the maximum dimension.
+ */
+- (id) initWithType:(PieceEnum)type color:(ColorEnum)color
+          imageName:(NSString*)imageName scale:(CGFloat)scale;
 
 /** Removes this Bit while running a explosion/fade-out animation */
 - (void) destroyWithAnimation:(BOOL)animated;

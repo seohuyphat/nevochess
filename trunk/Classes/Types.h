@@ -74,11 +74,13 @@ typedef struct Position {
     int    move;
     Piece* srcPiece;
     Piece* capturedPiece;
+    Piece* checkedKing; // The King that is checked after this Move.
 }
 
-@property(nonatomic) int move;
-@property(nonatomic, retain) Piece* srcPiece;
-@property(nonatomic, retain) Piece* capturedPiece;
+@property (nonatomic)         int    move;
+@property (nonatomic, assign) Piece* srcPiece;
+@property (nonatomic, assign) Piece* capturedPiece;
+@property (nonatomic, assign) Piece* checkedKing;
 
 - (id)initWithMove:(int)mv;
 

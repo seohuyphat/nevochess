@@ -1059,6 +1059,12 @@ Referee_rep_status(int nRecur, int *repValue)
 }
 
 extern "C" int
+Referee_is_checked(int mv, int* ppcCaptured)
+{
+    return (pos.InCheck() ? 1 : 0);
+}
+
+extern "C" int
 Referee_is_mate()
 {
     return (pos.IsMate() ? 1 : 0);

@@ -44,9 +44,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 @interface BoardViewController (PrivateMethods)
 - (CGRect) _gameBoardFrame;
 - (id) _initSoundSystem:(NSString*)soundPath;
-- (void) _setHighlightCells:(BOOL)bHighlight;
-- (void) _animateLatestPiece:(Piece*)piece;
+- (void) _setHighlightCells:(BOOL)highlighted;
 - (void) _setPickedUpPiece:(Piece*)piece;
+- (void) _animateLatestMove:(MoveAtom*)pMove;
+- (void) _clearAllAnimation;
 - (void) _clearAllHighlight;
 - (void) _setReviewMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
@@ -102,6 +103,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
         _animatedPiece = nil;
         _pickedUpPiece = nil;
+        _checkedKing = nil;
 
         self._reviewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
         self._reviewLastTouched_prev = nil;
@@ -234,27 +236,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
 }
 
-- (void) _setHighlightCells:(BOOL)bHighlight
+- (void) _setHighlightCells:(BOOL)highlighted
 {
     for (int i = 0; i < _hl_nMoves; ++i) {
-        [_game highlightCell:DST(_hl_moves[i]) highlight:bHighlight];
+        [_game getCellAt:DST(_hl_moves[i])].highlighted = highlighted;
     }
 
-    if ( ! bHighlight ) {
+    if ( ! highlighted ) {
         _hl_nMoves = 0;
-    }
-}
-
-- (void) _animateLatestPiece:(Piece*)piece
-{
-    if (_animatedPiece) {
-        _animatedPiece.animated = NO;
-        _animatedPiece = nil;
-    }
-
-    if (piece) {
-        _animatedPiece = piece;
-        _animatedPiece.animated = YES;
     }
 }
 
@@ -264,24 +253,57 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _pickedUpPiece.pickedUp = NO;
     }
 
-    if (piece) {
+    if (piece)
+    {
         _pickedUpPiece = piece;
         _pickedUpPiece.pickedUp = YES;
+
         // Temporarily stop the latest piece's animation.
-        if (_animatedPiece) _animatedPiece.animated = NO;
-    }
-    else {
-        // Restore the latest piece's animation.
-        if (_animatedPiece && !_animatedPiece.animated) {
-            _animatedPiece.animated = YES;
+        if (_animatedPiece && _animatedPiece.highlightState == NC_HL_ANIMATED) {
+            _animatedPiece.highlightState = NC_HL_NONE;
         }
+        if (_checkedKing && _checkedKing.highlightState == NC_HL_CHECKED) {
+            _checkedKing.highlightState = NC_HL_NONE;
+        }
+    }
+    else
+    {
+        // Restore the latest piece's animation.
+        if (_animatedPiece && _animatedPiece.highlightState != NC_HL_ANIMATED) {
+            _animatedPiece.highlightState = NC_HL_ANIMATED;
+        }
+        if (_checkedKing && _checkedKing.highlightState != NC_HL_CHECKED) {
+            _checkedKing.highlightState = NC_HL_CHECKED;
+        }
+    }
+}
+
+- (void) _animateLatestMove:(MoveAtom*)pMove
+{
+    _animatedPiece = pMove.srcPiece;
+    _animatedPiece.highlightState = NC_HL_ANIMATED;
+
+    if (pMove.checkedKing) {
+        _checkedKing = pMove.checkedKing;
+        _checkedKing.highlightState = NC_HL_CHECKED;
+    }
+}
+
+- (void) _clearAllAnimation
+{
+    if (_animatedPiece) {
+        _animatedPiece.highlightState = NC_HL_NONE;
+        _animatedPiece = nil;
+    }
+    if (_checkedKing) {
+        _checkedKing.highlightState = NC_HL_NONE;
+        _checkedKing = nil;
     }
 }
 
 - (void) _clearAllHighlight
 {
     [self _setHighlightCells:NO];
-    [self _animateLatestPiece:nil];
     _pickedUpPiece.pickedUp = NO;
     _pickedUpPiece = nil;
 }
@@ -316,24 +338,29 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     Piece* piece = [_game getPieceAtRow:from.row col:from.col];
     Piece* capture = [_game getPieceAtRow:to.row col:to.col];
+    BOOL bChecked = [_game isChecked];
+    ColorEnum checkedColor = (piece.color == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+    Piece* checkedKing = (bChecked ? [_game getKingOfColor:checkedColor] : nil);
 
-    [_game movePiece:piece toPosition:to animated:(bSetup ? NO : YES)];
+    pMove.srcPiece = piece;
+    pMove.capturedPiece = capture;
+    pMove.checkedKing = checkedKing;
+
+    [self _clearAllAnimation];
+    [_game movePiece:piece toPosition:to animated:NO];
+    
     if (!bSetup) {
-        _animatedPiece.animated = NO;
-        _animatedPiece = piece;
-
-        NSString* sound = ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
-                                    : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") );
-        [_audioHelper playSound:sound];
+        NSString* sound =
+            (bChecked ? (moveColor == NC_COLOR_RED ? @"CHECK" : @"CHECK2")
+                      : ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
+                                  : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") ));
+        [_audioHelper playSound:sound];        
+        [self _animateLatestMove:pMove];
     }
 
     if (capture) {
         [capture destroyWithAnimation:(bSetup ? NO : YES)];
     }
-
-    // Add this new Move to the Move-History.
-    pMove.srcPiece = piece;
-    pMove.capturedPiece = capture;
 }
 
 - (void) onGameOver
@@ -437,7 +464,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
 
-    [self _animateLatestPiece:nil];
+    [self _clearAllAnimation];
     [_game movePiece:pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
 
     if (pMove.capturedPiece) {
@@ -448,8 +475,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     --_nthMove;
     if (_nthMove >= 0) {
         pMove = [_moves objectAtIndex:_nthMove];
-        Piece* prevPiece = [_game getPieceAtCell:DST(pMove.move)];
-        [self _animateLatestPiece:prevPiece];
+        [self _animateLatestMove:pMove];
     }
     return YES;
 }
@@ -469,7 +495,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
     self._reviewLastTouched = [NSDate date];
     if (![self _isInReview]) {
-        //NSLog(@"%s: Clear old highlight.", __FUNCTION__);
         [self _clearAllHighlight];
     }
 
@@ -494,7 +519,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     ++_nthMove;
     NSAssert1(_nthMove >= 0 && _nthMove < [_moves count], @"Invalid index [%d]", _nthMove);
     
-    const MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
+    MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
     
     if (_nthMove == [_moves count] - 1) {
         _nthMove = HISTORY_INDEX_END;
@@ -512,9 +537,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         pMove.srcPiece = [_game getPieceAtCell:SRC(move)];
         NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
         pMove.capturedPiece = capture;
+        if ([_game isChecked]) {
+            ColorEnum checkedColor = (pMove.srcPiece.color == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+            pMove.checkedKing = [_game getKingOfColor:checkedColor];
+        }
     }
+    [self _clearAllAnimation];
     [_game movePiece:pMove.srcPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    [self _animateLatestPiece:pMove.srcPiece];
+    [self _animateLatestMove:pMove];
     return YES;
 }
 
@@ -577,11 +607,11 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         if (   (!_pickedUpPiece && piece.color == _game.nextColor) 
             || (_pickedUpPiece && piece.color == _pickedUpPiece.color) )
         {
+            [self _setPickedUpPiece:piece]; // Must come before 'highlighting'!
             Position from = [_game getActualPositionAtCell:holder];
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
-            [self _setPickedUpPiece:piece];
             [_audioHelper playSound:@"CLICK"];
             return;
         }
@@ -598,13 +628,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         if ([_game isMoveLegalFrom:from toPosition:to])
         {
             [_game doMoveFrom:from toPosition:to];
+            [self _setHighlightCells:NO]; // Must come before 'Move-animation'!
             [self onNewMoveFrom:from toPosition:to inSetupMode:NO];
             [_boardOwner onLocalMoveMadeFrom:from toPosition:to];
         }
         else {
             [_audioHelper playSound:@"ILLEGAL"];
         }
-
     }
 
     [self _setHighlightCells:NO];
@@ -614,6 +644,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (void) resetBoard
 {
     [self _clearAllHighlight];
+    [self _clearAllAnimation];
 
     [_redTime release];
     _redTime = [[TimeInfo alloc] initWithTime:_initialTime];
