@@ -679,6 +679,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) reverseRole
 {
+    [self _clearAllHighlight];
     [self reverseBoardView];
     NSString* redText = _red_label.text;
     _red_label.text = _black_label.text;
