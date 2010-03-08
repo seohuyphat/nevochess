@@ -107,7 +107,7 @@
     {
         // Start the run loop but return after each source is handled.
         result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 60, NO);
-        NSLog(@"%s: Loop returned with [%d].", __FUNCTION__, result);
+        //NSLog(@"%s: Loop returned with [%d].", __FUNCTION__, result);
         // If a source explicitly stopped the run loop, go and exit the loop
     } while (result != kCFRunLoopRunStopped);
     

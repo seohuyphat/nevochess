@@ -97,8 +97,8 @@
 - (void) setBlackTime:(NSString*)times;
 - (void) rescheduleTimer;
 - (void) destroyTimer;
-- (void) onNewMoveFrom:(Position)from toPosition:(Position)to
-           inSetupMode:(BOOL)bSetup;
+- (void) onNewMoveFromPosition:(Position)from toPosition:(Position)to
+                     setupMode:(BOOL)setup;
 - (void) onGameOver;
 - (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;

@@ -66,7 +66,7 @@
         _board = [board retain];
         
         CGFloat    cellSize = 34;
-        CGPoint    cellOffset = CGPointMake(2, 3);
+        CGPoint    cellOffset = CGPointMake(7, 3);
         CGPoint    boardPosition = CGPointMake(0, 28);
         CGRect     boardFrame = CGRectMake(0, 0, 320, 352);
         CGColorRef backgroundColor = nil;
@@ -98,8 +98,8 @@
             default: // The custom-drawn background.
             {
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-                highlightColor  = kHighlightColor;
-                animateColor    = kHighlightColor;
+                //highlightColor  = kHighlightColor;
+                //animateColor    = kHighlightColor;
                 break;
             }
         }

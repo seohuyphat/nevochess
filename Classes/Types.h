@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /*
- *  Enums.h
+ *  Types.h
  *  Created by Huy Phan on 02/28/2010.
  *
  *  Containing the common types that are used throughout the project.
