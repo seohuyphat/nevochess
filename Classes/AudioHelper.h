@@ -63,13 +63,12 @@
 // ---------------------------------------------------
 @interface AudioHelper : NSObject
 {
-    NSString*            _soundPath;
+    BOOL                 _enabled;
     NSMutableDictionary* _loadedSounds;
 }
 
-@property (nonatomic, retain) NSString* soundPath;
+@property BOOL enabled;
 
-- (id) initWithPath:(NSString*)soundPath;
-- (void) loadSound:(NSString*)sound;
++ (AudioHelper*) sharedInstance;
 - (void) playSound:(NSString*)sound;
 @end

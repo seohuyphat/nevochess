@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #import "AudioHelper.h"
+#import "Enums.h"
 
 // playback callback
 static void playbackCallback(void*               inUserData,
@@ -183,41 +184,104 @@ static void playbackCallback(void*               inUserData,
 @end
 
 // ----------------------------------------------------------------------------
+///////////////////////////////////////////////////////////////////////////
+//
+// CREDITS: 
+//  http://stackoverflow.com/questions/145154/what-does-your-objective-c-singleton-look-like
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma mark -
+#pragma mark The class (Singleton) instance object for Audio
+
+static AudioHelper* _sharedAudio = nil;
+
 #pragma mark -
 
 @implementation AudioHelper
 
-@synthesize soundPath=_soundPath;
+#pragma mark -
+#pragma mark Singleton methods
 
-- (id) initWithPath:(NSString*)soundPath
++ (AudioHelper*) sharedInstance
 {
-    if (self = [super init]) {
-        self.soundPath = soundPath;
+    @synchronized(self)
+    {
+        if (_sharedAudio == nil) {
+            _sharedAudio = [[AudioHelper alloc] init];
+        }
+    }
+    return _sharedAudio;
+}
+
++ (id) allocWithZone:(NSZone *)zone
+{
+    @synchronized(self) {
+        if (_sharedAudio == nil) {
+            _sharedAudio = [super allocWithZone:zone];
+            return _sharedAudio;  // assignment and return on first allocation
+        }
+    }
+    return nil; // on subsequent allocation attempts return nil
+}
+
+- (id) copyWithZone:(NSZone *)zone { return self; }
+- (id) retain { return self; }
+- (unsigned) retainCount { return UINT_MAX; /* ... cannot be released */ }
+- (id) autorelease { return self; }
+
+
+#pragma mark -
+#pragma mark Normal methods
+
+@synthesize enabled=_enabled;
+
+- (id) init
+{
+    if (self = [super init])
+    {
+        _enabled = YES;
         _loadedSounds = [[NSMutableDictionary alloc] init];
+
+        NSArray* soundList =
+            [NSArray arrayWithObjects: @"CAPTURE", @"CAPTURE2", @"CLICK",
+                                       @"DRAW", @"LOSS", @"CHECK2",
+                                       @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
+                                       @"Check1", @"Review", @"Undo", @"ChangeRole", 
+                                       nil];
+        for (NSString* sound in soundList)
+        {
+            NSString* path = [[NSBundle  mainBundle] pathForResource:sound ofType:@"WAV"
+                                                         inDirectory:NC_SOUND_PATH];
+            if (!path) {
+                NSLog(@"%s: WARN: Failed to locate the sound file [%@].", __FUNCTION__, sound);
+                continue;
+            }
+            AudioData* snd = [[AudioData alloc] initWithSoundFile:path];
+            [_loadedSounds setObject:snd forKey:sound];
+            [snd release];
+        }
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [_soundPath release];
+    // NOTE: We actually do not need to do anything because the Singleton
+    //       object will never be released.
+    //       The following code is provided to avoid warnings from
+    //       Xcode's Build and Analyze tool.
+
     [_loadedSounds release];
     [super dealloc];
 }
 
-- (void) loadSound:(NSString*)sound
-{
-    NSString *path = [[NSBundle  mainBundle] pathForResource:sound ofType:@"WAV"
-                                                 inDirectory:_soundPath];
-    AudioData *snd = [[AudioData alloc] initWithSoundFile:path];
-    [_loadedSounds setObject:snd forKey:sound];
-    [snd release];
-}
-
 - (void) playSound:(NSString*)sound
 {
-    AudioData* snd = [_loadedSounds objectForKey:sound];
-    [snd play];
+    if (_enabled) {
+        AudioData* snd = [_loadedSounds objectForKey:sound];
+        [snd play];
+    }
 }
 
 @end

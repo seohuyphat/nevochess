@@ -19,6 +19,7 @@
 
 #import "NevoChessAppDelegate.h"
 #import "Enums.h"
+#import "AudioHelper.h"
 
 @implementation NevoChessAppDelegate
 
@@ -40,6 +41,9 @@
         [[NSUserDefaults standardUserDefaults] setObject:@"XQWLight" forKey:@"ai_type"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"network_autoConnect"];
     }
+
+    [AudioHelper sharedInstance].enabled = 
+        [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"];
 
     [window addSubview:[navigationController view]];
     navigationController.navigationBarHidden = YES;
