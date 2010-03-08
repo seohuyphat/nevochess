@@ -75,20 +75,29 @@
         
         switch (boardType)
         {
-            case 1:  // SKELETON background.
+            case 1:  // Western background.
+            {
+                backgroundColor = GetCGPatternNamed(@"Western.png");
+                cellSize = 35.0;
+                cellOffset = CGPointMake(0, 0);
+                boardPosition = CGPointMake(2.5, 29);
+                boardFrame = CGRectMake(0, 0, 315, 350);
+                break;
+            }
+            case 2:  // SKELETON background.
             {
                 backgroundColor = GetCGPatternNamed(@"SKELETON.png");
                 cellSize = 34.84;
                 cellOffset = CGPointMake(2.7, 1.5);
                 break;
             }
-            case 2:  // HOXChess background.
+            case 3:  // HOXChess background.
             {
                 backgroundColor = GetCGPatternNamed(@"HOXChess.png");
                 cellOffset = CGPointMake(7, 1);
                 break;
             }
-            case 3:  // WOOD background.
+            case 4:  // WOOD background.
             {
                 backgroundColor = GetCGPatternNamed(@"WOOD.png");
                 cellSize = 34.84;
@@ -326,7 +335,7 @@
                                                      inDirectory:_pieceFolder];
     GridCell* cell = [_grid cellAtRow:row column:col]; 
     Piece* piece = [[Piece alloc] initWithType:type color:color
-                                     imageName:imageName scale:_grid.spacing.width];
+                                     imageName:imageName scale:_pieceScale];
     piece.holder = cell;
     [_board addSublayer:piece];
     piece.position = [cell getMidInLayer:_board];
@@ -420,10 +429,11 @@
 - (void) _setupPieces
 {
     _pieceFolder = nil;
+    _pieceScale = _grid.spacing.width;
     NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     switch (pieceType) {
         case 0: _pieceFolder = @"pieces/xqwizard_31x31"; break;
-        case 1: _pieceFolder = @"pieces/alfaerie_31x31"; break;
+        case 1: _pieceFolder = @"pieces/alfaerie"; break;
         case 2: _pieceFolder = @"pieces/HOXChess"; break;
         default: _pieceFolder = @"pieces/iXiangQi"; break;
     }

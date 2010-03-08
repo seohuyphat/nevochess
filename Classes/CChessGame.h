@@ -28,6 +28,7 @@
     Grid*           _grid;
     NSMutableArray* _pieceBox;
     NSString*       _pieceFolder;
+    CGFloat         _pieceScale;
     BOOL            _blackAtTopSide;
 
     Referee*        _referee;
