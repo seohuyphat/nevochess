@@ -313,54 +313,75 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
-- (void) onNewMoveFrom:(Position)from toPosition:(Position)to
-           inSetupMode:(BOOL)bSetup
+- (void) _updateUIOnNewMove:(MoveAtom*)pMove animated:(BOOL)animated
+{
+    int move = pMove.move;
+    int sqDst = DST(move);
+    Position toPosition = { ROW(sqDst), COLUMN(sqDst) };
+    
+    Piece*    piece       = pMove.srcPiece;
+    Piece*    capture     = pMove.capturedPiece;
+    Piece*    checkedKing = pMove.checkedKing;
+    ColorEnum moveColor   = pMove.srcPiece.color;
+
+    if (animated) [self _clearAllAnimation];
+    [_game movePiece:piece toPosition:toPosition animated:NO /*YES*/];
+
+    if (capture) {
+        [capture destroyWithAnimation:animated];
+    }
+
+    if (animated) {
+        NSString* sound =
+            (checkedKing ? (moveColor == NC_COLOR_RED ? @"CHECK" : @"CHECK2")
+                         : ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
+                                     : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") ));
+        [_audioHelper playSound:sound];        
+        [self _animateLatestMove:pMove];
+    }
+}
+
+/**
+ * This function is dedicated to process only NEW incoming move that is
+ * sent from one of the following sources:
+ *    (1) The Local User.
+ *    (2) The AI Robot.
+ *    (3) The remote network user.
+ */
+- (void) onNewMoveFromPosition:(Position)from toPosition:(Position)to
+                     setupMode:(BOOL)setup
 {
     int sqSrc = TOSQUARE(from.row, from.col);
     int sqDst = TOSQUARE(to.row, to.col);
     int move = MOVE(sqSrc, sqDst);
 
-    ColorEnum moveColor = (_game.nextColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
-
-    if (!bSetup) {
-        [self resetMoveTime:moveColor];
-    }
-
     MoveAtom* pMove = [[[MoveAtom alloc] initWithMove:move] autorelease];
     [_moves addObject:pMove];
 
+    ColorEnum moveColor = (_game.nextColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+    if (!setup) {
+        [self resetMoveTime:moveColor];
+    }
+
     // Delay update the UI if in Review mode.
+    // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
+    //       to signal that it is NOT yet processed.
     if ([self _isInReview]) {
-        // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
-        //       to signal that it is NOT yet processed.
         return;
     }
 
-    Piece* piece = [_game getPieceAtRow:from.row col:from.col];
-    Piece* capture = [_game getPieceAtRow:to.row col:to.col];
-    BOOL bChecked = [_game isChecked];
-    ColorEnum checkedColor = (piece.color == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
-    Piece* checkedKing = (bChecked ? [_game getKingOfColor:checkedColor] : nil);
+    // Full update the Move's information.
+    pMove.srcPiece = [_game getPieceAtRow:from.row col:from.col];
+    pMove.capturedPiece = [_game getPieceAtRow:to.row col:to.col];
 
-    pMove.srcPiece = piece;
-    pMove.capturedPiece = capture;
-    pMove.checkedKing = checkedKing;
-
-    [self _clearAllAnimation];
-    [_game movePiece:piece toPosition:to animated:NO];
-    
-    if (!bSetup) {
-        NSString* sound =
-            (bChecked ? (moveColor == NC_COLOR_RED ? @"CHECK" : @"CHECK2")
-                      : ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
-                                  : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") ));
-        [_audioHelper playSound:sound];        
-        [self _animateLatestMove:pMove];
+    if ([_game isChecked]) {
+        ColorEnum checkedColor = (pMove.srcPiece.color == NC_COLOR_RED
+                                  ? NC_COLOR_BLACK : NC_COLOR_RED);
+        pMove.checkedKing = [_game getKingOfColor:checkedColor];
     }
 
-    if (capture) {
-        [capture destroyWithAnimation:(bSetup ? NO : YES)];
-    }
+    // Finally, update the Board's UI accordingly.
+    [self _updateUIOnNewMove:pMove animated:!setup];
 }
 
 - (void) onGameOver
@@ -524,27 +545,32 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (_nthMove == [_moves count] - 1) {
         _nthMove = HISTORY_INDEX_END;
     }
-    
+
     int move = pMove.move;
-    int sqDst = DST(move);
-    [_audioHelper playSound:@"Review"];
-    Piece *capture = [_game getPieceAtCell:DST(move)];
-    if (capture) {
-        [capture destroyWithAnimation:NO];
-    }
-    if (!pMove.srcPiece) { // not yet processed?
+
+    if (!pMove.srcPiece) // not yet processed?
+    {                    // ... then we process it as a NEW move.
         NSLog(@"%s: Process pending move [%@]...", __FUNCTION__, pMove);
         pMove.srcPiece = [_game getPieceAtCell:SRC(move)];
-        NSAssert(pMove.srcPiece, @"The SRC piece should be found.");
-        pMove.capturedPiece = capture;
+        pMove.capturedPiece = [_game getPieceAtCell:DST(move)];
         if ([_game isChecked]) {
-            ColorEnum checkedColor = (pMove.srcPiece.color == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
+            ColorEnum checkedColor = (pMove.srcPiece.color == NC_COLOR_RED
+                                      ? NC_COLOR_BLACK : NC_COLOR_RED);
             pMove.checkedKing = [_game getKingOfColor:checkedColor];
         }
+        [self _updateUIOnNewMove:pMove animated:YES];
     }
-    [self _clearAllAnimation];
-    [_game movePiece:pMove.srcPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    [self _animateLatestMove:pMove];
+    else
+    {
+        [_audioHelper playSound:@"Review"];
+        [self _clearAllAnimation];
+        const int sqDst = DST(move);
+        Position toPosition = { ROW(sqDst), COLUMN(sqDst) };
+        [_game movePiece:pMove.srcPiece toPosition:toPosition animated:NO];
+        [pMove.capturedPiece destroyWithAnimation:YES];
+        [self _animateLatestMove:pMove];
+    }
+
     return YES;
 }
 
@@ -629,7 +655,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         {
             [_game doMoveFrom:from toPosition:to];
             [self _setHighlightCells:NO]; // Must come before 'Move-animation'!
-            [self onNewMoveFrom:from toPosition:to inSetupMode:NO];
+            [self onNewMoveFromPosition:from toPosition:to setupMode:NO];
             [_boardOwner onLocalMoveMadeFrom:from toPosition:to];
         }
         else {

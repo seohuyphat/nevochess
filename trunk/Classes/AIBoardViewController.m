@@ -299,12 +299,13 @@ enum ActionSheetEnum
     to.col = COLUMN(sqDst);
 
     [_game doMoveFrom:from toPosition:to];
-    [_board onNewMoveFrom:from toPosition:to inSetupMode:NO];
+    [_board onNewMoveFromPosition:from toPosition:to setupMode:NO];
 
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
     _toolbar.items = newItems;
 
+    // TODO: Re-consider calling this function because the Board may be in Review-Mode.
     [self _onAfterDidMove];
 }
 
@@ -474,7 +475,7 @@ enum ActionSheetEnum
         
         [_game doMoveFrom:from toPosition:to];
         [_aiRobot onMove_sync:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
+        [_board onNewMoveFromPosition:from toPosition:to setupMode:(i < lastResumedIndex)];
     }
     
     if ([_game getMoveCount] == 0)

@@ -699,7 +699,7 @@
         to.col = [moveStr characterAtIndex:2] - '0';
 
         [_game doMoveFrom:from toPosition:to];
-        [_board onNewMoveFrom:from toPosition:to inSetupMode:(i < lastResumedIndex)];
+        [_board onNewMoveFromPosition:from toPosition:to setupMode:(i < lastResumedIndex)];
     }
 }
 
@@ -718,10 +718,9 @@
     from.col = [moveStr characterAtIndex:0] - '0';
     to.row = [moveStr characterAtIndex:3] - '0';
     to.col = [moveStr characterAtIndex:2] - '0';
-    //NSLog(@"%s: MOVE [%d%d -> %d%d].", __FUNCTION__, row1, col1, row2, col2);
 
     [_game doMoveFrom:from toPosition:to];
-    [_board onNewMoveFrom:from toPosition:to inSetupMode:NO];
+    [_board onNewMoveFromPosition:from toPosition:to setupMode:NO];
 }
 
 - (void) _handleNetworkEvent_E_END:(NSString*)event
