@@ -19,7 +19,6 @@
 
 #import <UIKit/UIKit.h>
 #import "CChessGame.h"
-#import "AudioHelper.h"
 
 @class TimeInfo;
 
@@ -35,8 +34,6 @@
 {
     CChessGame*           _game;           // Current Game
     CALayer*              _gameboard;      // Game's main layer
-
-    AudioHelper*          _audioHelper;
 
     id <BoardOwner>       _boardOwner;
 
@@ -100,7 +97,6 @@
 - (void) onNewMoveFromPosition:(Position)from toPosition:(Position)to
                      setupMode:(BOOL)setup;
 - (void) onGameOver;
-- (void) playSound:(NSString*)sound;
 - (NSMutableArray*) getMoves;
 - (void) resetBoard;
 - (void) reverseBoardView;

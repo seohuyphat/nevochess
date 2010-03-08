@@ -22,6 +22,7 @@
 #import "Grid.h"
 #import "Piece.h"
 #import "Types.h"
+#import "AudioHelper.h"
 
 enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
@@ -43,7 +44,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 //
 @interface BoardViewController (PrivateMethods)
 - (CGRect) _gameBoardFrame;
-- (id) _initSoundSystem:(NSString*)soundPath;
 - (void) _setHighlightCells:(BOOL)highlighted;
 - (void) _setPickedUpPiece:(Piece*)piece;
 - (void) _animateLatestMove:(MoveAtom*)pMove;
@@ -73,10 +73,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
         int boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
         _game = [[CChessGame alloc] initWithBoard:_gameboard boardType:boardType];
-
-        _audioHelper = ( [[NSUserDefaults standardUserDefaults] boolForKey:@"sound_on"]
-                        ? [self _initSoundSystem:NC_SOUND_PATH]
-                        : nil );    
+ 
         _boardOwner = nil;
 
         _initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
@@ -123,7 +120,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_reviewLastTouched release];
     [_reviewLastTouched_prev release];
     [_reviewLastTouched_next release];
-    [_audioHelper release];
     [_game release];
     [_gameboard removeFromSuperlayer];
     [_gameboard release];
@@ -141,20 +137,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     self.layer.bounds = bounds;
 */
     return bounds;
-}
-
-- (id) _initSoundSystem:(NSString*)soundPath
-{
-    AudioHelper* audioHelper = [[AudioHelper alloc] initWithPath:soundPath];
-
-    NSArray *soundList = [NSArray arrayWithObjects:@"CAPTURE", @"CAPTURE2", @"CLICK",
-                          @"DRAW", @"LOSS", @"CHECK", @"CHECK2",
-                          @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL", @"PROMOTE",
-                          @"Review", nil];
-    for (NSString* sound in soundList) {
-        [audioHelper loadSound:sound];
-    }
-    return audioHelper;
 }
 
 
@@ -333,10 +315,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     if (animated) {
         NSString* sound =
-            (checkedKing ? (moveColor == NC_COLOR_RED ? @"CHECK" : @"CHECK2")
+            (checkedKing ? (moveColor == NC_COLOR_RED ? @"Check1" : @"CHECK2")
                          : ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
                                      : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") ));
-        [_audioHelper playSound:sound];        
+        [[AudioHelper sharedInstance] playSound:sound];
         [self _animateLatestMove:pMove];
     }
 }
@@ -450,11 +432,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     self._timer = nil;
 }
 
-- (void) playSound:(NSString*)sound
-{
-    [_audioHelper playSound:sound];
-}
-
 - (NSMutableArray*) getMoves
 {
     return _moves;
@@ -479,7 +456,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     int move = pMove.move;
     int sqSrc = SRC(move);
     int sqDst = DST(move);
-    [_audioHelper playSound:@"Review"];
+    [[AudioHelper sharedInstance] playSound:@"Review"];
     
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
@@ -562,7 +539,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
     else
     {
-        [_audioHelper playSound:@"Review"];
+        [[AudioHelper sharedInstance] playSound:@"Review"];
         [self _clearAllAnimation];
         const int sqDst = DST(move);
         Position toPosition = { ROW(sqDst), COLUMN(sqDst) };
@@ -638,7 +615,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             [self _setHighlightCells:NO];
             _hl_nMoves = [_game generateMoveFrom:from moves:_hl_moves];
             [self _setHighlightCells:YES];
-            [_audioHelper playSound:@"CLICK"];
+            [[AudioHelper sharedInstance] playSound:@"CLICK"];
             return;
         }
     } else {
@@ -659,7 +636,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
             [_boardOwner onLocalMoveMadeFrom:from toPosition:to];
         }
         else {
-            [_audioHelper playSound:@"ILLEGAL"];
+            [[AudioHelper sharedInstance] playSound:@"ILLEGAL"];
         }
     }
 

@@ -19,6 +19,7 @@
 
 #import "OptionsViewController.h"
 #import "AboutViewController.h"
+#import "AudioHelper.h"
 
 enum ViewTagEnum
 {
@@ -426,6 +427,7 @@ enum ViewTagEnum
 - (IBAction) autoConnectValueChanged:(id)sender
 {    
     [[NSUserDefaults standardUserDefaults] setBool:_soundSwitch.on forKey:@"sound_on"];
+    [AudioHelper sharedInstance].enabled = _soundSwitch.on;
 }
 
 @end

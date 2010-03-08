@@ -20,6 +20,7 @@
 #import "AIBoardViewController.h"
 #import "Enums.h"
 #import "Types.h"
+#import "AudioHelper.h"
 
 #define ACTION_BUTTON_INDEX 4
 
@@ -255,6 +256,7 @@ enum ActionSheetEnum
 
     _myColor = (_myColor == NC_COLOR_RED ? NC_COLOR_BLACK : NC_COLOR_RED);
     [_board reverseRole];
+    [[AudioHelper sharedInstance] playSound:@"ChangeRole"];
 
     if (_myColor == NC_COLOR_BLACK) {
         [self _countDownToAIMove];
@@ -379,7 +381,7 @@ enum ActionSheetEnum
     
     if ( !sound ) return;
 
-    [_board playSound:sound];
+    [[AudioHelper sharedInstance] playSound:sound];
     [_board onGameOver];
 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
@@ -450,7 +452,7 @@ enum ActionSheetEnum
     [self _loadListOfMoves:moveList];
 
     [_activity stopAnimating];
-    [_board playSound:@"PROMOTE"];
+    [[AudioHelper sharedInstance] playSound:@"Undo"];
 }
 
 - (void) _loadListOfMoves:(NSArray*)moves
