@@ -280,7 +280,7 @@ enum ViewTagEnum
                 }
                 case 2:  // - Piece
                 {
-                    NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
+                    NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard",
                                            @"pieces/alfaerie",
                                            @"pieces/wikipedia", @"pieces/HOXChess",
                                            @"pieces/iXiangQi", nil];
