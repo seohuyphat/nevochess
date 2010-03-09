@@ -41,8 +41,6 @@
 		AF1B67201085546100032C01 /* preferences-system.png in Resources */ = {isa = PBXBuildFile; fileRef = AF1B671F1085546100032C01 /* preferences-system.png */; };
 		AF1B6724108555DC00032C01 /* applications-internet.png in Resources */ = {isa = PBXBuildFile; fileRef = AF1B6723108555DC00032C01 /* applications-internet.png */; };
 		AF1B672F108558D600032C01 /* start-here.png in Resources */ = {isa = PBXBuildFile; fileRef = AF1B672E108558D600032C01 /* start-here.png */; };
-		AF1EA7861138BE7300689D03 /* HOXChess.png in Resources */ = {isa = PBXBuildFile; fileRef = AF1EA7841138BE7300689D03 /* HOXChess.png */; };
-		AF1EA7871138BE7300689D03 /* HOXChess_60px.png in Resources */ = {isa = PBXBuildFile; fileRef = AF1EA7851138BE7300689D03 /* HOXChess_60px.png */; };
 		AF28B5DC1111D1CC00B3EAD8 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */; };
 		AF2A5022106FB3D900CF69D8 /* AI_haqikidHOX.c in Sources */ = {isa = PBXBuildFile; fileRef = AF2A5021106FB3D900CF69D8 /* AI_haqikidHOX.c */; };
 		AF32D2A4107BA45E000C356A /* go-next.png in Resources */ = {isa = PBXBuildFile; fileRef = AF32D2A0107BA45E000C356A /* go-next.png */; };
@@ -54,6 +52,8 @@
 		AF4B70CC112712F80061590B /* AIBoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF4B70CB112712F80061590B /* AIBoardViewController.m */; };
 		AF4E2AC4111D988C009E2EC8 /* ItemInputView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF4E2AC3111D988C009E2EC8 /* ItemInputView.xib */; };
 		AF4E2ADC111D99A2009E2EC8 /* ItemInputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF4E2ADB111D99A2009E2EC8 /* ItemInputViewController.m */; };
+		AF504FF01146209B002C5BB4 /* PlayXiangqi_60px.png in Resources */ = {isa = PBXBuildFile; fileRef = AF504FEE1146209B002C5BB4 /* PlayXiangqi_60px.png */; };
+		AF504FF11146209B002C5BB4 /* PlayXiangqi.png in Resources */ = {isa = PBXBuildFile; fileRef = AF504FEF1146209B002C5BB4 /* PlayXiangqi.png */; };
 		AF534CAF1111435400067844 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF534CAE1111435400067844 /* LoginViewController.m */; };
 		AF534CB81111440F00067844 /* LoginView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF534CB71111440F00067844 /* LoginView.xib */; };
 		AF559E55112720F900C6236D /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = AF559E54112720F900C6236D /* help.png */; };
@@ -154,8 +154,6 @@
 		AF1B671F1085546100032C01 /* preferences-system.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "preferences-system.png"; sourceTree = "<group>"; };
 		AF1B6723108555DC00032C01 /* applications-internet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "applications-internet.png"; sourceTree = "<group>"; };
 		AF1B672E108558D600032C01 /* start-here.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "start-here.png"; sourceTree = "<group>"; };
-		AF1EA7841138BE7300689D03 /* HOXChess.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HOXChess.png; sourceTree = "<group>"; };
-		AF1EA7851138BE7300689D03 /* HOXChess_60px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HOXChess_60px.png; sourceTree = "<group>"; };
 		AF28B5DA1111D1CC00B3EAD8 /* NetworkConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConnection.h; sourceTree = "<group>"; };
 		AF28B5DB1111D1CC00B3EAD8 /* NetworkConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkConnection.m; sourceTree = "<group>"; };
 		AF2A5021106FB3D900CF69D8 /* AI_haqikidHOX.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AI_haqikidHOX.c; path = AI/AI_haqikidHOX.c; sourceTree = "<group>"; };
@@ -171,6 +169,8 @@
 		AF4E2AC3111D988C009E2EC8 /* ItemInputView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ItemInputView.xib; sourceTree = "<group>"; };
 		AF4E2ADA111D99A2009E2EC8 /* ItemInputViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemInputViewController.h; sourceTree = "<group>"; };
 		AF4E2ADB111D99A2009E2EC8 /* ItemInputViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemInputViewController.m; sourceTree = "<group>"; };
+		AF504FEE1146209B002C5BB4 /* PlayXiangqi_60px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PlayXiangqi_60px.png; sourceTree = "<group>"; };
+		AF504FEF1146209B002C5BB4 /* PlayXiangqi.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PlayXiangqi.png; sourceTree = "<group>"; };
 		AF534CAD1111435400067844 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		AF534CAE1111435400067844 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		AF534CB71111440F00067844 /* LoginView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoginView.xib; sourceTree = "<group>"; };
@@ -403,12 +403,12 @@
 		AF6B21E61131C65200A2AA3A /* boards */ = {
 			isa = PBXGroup;
 			children = (
-				AF1EA7841138BE7300689D03 /* HOXChess.png */,
-				AF1EA7851138BE7300689D03 /* HOXChess_60px.png */,
 				AFEE8C3911325EF800EE7239 /* board_320x480.png */,
 				AF6B222B1131C92300A2AA3A /* board_60px.png */,
 				AF81950311456EA100CF465B /* Western.png */,
 				AF3529FD11456F0800D7E4D7 /* Western_60px.png */,
+				AF504FEE1146209B002C5BB4 /* PlayXiangqi_60px.png */,
+				AF504FEF1146209B002C5BB4 /* PlayXiangqi.png */,
 				AF6B21E71131C65200A2AA3A /* SKELETON.png */,
 				AF6B21E81131C65200A2AA3A /* SKELETON_60px.png */,
 				AF6B21E91131C65200A2AA3A /* WOOD.png */,
@@ -586,8 +586,6 @@
 				AFC901A011386FCF00CAB0DD /* AI-avatar.png in Resources */,
 				AFC901A71138708300CAB0DD /* AI-level.png in Resources */,
 				AF3B8A7E1138849B002F1FCB /* board_22px.png in Resources */,
-				AF1EA7861138BE7300689D03 /* HOXChess.png in Resources */,
-				AF1EA7871138BE7300689D03 /* HOXChess_60px.png in Resources */,
 				AF5F8C67113A32DF00693FFD /* BoardView.xib in Resources */,
 				AF5F8C6D113A349100693FFD /* AIBoardView.xib in Resources */,
 				AF5F8D8B113A45C800693FFD /* NetworkBoardView.xib in Resources */,
@@ -596,6 +594,8 @@
 				AF5F8DFA113A4E5300693FFD /* search.png in Resources */,
 				AF81950411456EA100CF465B /* Western.png in Resources */,
 				AF3529FE11456F0800D7E4D7 /* Western_60px.png in Resources */,
+				AF504FF01146209B002C5BB4 /* PlayXiangqi_60px.png in Resources */,
+				AF504FF11146209B002C5BB4 /* PlayXiangqi.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -52,8 +52,8 @@ enum ViewTagEnum
     _boardChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Western", @""),
+                                        @"PlayXiangqi",
                                         NSLocalizedString(@"Skeleton", @""),
-                                        NSLocalizedString(@"HOXChess", @""),
                                         NSLocalizedString(@"Wood", @""),
                                         nil];
     _boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
@@ -250,7 +250,7 @@ enum ViewTagEnum
                 case 1:  // - Board
                 {
                     NSArray* boards = [NSArray arrayWithObjects:@"board_60px", @"Western_60px",
-                                        @"SKELETON_60px", @"HOXChess_60px", @"WOOD_60px", nil];
+                                        @"PlayXiangqi_60px", @"SKELETON_60px", @"WOOD_60px", nil];
                     NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[boards count]];
                     for (NSString* name in boards)
                     {
