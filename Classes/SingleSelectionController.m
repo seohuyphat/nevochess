@@ -25,15 +25,41 @@
 @synthesize tag=_tag;
 @synthesize selectionIndex=_selectionIndex;
 
+- (id) initWithChoices:(NSArray*)choices
+              delegate:(id<SingleSelectionDelegate>)delegate
+{
+    return [self initWithChoices:choices
+                      imageNames:nil subTitles:nil delegate:delegate];
+}
+
 - (id) initWithChoices:(NSArray*)choices imageNames:(NSArray*)imageNames
               delegate:(id<SingleSelectionDelegate>)delegate
 {
-    if (self = [self initWithNibName:@"SingleSelectionView" bundle:nil])
+    return [self initWithChoices:choices
+                      imageNames:imageNames subTitles:nil delegate:delegate];
+}
+
+- (id) initWithChoices:(NSArray*)choices subTitles:(NSArray*)subTitles
+              delegate:(id<SingleSelectionDelegate>)delegate
+{
+    return [self initWithChoices:choices
+                      imageNames:nil subTitles:(NSArray*)subTitles
+                        delegate:delegate];
+}
+
+- (id) initWithChoices:(NSArray*)choices
+            imageNames:(NSArray*)imageNames
+             subTitles:(NSArray*)subTitles
+              delegate:(id<SingleSelectionDelegate>)delegate
+{
+    if (self = [super initWithNibName:@"SingleSelectionView" bundle:nil])
     {
         self._delegate = delegate;
         _choices = [[NSArray alloc] initWithArray:choices];
         _imageNames = (imageNames ? [[NSArray alloc] initWithArray:imageNames]
                                   : nil);
+        _subTitles = (subTitles ? [[NSArray alloc] initWithArray:subTitles]
+                                : nil);
         _selectionIndex = 0;
     }
     return self;
@@ -44,6 +70,11 @@
     if (selection < [_choices count]) {
         _selectionIndex = selection;
     }
+}
+
+- (CGFloat) rowHeight
+{
+    return self.tableView.rowHeight;
 }
 
 - (void) setRowHeight:(CGFloat)height
@@ -85,7 +116,8 @@
     NSString* cellId = [NSString stringWithFormat:@"%d", indexPath.row];
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:cellId];
     if (!cell) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellId] autorelease];
+        cell.detailTextLabel.numberOfLines = 0;
     }
     cell.textLabel.text = [_choices objectAtIndex:indexPath.row];
     cell.accessoryType = (indexPath.row == _selectionIndex ? UITableViewCellAccessoryCheckmark
@@ -95,6 +127,11 @@
         NSString* imageName = [_imageNames objectAtIndex:indexPath.row];
         UIImage* theImage = [UIImage imageWithContentsOfFile:imageName];
         cell.imageView.image = theImage;
+    }
+
+    if (_subTitles) {
+        NSString* subTitle = [_subTitles objectAtIndex:indexPath.row];
+        cell.detailTextLabel.text = subTitle;
     }
 
     return cell;
@@ -118,6 +155,7 @@
 {
     [_choices release];
     [_imageNames release];
+    [_subTitles release];
     [_delegate release];
     [super dealloc];
 }
