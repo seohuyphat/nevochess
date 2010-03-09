@@ -42,6 +42,7 @@ enum ViewTagEnum
     _pieceChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Western", @""),
+                                        @"Wikipedia",
                                         @"HOXChess",
                                         @"iXiangQi",
                                         nil];
@@ -52,7 +53,7 @@ enum ViewTagEnum
     _boardChoices = [[NSArray alloc] initWithObjects:
                                         NSLocalizedString(@"Default", @""),
                                         NSLocalizedString(@"Western", @""),
-                                        @"PlayXiangqi",
+                                        NSLocalizedString(@"Simple", @""),
                                         NSLocalizedString(@"Skeleton", @""),
                                         NSLocalizedString(@"Wood", @""),
                                         nil];
@@ -259,13 +260,18 @@ enum ViewTagEnum
                                                                     inDirectory:nil];
                         [imageNames addObject:path];
                     }
-
+                    NSArray* subTitles = [NSArray arrayWithObjects:
+                                          @"", @"http://www.playxiangqi.com",
+                                          @"http://www.playxiangqi.com",
+                                          @"http://www.xqbase.com", @"http://www.xqbase.com",
+                                          nil];
                     SingleSelectionController* controller =
                         [[SingleSelectionController alloc] initWithChoices:_boardChoices
                                                                 imageNames:imageNames
+                                                                 subTitles:subTitles
                                                                   delegate:self];
                     [imageNames release];
-                    [controller setRowHeight:80];
+                    controller.rowHeight = 78;
                     subController = controller;
                     controller.title = ((UILabel*)[_boardCell viewWithTag:1]).text;
                     controller.selectionIndex = _boardType;
@@ -275,8 +281,9 @@ enum ViewTagEnum
                 case 2:  // - Piece
                 {
                     NSArray* piecePaths = [NSArray arrayWithObjects:@"pieces/xqwizard_31x31",
-                                           @"pieces/alfaerie", @"pieces/HOXChess", @"pieces/iXiangQi",
-                                           nil];
+                                           @"pieces/alfaerie",
+                                           @"pieces/wikipedia", @"pieces/HOXChess",
+                                           @"pieces/iXiangQi", nil];
                     NSMutableArray* imageNames = [[NSMutableArray alloc] initWithCapacity:[piecePaths count]];
                     for (NSString* subPath in piecePaths)
                     {
@@ -285,13 +292,20 @@ enum ViewTagEnum
                                                                     inDirectory:subPath];
                         [imageNames addObject:path];
                     }
-                    
+                    NSArray* subTitles = [NSArray arrayWithObjects:
+                                          @"",
+                                          @"Alfaerie graphics \nhttp://www.chessvariants.com",
+                                          @"http://wikipedia.org/wiki/Xiangqi",
+                                          @"http://wikipedia.org/wiki/Xiangqi",
+                                          @"'nanshanweng' \nhttp://sites.google.com/site/328113",
+                                          nil];
                     SingleSelectionController* controller =
                     [[SingleSelectionController alloc] initWithChoices:_pieceChoices
                                                             imageNames:imageNames
+                                                             subTitles:subTitles
                                                               delegate:self];
                     [imageNames release];
-                    [controller setRowHeight:50];
+                    controller.rowHeight = 75;
                     subController = controller;
                     controller.title = ((UILabel*)[_pieceCell viewWithTag:1]).text;
                     controller.selectionIndex = _pieceType;
@@ -305,24 +319,28 @@ enum ViewTagEnum
         {
             switch (indexPath.row)
             {
-                case 0:
+                case 0:  // - AI-Type
                 {
+                    NSArray* subTitles = [NSArray arrayWithObjects:
+                                          @" Morning Yellow \n http://www.xqbase.com",
+                                          @" H.G. Muller \n http://home.hccnet.nl/h.g.muller",
+                                          nil];
                     SingleSelectionController* controller =
                         [[SingleSelectionController alloc] initWithChoices:_aiTypeChoices
-                                                                imageNames:nil
+                                                                 subTitles:subTitles
                                                                   delegate:self];
+                    controller.rowHeight = 80;
                     subController = controller;
                     controller.title = ((UILabel*)[_aiTypeCell viewWithTag:1]).text;
                     controller.selectionIndex = _aiType;
                     controller.tag = VIEW_TAG_AI_TYPE;
                     break;
                 }
-                case 1:
+                case 1:  // - AI-Level
                 {
                     SingleSelectionController* controller =
-                    [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices
-                                                            imageNames:nil
-                                                              delegate:self];
+                        [[SingleSelectionController alloc] initWithChoices:_aiLevelChoices
+                                                                  delegate:self];
                     subController = controller;
                     controller.title = ((UILabel*)[_aiLevelCell viewWithTag:1]).text;
                     controller.selectionIndex = _aiLevel;

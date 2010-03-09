@@ -34,16 +34,27 @@
 
     NSArray*         _choices;
     NSArray*         _imageNames;
+    NSArray*         _subTitles;
     unsigned int     _selectionIndex;
 }
 
 @property (nonatomic, retain) id<SingleSelectionDelegate> _delegate;
 @property (nonatomic)         int tag;
 @property (nonatomic)         unsigned int selectionIndex;
+@property (nonatomic)         CGFloat rowHeight;
+
+- (id) initWithChoices:(NSArray*)choices
+              delegate:(id<SingleSelectionDelegate>)delegate;
 
 - (id) initWithChoices:(NSArray*)choices imageNames:(NSArray*)imageNames
               delegate:(id<SingleSelectionDelegate>)delegate;
 
-- (void) setRowHeight:(CGFloat)height;
+- (id) initWithChoices:(NSArray*)choices subTitles:(NSArray*)subTitles
+              delegate:(id<SingleSelectionDelegate>)delegate;
+
+- (id) initWithChoices:(NSArray*)choices
+            imageNames:(NSArray*)imageNames
+             subTitles:(NSArray*)subTitles
+              delegate:(id<SingleSelectionDelegate>)delegate;
 
 @end

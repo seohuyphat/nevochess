@@ -427,12 +427,13 @@
 - (void) _setupPieces
 {
     _pieceFolder = nil;
-    _pieceScale = _grid.spacing.width;
+    _pieceScale = 33; //_grid.spacing.width
     NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     switch (pieceType) {
-        case 0: _pieceFolder = @"pieces/xqwizard_31x31"; _pieceScale = 33; break;
+        case 0: _pieceFolder = @"pieces/xqwizard_31x31"; break;
         case 1: _pieceFolder = @"pieces/alfaerie"; break;
-        case 2: _pieceFolder = @"pieces/HOXChess"; _pieceScale = 33; break;
+        case 2: _pieceFolder = @"pieces/wikipedia"; break;
+        case 3: _pieceFolder = @"pieces/HOXChess"; break;
         default: _pieceFolder = @"pieces/iXiangQi"; _pieceScale = 35; break;
     }
 
