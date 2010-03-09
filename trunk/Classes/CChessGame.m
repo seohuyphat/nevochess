@@ -65,8 +65,8 @@
     {
         _board = [board retain];
         
-        CGFloat    cellSize = 34;
-        CGPoint    cellOffset = CGPointMake(7, 3);
+        CGFloat    cellSize = 35;
+        CGPoint    cellOffset = CGPointMake(0, 0);
         CGPoint    boardPosition = CGPointMake(0, 28);
         CGRect     boardFrame = CGRectMake(0, 0, 320, 352);
         CGColorRef backgroundColor = nil;
@@ -78,23 +78,22 @@
             case 1:  // Western background.
             {
                 backgroundColor = GetCGPatternNamed(@"Western.png");
-                cellSize = 35.0;
-                cellOffset = CGPointMake(0, 0);
                 boardPosition = CGPointMake(2.5, 29);
                 boardFrame = CGRectMake(0, 0, 315, 350);
                 break;
             }
-            case 2:  // SKELETON background.
+            case 2:  // PlayXiangqi background.
+            {
+                backgroundColor = GetCGPatternNamed(@"PlayXiangqi.png");
+                cellOffset = CGPointMake(2.5, 2);
+                boardFrame = CGRectMake(0, 0, 320, 355);
+                break;
+            }
+            case 3:  // SKELETON background.
             {
                 backgroundColor = GetCGPatternNamed(@"SKELETON.png");
                 cellSize = 34.84;
                 cellOffset = CGPointMake(2.7, 1.5);
-                break;
-            }
-            case 3:  // HOXChess background.
-            {
-                backgroundColor = GetCGPatternNamed(@"HOXChess.png");
-                cellOffset = CGPointMake(7, 1);
                 break;
             }
             case 4:  // WOOD background.
@@ -107,8 +106,7 @@
             default: // The custom-drawn background.
             {
                 _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-                //highlightColor  = kHighlightColor;
-                //animateColor    = kHighlightColor;
+                boardPosition = CGPointMake(2.5, 28);
                 break;
             }
         }
@@ -432,10 +430,10 @@
     _pieceScale = _grid.spacing.width;
     NSInteger pieceType = [[NSUserDefaults standardUserDefaults] integerForKey:@"piece_type"];
     switch (pieceType) {
-        case 0: _pieceFolder = @"pieces/xqwizard_31x31"; break;
+        case 0: _pieceFolder = @"pieces/xqwizard_31x31"; _pieceScale = 33; break;
         case 1: _pieceFolder = @"pieces/alfaerie"; break;
-        case 2: _pieceFolder = @"pieces/HOXChess"; break;
-        default: _pieceFolder = @"pieces/iXiangQi"; break;
+        case 2: _pieceFolder = @"pieces/HOXChess"; _pieceScale = 33; break;
+        default: _pieceFolder = @"pieces/iXiangQi"; _pieceScale = 35; break;
     }
 
     // Chariot      
