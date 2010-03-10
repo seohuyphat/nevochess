@@ -185,15 +185,6 @@
     [piece movePieceTo:newPosition animated:animated];
 }
 
-- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
-{
-    if (!_blackAtTopSide) {
-        row = 9 - row;
-        col = 8 - col;
-    }
-    [self _setPiece:piece toRow:row toCol:col];
-}
-
 - (Piece*) getPieceAtRow:(int)row col:(int)col
 {
     if (!_blackAtTopSide) {
@@ -374,54 +365,63 @@
     }
 }
 
+- (void) _movePiece:(Piece*)piece toRow:(int)row toCol:(int)col
+{
+    if (!_blackAtTopSide) {
+        row = 9 - row;
+        col = 8 - col;
+    }
+    [self _setPiece:piece toRow:row toCol:col];
+}
+
 - (void) _resetPieces
 {
     // reset the pieces in pieceBox by the order they are created
     // chariot
-    [self movePiece:[_pieceBox objectAtIndex:0] toRow:0 toCol:0];
-    [self movePiece:[_pieceBox objectAtIndex:1] toRow:0 toCol:8];
-    [self movePiece:[_pieceBox objectAtIndex:2] toRow:9 toCol:0];
-    [self movePiece:[_pieceBox objectAtIndex:3] toRow:9 toCol:8];
+    [self _movePiece:[_pieceBox objectAtIndex:0] toRow:0 toCol:0];
+    [self _movePiece:[_pieceBox objectAtIndex:1] toRow:0 toCol:8];
+    [self _movePiece:[_pieceBox objectAtIndex:2] toRow:9 toCol:0];
+    [self _movePiece:[_pieceBox objectAtIndex:3] toRow:9 toCol:8];
     
     // horse
-    [self movePiece:[_pieceBox objectAtIndex:4] toRow:0 toCol:1];
-    [self movePiece:[_pieceBox objectAtIndex:5] toRow:0 toCol:7];
-    [self movePiece:[_pieceBox objectAtIndex:6] toRow:9 toCol:1];
-    [self movePiece:[_pieceBox objectAtIndex:7] toRow:9 toCol:7];
+    [self _movePiece:[_pieceBox objectAtIndex:4] toRow:0 toCol:1];
+    [self _movePiece:[_pieceBox objectAtIndex:5] toRow:0 toCol:7];
+    [self _movePiece:[_pieceBox objectAtIndex:6] toRow:9 toCol:1];
+    [self _movePiece:[_pieceBox objectAtIndex:7] toRow:9 toCol:7];
     
     // elephant
-    [self movePiece:[_pieceBox objectAtIndex:8] toRow:0 toCol:2];
-    [self movePiece:[_pieceBox objectAtIndex:9] toRow:0 toCol:6];
-    [self movePiece:[_pieceBox objectAtIndex:10] toRow:9 toCol:2];
-    [self movePiece:[_pieceBox objectAtIndex:11] toRow:9 toCol:6];
+    [self _movePiece:[_pieceBox objectAtIndex:8] toRow:0 toCol:2];
+    [self _movePiece:[_pieceBox objectAtIndex:9] toRow:0 toCol:6];
+    [self _movePiece:[_pieceBox objectAtIndex:10] toRow:9 toCol:2];
+    [self _movePiece:[_pieceBox objectAtIndex:11] toRow:9 toCol:6];
     
     // advisor
-    [self movePiece:[_pieceBox objectAtIndex:12] toRow:0 toCol:3];
-    [self movePiece:[_pieceBox objectAtIndex:13] toRow:0 toCol:5];
-    [self movePiece:[_pieceBox objectAtIndex:14] toRow:9 toCol:3];
-    [self movePiece:[_pieceBox objectAtIndex:15] toRow:9 toCol:5];
+    [self _movePiece:[_pieceBox objectAtIndex:12] toRow:0 toCol:3];
+    [self _movePiece:[_pieceBox objectAtIndex:13] toRow:0 toCol:5];
+    [self _movePiece:[_pieceBox objectAtIndex:14] toRow:9 toCol:3];
+    [self _movePiece:[_pieceBox objectAtIndex:15] toRow:9 toCol:5];
     
     // king
-    [self movePiece:[_pieceBox objectAtIndex:16] toRow:0 toCol:4];
-    [self movePiece:[_pieceBox objectAtIndex:17] toRow:9 toCol:4];
+    [self _movePiece:[_pieceBox objectAtIndex:16] toRow:0 toCol:4];
+    [self _movePiece:[_pieceBox objectAtIndex:17] toRow:9 toCol:4];
     
     // cannon
-    [self movePiece:[_pieceBox objectAtIndex:18] toRow:2 toCol:1];
-    [self movePiece:[_pieceBox objectAtIndex:19] toRow:2 toCol:7];
-    [self movePiece:[_pieceBox objectAtIndex:20] toRow:7 toCol:1];
-    [self movePiece:[_pieceBox objectAtIndex:21] toRow:7 toCol:7];
+    [self _movePiece:[_pieceBox objectAtIndex:18] toRow:2 toCol:1];
+    [self _movePiece:[_pieceBox objectAtIndex:19] toRow:2 toCol:7];
+    [self _movePiece:[_pieceBox objectAtIndex:20] toRow:7 toCol:1];
+    [self _movePiece:[_pieceBox objectAtIndex:21] toRow:7 toCol:7];
     
     // pawn
-    [self movePiece:[_pieceBox objectAtIndex:22] toRow:3 toCol:0];
-    [self movePiece:[_pieceBox objectAtIndex:23] toRow:3 toCol:2];
-    [self movePiece:[_pieceBox objectAtIndex:24] toRow:3 toCol:4];
-    [self movePiece:[_pieceBox objectAtIndex:25] toRow:3 toCol:6];
-    [self movePiece:[_pieceBox objectAtIndex:26] toRow:3 toCol:8];
-    [self movePiece:[_pieceBox objectAtIndex:27] toRow:6 toCol:0];
-    [self movePiece:[_pieceBox objectAtIndex:28] toRow:6 toCol:2];
-    [self movePiece:[_pieceBox objectAtIndex:29] toRow:6 toCol:4];
-    [self movePiece:[_pieceBox objectAtIndex:30] toRow:6 toCol:6];
-    [self movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];
+    [self _movePiece:[_pieceBox objectAtIndex:22] toRow:3 toCol:0];
+    [self _movePiece:[_pieceBox objectAtIndex:23] toRow:3 toCol:2];
+    [self _movePiece:[_pieceBox objectAtIndex:24] toRow:3 toCol:4];
+    [self _movePiece:[_pieceBox objectAtIndex:25] toRow:3 toCol:6];
+    [self _movePiece:[_pieceBox objectAtIndex:26] toRow:3 toCol:8];
+    [self _movePiece:[_pieceBox objectAtIndex:27] toRow:6 toCol:0];
+    [self _movePiece:[_pieceBox objectAtIndex:28] toRow:6 toCol:2];
+    [self _movePiece:[_pieceBox objectAtIndex:29] toRow:6 toCol:4];
+    [self _movePiece:[_pieceBox objectAtIndex:30] toRow:6 toCol:6];
+    [self _movePiece:[_pieceBox objectAtIndex:31] toRow:6 toCol:8];
 }
 
 - (void) _setupPieces

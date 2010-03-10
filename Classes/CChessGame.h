@@ -39,7 +39,6 @@
 
 - (void) movePiece:(Piece*)piece toPosition:(Position)position
           animated:(BOOL)animated;
-- (void) movePiece:(Piece*)piece toRow:(int)row toCol:(int)col;
 - (Piece*) getPieceAtRow:(int)row col:(int)col;
 - (Piece*) getPieceAtCell:(int)square;
 - (Piece*) getKingOfColor:(ColorEnum)color;

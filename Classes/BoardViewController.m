@@ -309,9 +309,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (animated) [self _clearAllAnimation];
     [_game movePiece:piece toPosition:toPosition animated:NO /*YES*/];
 
-    if (capture) {
-        [capture destroyWithAnimation:animated];
-    }
+    [capture destroyWithAnimation:animated];
 
     if (animated) {
         NSString* sound =
@@ -440,7 +438,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 #pragma mark -
 #pragma mark UI-Event Handlers:
 
-- (BOOL) _doPreviewPREV
+- (BOOL) _doPreviewPREV:(BOOL)animated
 {
     if (    [_moves count] == 0              // No Moves made yet?
         || _nthMove == HISTORY_INDEX_BEGIN ) // ... or already at BEGIN mark?
@@ -455,32 +453,31 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
     int move = pMove.move;
     int sqSrc = SRC(move);
-    int sqDst = DST(move);
-    [[AudioHelper sharedInstance] playSound:@"Review"];
+    if (animated) [[AudioHelper sharedInstance] playSound:@"Review"];
     
     // For Move-Review, just reverse the move order (sqDst->sqSrc)
     // Since it's only a review, no need to make actual move in
     // the underlying game logic.
 
     [self _clearAllAnimation];
-    [_game movePiece:pMove.srcPiece toRow:ROW(sqSrc) toCol:COLUMN(sqSrc)];
+    Position oldPosition = { ROW(sqSrc), COLUMN(sqSrc) };
+    [_game movePiece:pMove.srcPiece toPosition:oldPosition animated:NO];
 
-    if (pMove.capturedPiece) {
-        [_game movePiece:pMove.capturedPiece toRow:ROW(sqDst) toCol:COLUMN(sqDst)];
-    }
+    [pMove.capturedPiece putbackInLayer:_gameboard]; // Restore.
     
     // Highlight the Piece (if any) of the "next-PREV" Move.
     --_nthMove;
     if (_nthMove >= 0) {
         pMove = [_moves objectAtIndex:_nthMove];
-        [self _animateLatestMove:pMove];
+        if (animated) [self _animateLatestMove:pMove];
     }
     return YES;
 }
 
 - (BOOL) _doPreviewBEGIN
 {
-    while ([self _doPreviewPREV]) { /* keep going */}
+    while ([self _doPreviewPREV:NO]) { /* keep going */}
+    [[AudioHelper sharedInstance] playSound:@"Review"];
     return YES;
 }
 
@@ -500,13 +497,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
         [self _doPreviewBEGIN];
     } else {
-        [self _doPreviewPREV];
+        [self _doPreviewPREV:YES];
     }
 
     [self _setReviewMode:[self _isInReview]];
 }
 
-- (BOOL) _doPreviewNEXT
+- (BOOL) _doPreviewNEXT:(BOOL)animated
 {
     if (    [_moves count] == 0             // No Moves made yet?
          || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
@@ -539,13 +536,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     }
     else
     {
-        [[AudioHelper sharedInstance] playSound:@"Review"];
         [self _clearAllAnimation];
-        const int sqDst = DST(move);
-        Position toPosition = { ROW(sqDst), COLUMN(sqDst) };
-        [_game movePiece:pMove.srcPiece toPosition:toPosition animated:NO];
-        [pMove.capturedPiece destroyWithAnimation:YES];
-        [self _animateLatestMove:pMove];
+        [self _updateUIOnNewMove:pMove animated:animated];
     }
 
     return YES;
@@ -553,7 +545,18 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (BOOL) _doPreviewEND
 {
-    while ([self _doPreviewNEXT]) { /* keep going */}
+    if (    [_moves count] == 0             // No Moves made yet?
+        || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
+    {
+        return NO;
+    }
+
+    const int lastMoveIndex = [_moves count] - 2;
+    while (_nthMove < lastMoveIndex) {
+        [self _doPreviewNEXT:NO];
+    }
+    [self _doPreviewNEXT:YES];
+
     return YES;
 }
 
@@ -570,7 +573,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
         [self _doPreviewEND];
     } else {
-        [self _doPreviewNEXT];
+        [self _doPreviewNEXT:YES];
     }
 
     [self _setReviewMode:[self _isInReview]];

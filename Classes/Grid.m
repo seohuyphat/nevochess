@@ -72,7 +72,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         _nRows = nRows;
         _nColumns = nColumns;
         _spacing = spacing;
-        _lineColor = CGColorRetain(kRedColor); // Default setting.
+        _lineColor = CGColorRetain(kLightRedColor); // Default setting.
         _highlightColor = nil;
         _animateColor = nil;
         _cellOffset = cellOffset;
@@ -317,7 +317,22 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
         return;
     }
 
-    const CGFloat ds = 4.0;
+    // INNER circle.
+    CGFloat ds = 12.0;
+    CGRect innerFrame = self.frame;
+    innerFrame.origin = CGPointMake(0, 0);
+    innerFrame.origin.x += ds/2;
+    innerFrame.origin.y += ds/2;
+    innerFrame.size.width -= ds;
+    innerFrame.size.height -= ds;
+    
+    CGContextSetStrokeColorWithColor(ctx, kWhiteColor);
+    CGContextSetLineWidth(ctx, 4.0);
+    CGContextAddEllipseInRect(ctx, innerFrame);
+    CGContextStrokePath(ctx);
+
+    // OUTER circle.
+    ds = 8.0;
     CGRect newFrame = self.frame;
     newFrame.origin = CGPointMake(0, 0);
     newFrame.origin.x += ds/2;
@@ -326,7 +341,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
     newFrame.size.height -= ds;
 
     CGContextSetStrokeColorWithColor(ctx, self.borderColor);
-    CGContextSetLineWidth(ctx, 3.0);
+    CGContextSetLineWidth(ctx, 2.0);
     CGContextAddEllipseInRect(ctx, newFrame);
     CGContextStrokePath(ctx);
 }
