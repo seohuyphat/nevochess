@@ -64,6 +64,7 @@ enum ActionSheetEnum
 @implementation AIBoardViewController
 
 @synthesize _tableId;
+@synthesize ownerColor=_myColor;
 @synthesize _idleTimer;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -351,7 +352,6 @@ enum ActionSheetEnum
 
 - (void) _handleEndGameInUI
 {
-    NSString *sound = nil;
     NSString *msg   = nil;
 
     GameStatusEnum result = _game.gameResult;
@@ -359,29 +359,26 @@ enum ActionSheetEnum
     if (   (result == NC_GAME_STATUS_RED_WIN && _myColor == NC_COLOR_RED)
         || (result == NC_GAME_STATUS_BLACK_WIN && _myColor == NC_COLOR_BLACK) )
     {
-        sound = @"WIN";
         msg = NSLocalizedString(@"You win,congratulations!", @"");
     }
     else if (  (result == NC_GAME_STATUS_RED_WIN && _myColor == NC_COLOR_BLACK)
            || (result == NC_GAME_STATUS_BLACK_WIN && _myColor == NC_COLOR_RED) )
     {
-        sound = @"LOSS";
         msg = NSLocalizedString(@"Computer wins. Don't give up, please try again!", @"");
     }
     else if (result == NC_GAME_STATUS_DRAWN)
     {
-        sound = @"DRAW";
         msg = NSLocalizedString(@"Sorry,we are in draw!", @"");
     }
     else if (result == NC_GAME_STATUS_TOO_MANY_MOVES)
     {
-        sound = @"ILLEGAL";
         msg = NSLocalizedString(@"Sorry,we made too many moves, please restart again!", @"");
     }
-    
-    if ( !sound ) return;
+    else
+    {
+        return;
+    }
 
-    [[AudioHelper sharedInstance] playSound:sound];
     [_board onGameOver];
 
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
@@ -449,7 +446,11 @@ enum ActionSheetEnum
         [moveList addObject:[NSNumber numberWithInt:mv]];
     }
 
+    // Temporarily (force to disable) the Sound.
+    const BOOL savedEnabled = [AudioHelper sharedInstance].enabled;
+    [AudioHelper sharedInstance].enabled = NO;
     [self _loadListOfMoves:moveList];
+    [AudioHelper sharedInstance].enabled = savedEnabled;
 
     [_activity stopAnimating];
     [[AudioHelper sharedInstance] playSound:@"Undo"];

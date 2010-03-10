@@ -295,28 +295,54 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return [[NSString alloc] initWithFormat:@"%d:%02d", (seconds / 60), (seconds % 60)];
 }
 
+- (void) _playSoundAfterMove:(MoveAtom*)pMove
+{
+    const GameStatusEnum result     = _game.gameResult;
+    const ColorEnum      ownerColor = _boardOwner.ownerColor;
+    const ColorEnum      moveColor  = pMove.srcPiece.color;
+    NSString*            sound      = nil;
+
+    if (   (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_RED)
+        || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_BLACK))
+    {
+        sound = @"WIN";
+    }
+    else if (  (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_BLACK)
+             || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_RED))
+    {
+        sound = @"LOSS";
+    }
+    else if (result == NC_GAME_STATUS_DRAWN) {
+        sound = @"DRAW";
+    }
+    else if (result == NC_GAME_STATUS_TOO_MANY_MOVES) {
+        sound = @"ILLEGAL";
+    }
+    else if (pMove.checkedKing) {
+        sound = (moveColor == NC_COLOR_RED ? @"Check1" : @"CHECK2");
+    }
+    else if (pMove.capturedPiece) {
+        sound = (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2");
+    }
+    else {
+        sound= (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2");
+    }
+
+    [[AudioHelper sharedInstance] playSound:sound];
+}
+
 - (void) _updateUIOnNewMove:(MoveAtom*)pMove animated:(BOOL)animated
 {
-    int move = pMove.move;
-    int sqDst = DST(move);
+    int sqDst = DST(pMove.move);
     Position toPosition = { ROW(sqDst), COLUMN(sqDst) };
-    
-    Piece*    piece       = pMove.srcPiece;
-    Piece*    capture     = pMove.capturedPiece;
-    Piece*    checkedKing = pMove.checkedKing;
-    ColorEnum moveColor   = pMove.srcPiece.color;
 
     if (animated) [self _clearAllAnimation];
-    [_game movePiece:piece toPosition:toPosition animated:NO /*YES*/];
+    [_game movePiece:pMove.srcPiece toPosition:toPosition animated:NO /*YES*/];
 
-    [capture destroyWithAnimation:animated];
+    [pMove.capturedPiece destroyWithAnimation:animated];
 
     if (animated) {
-        NSString* sound =
-            (checkedKing ? (moveColor == NC_COLOR_RED ? @"Check1" : @"CHECK2")
-                         : ( capture ? (moveColor == NC_COLOR_RED ? @"CAPTURE" : @"CAPTURE2")
-                                     : (moveColor == NC_COLOR_RED ? @"MOVE" : @"MOVE2") ));
-        [[AudioHelper sharedInstance] playSound:sound];
+        [self _playSoundAfterMove:pMove];
         [self _animateLatestMove:pMove];
     }
 }
