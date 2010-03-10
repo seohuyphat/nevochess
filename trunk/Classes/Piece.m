@@ -198,23 +198,34 @@
 {
     if (animated)
     {
-        const CGFloat ds = 5.0;
+        const CGFloat ds = 20.0;
         CGRect oriBounds = holder.bounds;
         CGRect ubounds = oriBounds;
         ubounds.size.width += ds*2;
         ubounds.size.height += ds*2;
-        
+
         // 'bounds' animation
         CABasicAnimation* boundsAnimation = [CABasicAnimation animationWithKeyPath:@"bounds"];
-        boundsAnimation.duration=1.0;
-        boundsAnimation.repeatCount=HUGE_VALF;
-        boundsAnimation.autoreverses=YES;
+        boundsAnimation.duration= 1.5;
         boundsAnimation.fromValue=[NSValue valueWithCGRect:oriBounds];
         boundsAnimation.toValue=[NSValue valueWithCGRect:ubounds];
-        [holder addAnimation:boundsAnimation forKey:@"animate_bounds"];
+
+        // 'opacity' animation
+        CABasicAnimation* opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        CGFloat oriOpacity = holder.opacity;
+        opacityAnimation.duration= 1.5;
+        opacityAnimation.fromValue = [NSNumber numberWithFloat:oriOpacity];
+        opacityAnimation.toValue = [NSNumber numberWithFloat:0.0];
+        
+        // create an animation group and add the keyframe animation
+        CAAnimationGroup* theGroup = [CAAnimationGroup animation];
+        theGroup.animations=[NSArray arrayWithObjects:boundsAnimation, opacityAnimation, nil];
+        theGroup.duration=1.5 + 0.0 /* may be some delay if needed */;
+        theGroup.repeatCount=HUGE_VALF;
+        [holder addAnimation:theGroup forKey:@"animate_bounds_GROUP"];
     }
     else {
-        [holder removeAnimationForKey:@"animate_bounds"];
+        [holder removeAnimationForKey:@"animate_bounds_GROUP"];
     }
 }
 

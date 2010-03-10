@@ -56,7 +56,7 @@ Copyright © 2007 Apple Inc. All Rights Reserved.
 extern CGColorRef kBlackColor, kWhiteColor, 
                   kTranslucentGrayColor, kTranslucentLightGrayColor, 
                   kAlmostInvisibleWhiteColor,
-                  kHighlightColor, kRedColor, kLightBlueColor;
+                  kHighlightColor, kRedColor, kLightRedColor, kLightBlueColor;
 
 
 /** Moves a layer from one superlayer to another, without changing its position onscreen. */
