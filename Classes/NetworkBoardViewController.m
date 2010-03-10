@@ -67,6 +67,7 @@
 @synthesize _board;
 @synthesize _game;
 @synthesize _tableId;
+@synthesize ownerColor=_myColor;
 @synthesize _username, _password, _rating;
 @synthesize _redId;
 @synthesize _blackId;

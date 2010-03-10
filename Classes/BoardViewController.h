@@ -27,6 +27,7 @@
 - (BOOL) isMyTurnNext;
 - (BOOL) isGameReady;
 - (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to;
+@property (readonly) ColorEnum ownerColor;
 @end
 
 // --------------------------------------
