@@ -84,7 +84,7 @@
 "Tables" = "游戏棋桌";
 "Messages" = "聊天消息";
 "Table #%@" = "棋桌 #%@";
-"Review Mode" = "审查模式";
+"Replay" = "重播";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "一般设置";
