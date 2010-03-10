@@ -31,7 +31,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 };
 
 // The threshold (in seconds) to "go-BEGIN" or "go-END".
-#define REVIEW_BEGIN_END_THRESHOLD 0.7
+#define REPLAY_BEGIN_END_THRESHOLD 0.7
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -49,7 +49,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 - (void) _animateLatestMove:(MoveAtom*)pMove;
 - (void) _clearAllAnimation;
 - (void) _clearAllHighlight;
-- (void) _setReviewMode:(BOOL)on;
+- (void) _setReplayMode:(BOOL)on;
 - (void) _ticked:(NSTimer*)timer;
 - (void) _updateTimer;
 - (NSString*) _allocStringFrom:(int)seconds;
@@ -59,8 +59,8 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 @synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
-@synthesize _timer, _reviewLastTouched;
-@synthesize _reviewLastTouched_prev, _reviewLastTouched_next;
+@synthesize _timer, _replayLastTouched;
+@synthesize _replayLastTouched_prev, _replayLastTouched_next;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -102,9 +102,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _pickedUpPiece = nil;
         _checkedKing = nil;
 
-        self._reviewLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
-        self._reviewLastTouched_prev = nil;
-        self._reviewLastTouched_next = nil;
+        self._replayLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
+        self._replayLastTouched_prev = nil;
+        self._replayLastTouched_next = nil;
         self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
     }
 
@@ -117,9 +117,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_boardOwner release];
     [_timer release];
     [_moves release];
-    [_reviewLastTouched release];
-    [_reviewLastTouched_prev release];
-    [_reviewLastTouched_next release];
+    [_replayLastTouched release];
+    [_replayLastTouched_prev release];
+    [_replayLastTouched_next release];
     [_game release];
     [_gameboard removeFromSuperlayer];
     [_gameboard release];
@@ -193,7 +193,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 }
 
-- (BOOL) _isInReview
+- (BOOL) _isInReplay
 {
     return (_nthMove != HISTORY_INDEX_END);
 }
@@ -369,10 +369,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         [self resetMoveTime:moveColor];
     }
 
-    // Delay update the UI if in Review mode.
+    // Delay update the UI if in Replay mode.
     // NOTE: We do not update pMove.srcPiece (leaving it equal to nil)
     //       to signal that it is NOT yet processed.
-    if ([self _isInReview]) {
+    if ([self _isInReplay]) {
         return;
     }
 
@@ -398,14 +398,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _gameOver = YES;
 }
 
-- (void) _setReviewMode:(BOOL)on
+- (void) _setReplayMode:(BOOL)on
 {
     if (_game.gameResult != NC_GAME_STATUS_IN_PROGRESS) {
         return;  // Do nothing if Game Over.
     }
 
     if (on && _game_over_msg.hidden) {
-        _game_over_msg.text = NSLocalizedString(@"Review Mode", @"");
+        _game_over_msg.text = NSLocalizedString(@"Replay", @"");
         _game_over_msg.alpha = 0.5;
         _game_over_msg.hidden = NO;
     } else if (!on) {
@@ -428,10 +428,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
 - (void) _ticked:(NSTimer*)timer
 {
-    NSTimeInterval timeInterval = - [_reviewLastTouched timeIntervalSinceNow]; // in seconds.
-    if (![self _isInReview] && timeInterval > 5) { // hide if older than 5 seconds?
-        _review_prev.hidden = YES;
-        _review_next.hidden = YES;
+    NSTimeInterval timeInterval = - [_replayLastTouched timeIntervalSinceNow]; // in seconds.
+    if (![self _isInReplay] && timeInterval > 5) { // hide if older than 5 seconds?
+        _replay_prev.hidden = YES;
+        _replay_next.hidden = YES;
     }
     
     // NOTE: On networked games, at least one Move made by EACH player before
@@ -464,7 +464,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 #pragma mark -
 #pragma mark UI-Event Handlers:
 
-- (BOOL) _doPreviewPREV:(BOOL)animated
+- (BOOL) _doReplayPREV:(BOOL)animated
 {
     if (    [_moves count] == 0              // No Moves made yet?
         || _nthMove == HISTORY_INDEX_BEGIN ) // ... or already at BEGIN mark?
@@ -479,10 +479,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
     int move = pMove.move;
     int sqSrc = SRC(move);
-    if (animated) [[AudioHelper sharedInstance] playSound:@"Review"];
+    if (animated) [[AudioHelper sharedInstance] playSound:@"Replay"];
     
-    // For Move-Review, just reverse the move order (sqDst->sqSrc)
-    // Since it's only a review, no need to make actual move in
+    // For Move-Replay, just reverse the move order (sqDst->sqSrc)
+    // Since it's only a replay, no need to make actual move in
     // the underlying game logic.
 
     [self _clearAllAnimation];
@@ -500,36 +500,36 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (BOOL) _doPreviewBEGIN
+- (BOOL) _doReplayBEGIN
 {
-    while ([self _doPreviewPREV:NO]) { /* keep going */}
-    [[AudioHelper sharedInstance] playSound:@"Review"];
+    while ([self _doReplayPREV:NO]) { /* keep going */}
+    [[AudioHelper sharedInstance] playSound:@"Replay"];
     return YES;
 }
 
-- (IBAction) reviewPrevious_DOWN:(id)sender
+- (IBAction) replayPrevious_DOWN:(id)sender
 {
-    self._reviewLastTouched_prev = [NSDate date];
+    self._replayLastTouched_prev = [NSDate date];
 }
 
-- (IBAction) reviewPrevious_UP:(id)sender
+- (IBAction) replayPrevious_UP:(id)sender
 {
-    self._reviewLastTouched = [NSDate date];
-    if (![self _isInReview]) {
+    self._replayLastTouched = [NSDate date];
+    if (![self _isInReplay]) {
         [self _clearAllHighlight];
     }
 
-    NSTimeInterval timeInterval = - [_reviewLastTouched_prev timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
-        [self _doPreviewBEGIN];
+    NSTimeInterval timeInterval = - [_replayLastTouched_prev timeIntervalSinceNow]; // in seconds.
+    if (timeInterval > REPLAY_BEGIN_END_THRESHOLD) {
+        [self _doReplayBEGIN];
     } else {
-        [self _doPreviewPREV:YES];
+        [self _doReplayPREV:YES];
     }
 
-    [self _setReviewMode:[self _isInReview]];
+    [self _setReplayMode:[self _isInReplay]];
 }
 
-- (BOOL) _doPreviewNEXT:(BOOL)animated
+- (BOOL) _doReplayNEXT:(BOOL)animated
 {
     if (    [_moves count] == 0             // No Moves made yet?
          || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
@@ -569,7 +569,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (BOOL) _doPreviewEND
+- (BOOL) _doReplayEND
 {
     if (    [_moves count] == 0             // No Moves made yet?
         || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
@@ -579,30 +579,30 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     const int lastMoveIndex = [_moves count] - 2;
     while (_nthMove < lastMoveIndex) {
-        [self _doPreviewNEXT:NO];
+        [self _doReplayNEXT:NO];
     }
-    [self _doPreviewNEXT:YES];
+    [self _doReplayNEXT:YES];
 
     return YES;
 }
 
-- (IBAction) reviewNext_DOWN:(id)sender
+- (IBAction) replayNext_DOWN:(id)sender
 {
-    self._reviewLastTouched_next = [NSDate date];
+    self._replayLastTouched_next = [NSDate date];
 }
 
-- (IBAction) reviewNext_UP:(id)sender
+- (IBAction) replayNext_UP:(id)sender
 {
-    self._reviewLastTouched = [NSDate date];
+    self._replayLastTouched = [NSDate date];
 
-    NSTimeInterval timeInterval = - [_reviewLastTouched_next timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > REVIEW_BEGIN_END_THRESHOLD) {
-        [self _doPreviewEND];
+    NSTimeInterval timeInterval = - [_replayLastTouched_next timeIntervalSinceNow]; // in seconds.
+    if (timeInterval > REPLAY_BEGIN_END_THRESHOLD) {
+        [self _doReplayEND];
     } else {
-        [self _doPreviewNEXT:YES];
+        [self _doReplayNEXT:YES];
     }
 
-    [self _setReviewMode:[self _isInReview]];
+    [self _setReplayMode:[self _isInReplay]];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -617,14 +617,14 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
     Piece* piece = (Piece*)[self hitTestPoint:p LayerMatchCallback:layerIsPiece offset:NULL];
 
-     if (!piece && p.y > 382) // ... near the y-coordinate of Review buttons.
+     if (!piece && p.y > 382) // ... near the y-coordinate of Replay buttons.
      {
-         _review_prev.hidden = NO;
-         _review_next.hidden = NO;
-         self._reviewLastTouched = [NSDate date]; // now.
+         _replay_prev.hidden = NO;
+         _replay_next.hidden = NO;
+         self._replayLastTouched = [NSDate date]; // now.
      }
     
-    if (    [self _isInReview]   // Do nothing if in the middle of Move-Review.
+    if (    [self _isInReplay]   // Do nothing if in the middle of Move-Replay.
         ||  _game.gameResult != NC_GAME_STATUS_IN_PROGRESS
         || ![_boardOwner isMyTurnNext] // Ignore when it is not my turn.
         || ![_boardOwner isGameReady] )

@@ -247,7 +247,7 @@ static AudioHelper* _sharedAudio = nil;
             [NSArray arrayWithObjects: @"CAPTURE", @"CAPTURE2", @"CLICK",
                                        @"DRAW", @"LOSS", @"CHECK2",
                                        @"MOVE", @"MOVE2", @"WIN", @"ILLEGAL",
-                                       @"Check1", @"Review", @"Undo", @"ChangeRole", 
+                                       @"Check1", @"Replay", @"Undo", @"ChangeRole", 
                                        nil];
         for (NSString* sound in soundList)
         {

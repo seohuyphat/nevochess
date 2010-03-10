@@ -50,11 +50,11 @@
     IBOutlet UILabel*     _game_over_msg;
     BOOL                  _gameOver;
 
-    IBOutlet UIButton*    _review_prev;
-    IBOutlet UIButton*    _review_next;
-    NSDate*               _reviewLastTouched;
-    NSDate*               _reviewLastTouched_prev;
-    NSDate*               _reviewLastTouched_next;
+    IBOutlet UIButton*    _replay_prev;
+    IBOutlet UIButton*    _replay_next;
+    NSDate*               _replayLastTouched;
+    NSDate*               _replayLastTouched_prev;
+    NSDate*               _replayLastTouched_next;
     
     NSTimer*              _timer;
     
@@ -70,7 +70,7 @@
     Piece*                _checkedKing;   // A King that is being checked.
 
     NSMutableArray*       _moves;       // MOVE history
-    int                   _nthMove;     // pivot for the Move Review
+    int                   _nthMove;     // pivot for the Move Replay
 }
 
 - (CALayer*) hitTestPoint:(CGPoint)locationInWindow
@@ -79,14 +79,14 @@
 @property (readonly) CChessGame* game;
 @property (nonatomic, retain) id <BoardOwner> boardOwner;
 @property (nonatomic, retain) NSTimer* _timer;
-@property (nonatomic, retain) NSDate* _reviewLastTouched;
-@property (nonatomic, retain) NSDate* _reviewLastTouched_prev;
-@property (nonatomic, retain) NSDate* _reviewLastTouched_next;
+@property (nonatomic, retain) NSDate* _replayLastTouched;
+@property (nonatomic, retain) NSDate* _replayLastTouched_prev;
+@property (nonatomic, retain) NSDate* _replayLastTouched_next;
 
-- (IBAction) reviewPrevious_DOWN:(id)sender;
-- (IBAction) reviewPrevious_UP:(id)sender;
-- (IBAction) reviewNext_DOWN:(id)sender;
-- (IBAction) reviewNext_UP:(id)sender;
+- (IBAction) replayPrevious_DOWN:(id)sender;
+- (IBAction) replayPrevious_UP:(id)sender;
+- (IBAction) replayNext_DOWN:(id)sender;
+- (IBAction) replayNext_UP:(id)sender;
 
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;

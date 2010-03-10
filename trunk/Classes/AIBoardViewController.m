@@ -308,7 +308,7 @@ enum ActionSheetEnum
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
     _toolbar.items = newItems;
 
-    // TODO: Re-consider calling this function because the Board may be in Review-Mode.
+    // TODO: Re-consider calling this function because the Board may be in Replay-Mode.
     [self _onAfterDidMove];
 }
 
