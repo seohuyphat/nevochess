@@ -66,6 +66,7 @@
 "Password" = "Password";
 "Guest" = "Guest";
 "Login" = "Login";
+"Need to register? Join now" = "Need to register? Join now";
 
 /* Network Settings */
 "Server" = "Server";
