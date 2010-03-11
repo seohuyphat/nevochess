@@ -44,7 +44,7 @@
  STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
  
- Copyright © 2007 Apple Inc. All Rights Reserved.
+ Copyright 2007 Apple Inc. All Rights Reserved.
  
  */
 
@@ -157,6 +157,9 @@
 
 - (void) putbackInLayer:(CALayer*)superLayer
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                  selector:@selector(removeFromSuperlayer) object:nil];
+
     // Temporarily disabling a layer's actions
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
