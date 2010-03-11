@@ -404,11 +404,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         return;  // Do nothing if Game Over.
     }
 
-    if (on && _game_over_msg.hidden) {
-        _game_over_msg.text = NSLocalizedString(@"Replay", @"");
+    if (on) {
+        _game_over_msg.text = [NSString stringWithFormat:@"%@ %d/%d",
+                               NSLocalizedString(@"Replay", @""),
+                               _nthMove+1, [_moves count]];
         _game_over_msg.alpha = 0.5;
         _game_over_msg.hidden = NO;
-    } else if (!on) {
+    } else {
         _game_over_msg.hidden = YES;
     }
 }
@@ -541,11 +543,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     NSAssert1(_nthMove >= 0 && _nthMove < [_moves count], @"Invalid index [%d]", _nthMove);
     
     MoveAtom* pMove = [_moves objectAtIndex:_nthMove];
-    
-    if (_nthMove == [_moves count] - 1) {
-        _nthMove = HISTORY_INDEX_END;
-    }
-
     int move = pMove.move;
 
     if (!pMove.srcPiece) // not yet processed?
@@ -564,6 +561,16 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     {
         [self _clearAllAnimation];
         [self _updateUIOnNewMove:pMove animated:animated];
+    }
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // NOTE: We delay updating the index to the "END" mark to avoid race
+    //       conditions that could occur when there is a NEW move.
+    //       The "END" mark is a signal that allows the main UI Thread to
+    //       process new incoming Moves immediately.
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (_nthMove == [_moves count] - 1) {
+        _nthMove = HISTORY_INDEX_END;
     }
 
     return YES;
