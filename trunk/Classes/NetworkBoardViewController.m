@@ -387,7 +387,6 @@
     NSLog(@"%s: ENTER.", __FUNCTION__);
     if (!_connection) {
         NSLog(@"%s: Connecting to network...", __FUNCTION__);
-        [_activity setHidden:NO];
         [_activity startAnimating];
         _connection = [[NetworkConnection alloc] init];
         _connection.delegate = self;

@@ -233,6 +233,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
     if (_pickedUpPiece) {
         _pickedUpPiece.pickedUp = NO;
+        _pickedUpPiece = nil;
     }
 
     if (piece)
