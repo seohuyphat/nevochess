@@ -124,7 +124,6 @@ enum LoginButtonEnum
         return;
     }
     _clickedButton = BUTTON_LOGIN;
-    [_activity setHidden:NO];
     [_activity startAnimating];
     [delegate handleLoginRequest:@"login" username:_username.text password:_password.text];
 }
@@ -133,7 +132,6 @@ enum LoginButtonEnum
 {
     NSLog(@"%s: ENTER.", __FUNCTION__);
     _clickedButton = BUTTON_GUEST;
-    [_activity setHidden:NO];
     [_activity startAnimating];
     [delegate handleLoginRequest:@"guest" username:@"" password:@""];
 }

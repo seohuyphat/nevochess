@@ -30,6 +30,10 @@
     IBOutlet UIBarButtonItem*         _resetButton;
     IBOutlet UIBarButtonItem*         _actionButton;
     IBOutlet UIBarButtonItem*         _reverseRoleButton;
+    IBOutlet UIBarButtonItem*         _suspendAIButton;
+
+    UIBarButtonItem*      _resumeAIButton;
+    BOOL                  _aiSuspended;
 
     BoardViewController*  _board;
     CChessGame*           _game;
@@ -50,6 +54,7 @@
 - (IBAction)resetPressed:(id)sender;
 - (IBAction)actionPressed:(id)sender;
 - (IBAction)reverseRolePressed:(id)sender;
+- (IBAction)suspendAIPressed:(id)sender;
 
 - (void) onLocalMoveMadeFrom:(Position)from toPosition:(Position)to;
 - (void) saveGame;

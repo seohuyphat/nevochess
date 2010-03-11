@@ -109,7 +109,6 @@ enum CellLabelEnum {
 {
     //NSLog(@"%s: ENTER.", __FUNCTION__);
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    [_activity setHidden:NO];
     [_activity startAnimating];
 }
 
@@ -141,7 +140,6 @@ enum CellLabelEnum {
 
 - (IBAction) refreshButtonPressed:(id)sender
 {
-    [_activity setHidden:NO];
     [_activity startAnimating];
     [_delegate handeRefreshFromList];
 }

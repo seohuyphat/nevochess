@@ -23,6 +23,7 @@
 #import "AudioHelper.h"
 
 #define ACTION_BUTTON_INDEX 4
+#define SUSPEND_AI_BUTTON_INDEX 8
 
 enum AlertViewEnum
 {
@@ -51,6 +52,7 @@ enum ActionSheetEnum
 - (void) _countDownToAIMove;
 - (void) _askAIToGenerateMove;
 - (void) _onAfterDidMove;
+- (void) _onAISuspendChanged;
 
 @end
 
@@ -88,15 +90,21 @@ enum ActionSheetEnum
 
     _game = _board.game;    
     self._tableId = nil;
-
     self._idleTimer = nil;
+
     _aiRobot = [[AIRobot alloc] initWith:self];
+    _resumeAIButton = [[UIBarButtonItem alloc]
+                       initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
+                       target:self action:_suspendAIButton.action];
 
+    _myColor == NC_COLOR_RED;
     [_board setRedLabel:NSLocalizedString(@"You", @"")];
-    [_board setBlackLabel:[NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]];
 
-    _aiThinkingActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    _aiThinkingActivity.hidden = YES;
+    _aiSuspended = [[NSUserDefaults standardUserDefaults] boolForKey:@"ai_suspended"];
+    [self _onAISuspendChanged];
+
+    _aiThinkingActivity = [[UIActivityIndicatorView alloc]
+                           initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
     NSString* color = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];
@@ -124,6 +132,7 @@ enum ActionSheetEnum
     [_aiThinkingActivity release];
     [_aiThinkingButton release];
     [_reverseRoleButton release];
+    [_resumeAIButton release];
     if (_idleTimer) {
         [_idleTimer invalidate];
         self._idleTimer = nil;
@@ -166,7 +175,6 @@ enum ActionSheetEnum
     else if (    alertView.tag == NC_ALERT_RESET_GAME
              && buttonIndex != [alertView cancelButtonIndex] )
     {
-        [_activity setHidden:NO];
         [_activity startAnimating];
         [_board rescheduleTimer];
         [_aiRobot runResetRobot];
@@ -185,7 +193,6 @@ enum ActionSheetEnum
 
 - (IBAction)homePressed:(id)sender
 {
-    [_activity setHidden:NO];
     [_activity startAnimating];
     [_board destroyTimer];
     [_aiRobot runStopRobot];
@@ -222,7 +229,8 @@ enum ActionSheetEnum
 
     UIActionSheet* actionSheet = nil;
 
-    if (   _myColor != _game.nextColor // Robot is thinking?
+    if (  !_aiSuspended
+        && _myColor != _game.nextColor // Robot is thinking?
         && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS)
     {
         actionSheet = [[UIActionSheet alloc] initWithTitle:nil
@@ -271,6 +279,19 @@ enum ActionSheetEnum
     }
 }
 
+- (IBAction)suspendAIPressed:(id)sender
+{
+    _aiSuspended = !_aiSuspended;
+    [self _onAISuspendChanged];
+
+    if ( !_aiSuspended
+         &&  (   _myColor != _game.nextColor
+              && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ))
+    {
+        [self _askAIToGenerateMove];
+    }
+}
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (actionSheet.tag == NC_ACTION_SHEET_CANCEL) {
@@ -282,7 +303,6 @@ enum ActionSheetEnum
         case 0:  // Undo Move
             if ([_game getMoveCount])
             {
-                [_activity setHidden:NO];
                 [_activity startAnimating];
                 [self performSelector:@selector(_undoLastMove) withObject:nil afterDelay:0];
             }
@@ -406,6 +426,7 @@ enum ActionSheetEnum
     [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
     [[NSUserDefaults standardUserDefaults] setObject:(_myColor == NC_COLOR_RED ? @"Red" : @"Black")
                                               forKey:@"my_color"];
+    [[NSUserDefaults standardUserDefaults] setBool:_aiSuspended forKey:@"ai_suspended"];
 }
 
 - (void) _loadPendingGame:(NSString *)sPendingGame
@@ -427,9 +448,12 @@ enum ActionSheetEnum
     NSArray* moves = [NSArray arrayWithArray:[_board getMoves]];
     NSUInteger moveCount = [moves count];
 
-    int myLastMoveIndex = (_myColor == NC_COLOR_RED
+    int myLastMoveIndex = moveCount-1;
+    if (!_aiSuspended) {
+        myLastMoveIndex = (_myColor == NC_COLOR_RED
                            ? ( (moveCount % 2) ? moveCount-1 : moveCount-2 )
                            : ( (moveCount % 2) ? moveCount-2 : moveCount-1 ));
+    }
 
     // NOTE: We know that at this time AI is not thinking.
     //       Therefore, we directly reset the Game to avoid race conditions.
@@ -513,14 +537,15 @@ enum ActionSheetEnum
 
 - (void) _askAIToGenerateMove
 {
-    _aiThinkingActivity.hidden = NO;
-    [_aiThinkingActivity startAnimating];
-    NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
-    [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
-    _toolbar.items = newItems;
+    if (!_aiSuspended) {
+        [_aiThinkingActivity startAnimating];
+        NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
+        [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_aiThinkingButton];
+        _toolbar.items = newItems;
 
-    _reverseRoleButton.enabled = NO;
-    [_aiRobot runGenerateMove];
+        _reverseRoleButton.enabled = NO;
+        [_aiRobot runGenerateMove];
+    }
 }
 
 - (void) _onAfterDidMove
@@ -536,9 +561,24 @@ enum ActionSheetEnum
     }
 }
 
+- (void) _onAISuspendChanged
+{
+    NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
+    [newItems replaceObjectAtIndex:SUSPEND_AI_BUTTON_INDEX
+                        withObject:(_aiSuspended ? _resumeAIButton : _suspendAIButton)];
+    _toolbar.items = newItems;
+    NSString* otherLabel = (_aiSuspended ? NSLocalizedString(@"Other", @"")
+                            : [NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]);
+    if (_myColor == NC_COLOR_RED) {
+        [_board setBlackLabel:otherLabel];
+    } else {
+        [_board setRedLabel:otherLabel];
+    }
+}
+
 - (BOOL) isMyTurnNext
 {
-    return (_game.nextColor == _myColor);
+    return (_game.nextColor == _myColor || _aiSuspended);
 }
 
 - (BOOL) isGameReady
