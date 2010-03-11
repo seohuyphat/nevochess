@@ -168,8 +168,36 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return nil;
 }
 
-- (void) setRedLabel:(NSString*)label  { _red_label.text = label; }
-- (void) setBlackLabel:(NSString*)label { _black_label.text = label; }
+- (void) setRedLabel:(NSString*)label  { [self setRedLabel:label animated:NO]; }
+- (void) setBlackLabel:(NSString*)label { [self setBlackLabel:label animated:NO]; }
+
+- (void) _animateLabel:(UILabel*)label withText:(NSString*)newText
+{
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:1.0];
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
+                           forView:label cache:YES];
+    label.text = newText;
+    [UIView commitAnimations];
+}
+
+- (void) setRedLabel:(NSString*)label animated:(BOOL)animated
+{
+    if (animated) {
+        [self _animateLabel:_red_label withText:label];
+    } else {
+        _red_label.text = label;
+    }
+}
+
+- (void) setBlackLabel:(NSString*)label animated:(BOOL)animated
+{
+    if (animated) {
+        [self _animateLabel:_black_label withText:label];
+    } else {
+        _black_label.text = label;
+    }
+}
 
 - (void) setInitialTime:(NSString*)times
 {
