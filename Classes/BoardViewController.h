@@ -90,6 +90,8 @@
 
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;
+- (void) setRedLabel:(NSString*)label animated:(BOOL)animated;
+- (void) setBlackLabel:(NSString*)label animated:(BOOL)animated;
 - (void) setInitialTime:(NSString*)times;
 - (void) setRedTime:(NSString*)times;
 - (void) setBlackTime:(NSString*)times;

@@ -570,9 +570,9 @@ enum ActionSheetEnum
     NSString* otherLabel = (_aiSuspended ? NSLocalizedString(@"Other", @"")
                             : [NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]);
     if (_myColor == NC_COLOR_RED) {
-        [_board setBlackLabel:otherLabel];
+        [_board setBlackLabel:otherLabel animated:YES];
     } else {
-        [_board setRedLabel:otherLabel];
+        [_board setRedLabel:otherLabel animated:YES];
     }
 }
 
