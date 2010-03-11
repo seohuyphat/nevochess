@@ -66,6 +66,7 @@
 "Password" = "Mot de Passe";
 "Guest" = "Invité";
 "Login" = "Connexion";
+"Need to register? Join now" = "Besoin de vous enregistrer? Rejoignez-nous";
 
 /* Network Settings */
 "Server" = "Serveur";

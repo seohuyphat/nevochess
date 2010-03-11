@@ -48,6 +48,8 @@ enum LoginButtonEnum
     _password.placeholder = NSLocalizedString(@"Password", @"");
     [_guestButton setTitle:NSLocalizedString(@"Guest", @"") forState:UIControlStateNormal];
     [_loginButton setTitle:NSLocalizedString(@"Login", @"") forState:UIControlStateNormal];
+    [_registerButton setTitle:NSLocalizedString(@"Need to register? Join now", @"")
+                     forState:UIControlStateNormal];
     _error.text = @"";
 
     // Load the existing Login info, if available, the 1st time.
@@ -134,6 +136,12 @@ enum LoginButtonEnum
     [_activity setHidden:NO];
     [_activity startAnimating];
     [delegate handleLoginRequest:@"guest" username:@"" password:@""];
+}
+
+- (IBAction)registerButtonPressed:(id)sender
+{
+    NSURL* url = [NSURL URLWithString:@"http://www.playxiangqi.com/index.php?page=register"];
+    [[UIApplication sharedApplication] openURL:url];
 }
 
 @end

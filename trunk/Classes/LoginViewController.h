@@ -33,6 +33,7 @@
     IBOutlet UIActivityIndicatorView* _activity;
     IBOutlet UIButton*    _guestButton;
     IBOutlet UIButton*    _loginButton;
+    IBOutlet UIButton*    _registerButton;
 
     id <LoginDelegate> delegate;
     int                _clickedButton;
@@ -45,5 +46,6 @@
 
 - (IBAction)loginButtonPressed:(id)sender;
 - (IBAction)guestButtonPressed:(id)sender;
+- (IBAction)registerButtonPressed:(id)sender;
 
 @end

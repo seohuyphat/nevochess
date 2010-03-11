@@ -66,6 +66,7 @@
 "Password" = "密码";
 "Guest" = "客人";
 "Login" = "注册";
+"Need to register? Join now" = "注册? 立即注册";
 
 /* Network Settings */
 "Server" = "服务器";
