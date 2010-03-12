@@ -570,9 +570,14 @@ enum InfoLabelTag
         [self _clearAllHighlight];
     }
 
-    while ([self _doReplayPREV:NO]) { /* keep going until no more moves */}
+    if (    [_moves count] == 0              // No Moves made yet?
+        || _nthMove == HISTORY_INDEX_BEGIN ) // ... or already at BEGIN mark?
+    {
+        return;
+    }
     [[AudioHelper sharedInstance] playSound:@"Replay"];
-    
+
+    while ([self _doReplayPREV:NO]) { /* keep going until no more moves */}
     [self _setReplayMode:[self _isInReplay]];
 }
 
