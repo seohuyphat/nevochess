@@ -65,9 +65,8 @@ enum ActionSheetEnum
 
 @implementation AIBoardViewController
 
-@synthesize _tableId;
 @synthesize ownerColor=_myColor;
-@synthesize _idleTimer;
+@synthesize _aiTimer;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -88,9 +87,8 @@ enum ActionSheetEnum
     [self.view bringSubviewToFront:_toolbar];
     [self.view bringSubviewToFront:_activity];
 
-    _game = _board.game;    
-    self._tableId = nil;
-    self._idleTimer = nil;
+    _game = _board.game;
+    _aiTimer = nil;
 
     _aiRobot = [[AIRobot alloc] initWith:self];
     _resumeAIButton = [[UIBarButtonItem alloc]
@@ -133,9 +131,9 @@ enum ActionSheetEnum
     [_aiThinkingButton release];
     [_reverseRoleButton release];
     [_resumeAIButton release];
-    if (_idleTimer) {
-        [_idleTimer invalidate];
-        self._idleTimer = nil;
+    if (_aiTimer) {
+        [_aiTimer invalidate];
+        self._aiTimer = nil;
     }
     _game = nil;
     _board = nil;
@@ -271,10 +269,10 @@ enum ActionSheetEnum
         [self _countDownToAIMove];
     } else {
         _reverseRoleButton.enabled = YES;
-        if (_idleTimer) {
+        if (_aiTimer) {
             NSLog(@"%s: Cancel the pending AI-timer...", __FUNCTION__);
-            [_idleTimer invalidate];
-            self._idleTimer = nil;
+            [_aiTimer invalidate];
+            self._aiTimer = nil;
         }
     }
 }
@@ -288,6 +286,10 @@ enum ActionSheetEnum
          &&  (   _myColor != _game.nextColor
               && _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ))
     {
+        if (_aiTimer) {
+            NSLog(@"%s: AI has already been scheduled to generate a Move.", __FUNCTION__);
+            return;
+        }
         [self _askAIToGenerateMove];
     }
 }
@@ -324,6 +326,10 @@ enum ActionSheetEnum
     [_game doMoveFrom:from toPosition:to];
     [_board onNewMoveFromPosition:from toPosition:to setupMode:NO];
 
+    if (_aiTimer) {
+        self._aiTimer = nil;
+    }
+    
     NSMutableArray* newItems = [NSMutableArray arrayWithArray:_toolbar.items];
     [newItems replaceObjectAtIndex:ACTION_BUTTON_INDEX withObject:_actionButton];
     _toolbar.items = newItems;
@@ -527,9 +533,11 @@ enum ActionSheetEnum
 
 - (void) _countDownToAIMove
 {
-    NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
-    self._idleTimer = [NSTimer scheduledTimerWithTimeInterval:5.0
-        target:self selector:@selector(_askAIToGenerateMove) userInfo:nil repeats:NO];
+    if (!_aiSuspended) {
+        NSLog(@"%s: Schedule AI to run the 1st move in 5 seconds.", __FUNCTION__);
+        self._aiTimer = [NSTimer scheduledTimerWithTimeInterval:5.0
+            target:self selector:@selector(_askAIToGenerateMove) userInfo:nil repeats:NO];
+    }
 }
 
 - (void) _askAIToGenerateMove
@@ -542,6 +550,11 @@ enum ActionSheetEnum
 
         _reverseRoleButton.enabled = NO;
         [_aiRobot runGenerateMove];
+    }
+    else if (_aiTimer) {
+        NSLog(@"%s: Cancel the pending AI-timer...", __FUNCTION__);
+        [_aiTimer invalidate];
+        self._aiTimer = nil;
     }
 }
 
