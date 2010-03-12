@@ -50,12 +50,13 @@
     IBOutlet UILabel*     _game_over_msg;
     BOOL                  _gameOver;
 
+    IBOutlet UIView*      _replayView;
+    IBOutlet UIButton*    _replay_begin;
     IBOutlet UIButton*    _replay_prev;
     IBOutlet UIButton*    _replay_next;
-    NSDate*               _replayLastTouched;
-    NSDate*               _replayLastTouched_prev;
-    NSDate*               _replayLastTouched_next;
-    
+    IBOutlet UIButton*    _replay_end;
+
+    NSDate*               _replayLastTouched;    
     NSTimer*              _timer;
     
     TimeInfo*             _initialTime;
@@ -80,13 +81,11 @@
 @property (nonatomic, retain) id <BoardOwner> boardOwner;
 @property (nonatomic, retain) NSTimer* _timer;
 @property (nonatomic, retain) NSDate* _replayLastTouched;
-@property (nonatomic, retain) NSDate* _replayLastTouched_prev;
-@property (nonatomic, retain) NSDate* _replayLastTouched_next;
 
-- (IBAction) replayPrevious_DOWN:(id)sender;
-- (IBAction) replayPrevious_UP:(id)sender;
-- (IBAction) replayNext_DOWN:(id)sender;
-- (IBAction) replayNext_UP:(id)sender;
+- (IBAction) replayPressed_BEGIN:(id)sender;
+- (IBAction) replayPressed_PREVIOUS:(id)sender;
+- (IBAction) replayPressed_NEXT:(id)sender;
+- (IBAction) replayPressed_END:(id)sender;
 
 - (void) setRedLabel:(NSString*)label;
 - (void) setBlackLabel:(NSString*)label;

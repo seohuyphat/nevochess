@@ -81,6 +81,8 @@
 		AF8CF66B107315E50071CAE2 /* AI_XQWLight.m in Sources */ = {isa = PBXBuildFile; fileRef = AF8CF66A107315E50071CAE2 /* AI_XQWLight.m */; };
 		AF943D1E10855C6100677DF9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB5F891033069500243E55 /* MainMenu.xib */; };
 		AF957A431085897500589D4A /* AboutViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF9F2B7C106A71D400D919B1 /* AboutViewController.xib */; };
+		AF9F11F811499A9A00B3A9B3 /* go-last.png in Resources */ = {isa = PBXBuildFile; fileRef = AF9F11F611499A9A00B3A9B3 /* go-last.png */; };
+		AF9F11F911499A9A00B3A9B3 /* go-first.png in Resources */ = {isa = PBXBuildFile; fileRef = AF9F11F711499A9A00B3A9B3 /* go-first.png */; };
 		AFA46640106FB2C60006DAFE /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA4663F106FB2C60006DAFE /* Icon.png */; };
 		AFA63FE5106FABD700D7B220 /* background_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFA63FE4106FABD700D7B220 /* background_320x480.png */; };
 		AFB0380F112C5E5D000A9AC1 /* NetworkSettingController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB0380D112C5E5D000A9AC1 /* NetworkSettingController.m */; };
@@ -202,6 +204,8 @@
 		AF8CF6661073154E0071CAE2 /* XQWLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XQWLight.cpp; path = AI/XQWLight.cpp; sourceTree = "<group>"; };
 		AF8CF669107315E50071CAE2 /* AI_XQWLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AI_XQWLight.h; path = AI/AI_XQWLight.h; sourceTree = "<group>"; };
 		AF8CF66A107315E50071CAE2 /* AI_XQWLight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AI_XQWLight.m; path = AI/AI_XQWLight.m; sourceTree = "<group>"; };
+		AF9F11F611499A9A00B3A9B3 /* go-last.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "go-last.png"; sourceTree = "<group>"; };
+		AF9F11F711499A9A00B3A9B3 /* go-first.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "go-first.png"; sourceTree = "<group>"; };
 		AF9F2B7C106A71D400D919B1 /* AboutViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AboutViewController.xib; sourceTree = "<group>"; };
 		AFA4663F106FB2C60006DAFE /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		AFA63FE4106FABD700D7B220 /* background_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background_320x480.png; sourceTree = "<group>"; };
@@ -469,6 +473,8 @@
 				AF44924A10810C5B00CBB9AE /* go-home.png */,
 				AF32D2A0107BA45E000C356A /* go-next.png */,
 				AF32D2A1107BA45E000C356A /* go-previous.png */,
+				AF9F11F611499A9A00B3A9B3 /* go-last.png */,
+				AF9F11F711499A9A00B3A9B3 /* go-first.png */,
 				AFA4663F106FB2C60006DAFE /* Icon.png */,
 				AF559E801127245100C6236D /* background_320x460.png */,
 				AFA63FE4106FABD700D7B220 /* background_320x480.png */,
@@ -596,6 +602,8 @@
 				AF3529FE11456F0800D7E4D7 /* Western_60px.png in Resources */,
 				AF504FF01146209B002C5BB4 /* PlayXiangqi_60px.png in Resources */,
 				AF504FF11146209B002C5BB4 /* PlayXiangqi.png in Resources */,
+				AF9F11F811499A9A00B3A9B3 /* go-last.png in Resources */,
+				AF9F11F911499A9A00B3A9B3 /* go-first.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
