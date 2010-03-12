@@ -30,9 +30,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     HISTORY_INDEX_BEGIN = -1
 };
 
-// The threshold (in seconds) to "go-BEGIN" or "go-END".
-#define REPLAY_BEGIN_END_THRESHOLD 0.7
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    BoardViewController
@@ -60,7 +57,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 @synthesize game=_game;
 @synthesize boardOwner=_boardOwner;
 @synthesize _timer, _replayLastTouched;
-@synthesize _replayLastTouched_prev, _replayLastTouched_next;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -73,7 +69,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
         int boardType = [[NSUserDefaults standardUserDefaults] integerForKey:@"board_type"];
         _game = [[CChessGame alloc] initWithBoard:_gameboard boardType:boardType];
- 
+
         _boardOwner = nil;
 
         _initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
@@ -102,9 +98,10 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _pickedUpPiece = nil;
         _checkedKing = nil;
 
+        _replayView.layer.cornerRadius = 9;
+        _replayView.layer.backgroundColor = kTranslucentGrayColor; 
+
         self._replayLastTouched = [[NSDate date] addTimeInterval:-60]; // 1-minute earlier.
-        self._replayLastTouched_prev = nil;
-        self._replayLastTouched_next = nil;
         self._timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_ticked:) userInfo:nil repeats:YES];
     }
 
@@ -118,8 +115,6 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [_timer release];
     [_moves release];
     [_replayLastTouched release];
-    [_replayLastTouched_prev release];
-    [_replayLastTouched_next release];
     [_game release];
     [_gameboard removeFromSuperlayer];
     [_gameboard release];
@@ -461,8 +456,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 {
     NSTimeInterval timeInterval = - [_replayLastTouched timeIntervalSinceNow]; // in seconds.
     if (![self _isInReplay] && timeInterval > 5) { // hide if older than 5 seconds?
-        _replay_prev.hidden = YES;
-        _replay_next.hidden = YES;
+        _replayView.hidden = YES;
     }
     
     // NOTE: On networked games, at least one Move made by EACH player before
@@ -531,32 +525,27 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (BOOL) _doReplayBEGIN
-{
-    while ([self _doReplayPREV:NO]) { /* keep going */}
-    [[AudioHelper sharedInstance] playSound:@"Replay"];
-    return YES;
-}
-
-- (IBAction) replayPrevious_DOWN:(id)sender
-{
-    self._replayLastTouched_prev = [NSDate date];
-}
-
-- (IBAction) replayPrevious_UP:(id)sender
+- (IBAction) replayPressed_BEGIN:(id)sender
 {
     self._replayLastTouched = [NSDate date];
     if (![self _isInReplay]) {
         [self _clearAllHighlight];
     }
 
-    NSTimeInterval timeInterval = - [_replayLastTouched_prev timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > REPLAY_BEGIN_END_THRESHOLD) {
-        [self _doReplayBEGIN];
-    } else {
-        [self _doReplayPREV:YES];
+    while ([self _doReplayPREV:NO]) { /* keep going until no more moves */}
+    [[AudioHelper sharedInstance] playSound:@"Replay"];
+    
+    [self _setReplayMode:[self _isInReplay]];
+}
+
+- (IBAction) replayPressed_PREVIOUS:(id)sender
+{
+    self._replayLastTouched = [NSDate date];
+    if (![self _isInReplay]) {
+        [self _clearAllHighlight];
     }
 
+    [self _doReplayPREV:YES];
     [self _setReplayMode:[self _isInReplay]];
 }
 
@@ -605,39 +594,29 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     return YES;
 }
 
-- (BOOL) _doReplayEND
+- (IBAction) replayPressed_NEXT:(id)sender
 {
+    self._replayLastTouched = [NSDate date];
+    [self _doReplayNEXT:YES];
+    [self _setReplayMode:[self _isInReplay]];
+}
+
+- (IBAction) replayPressed_END:(id)sender
+{
+    self._replayLastTouched = [NSDate date];
+    
     if (    [_moves count] == 0             // No Moves made yet?
         || _nthMove == HISTORY_INDEX_END ) // ... or at the END mark?
     {
-        return NO;
+        return;
     }
-
+    
     const int lastMoveIndex = [_moves count] - 2;
     while (_nthMove < lastMoveIndex) {
         [self _doReplayNEXT:NO];
     }
     [self _doReplayNEXT:YES];
-
-    return YES;
-}
-
-- (IBAction) replayNext_DOWN:(id)sender
-{
-    self._replayLastTouched_next = [NSDate date];
-}
-
-- (IBAction) replayNext_UP:(id)sender
-{
-    self._replayLastTouched = [NSDate date];
-
-    NSTimeInterval timeInterval = - [_replayLastTouched_next timeIntervalSinceNow]; // in seconds.
-    if (timeInterval > REPLAY_BEGIN_END_THRESHOLD) {
-        [self _doReplayEND];
-    } else {
-        [self _doReplayNEXT:YES];
-    }
-
+    
     [self _setReplayMode:[self _isInReplay]];
 }
 
@@ -655,8 +634,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
      if (!piece && p.y > 382) // ... near the y-coordinate of Replay buttons.
      {
-         _replay_prev.hidden = NO;
-         _replay_next.hidden = NO;
+         _replayView.hidden = NO;
          self._replayLastTouched = [NSDate date]; // now.
      }
     
