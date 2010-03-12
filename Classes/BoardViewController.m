@@ -75,13 +75,13 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
         _initialTime = [TimeInfo allocTimeFromString:@"1500/240/30"];
         _redTime = [[TimeInfo alloc] initWithTime:_initialTime];
         _blackTime = [[TimeInfo alloc] initWithTime:_initialTime];
-        _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-        _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _red_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:14.0];
+        _red_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:15.0];
         _red_time.text = [self _allocStringFrom:_redTime.gameTime];
         _red_move_time.text = [self _allocStringFrom:_redTime.moveTime];
         
-        _black_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
-        _black_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:13.0];
+        _black_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:14.0];
+        _black_move_time.font = [UIFont fontWithName:@"DBLCDTempBlack" size:15.0];
         _black_time.text = [self _allocStringFrom:_blackTime.gameTime];
         _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
