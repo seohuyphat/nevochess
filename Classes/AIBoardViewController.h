@@ -37,18 +37,16 @@
 
     BoardViewController*  _board;
     CChessGame*           _game;
-    NSString*             _tableId;
     ColorEnum             _myColor;  // The color (role) of the LOCAL player.
 
-    NSTimer*              _idleTimer;
+    NSTimer*              _aiTimer;  // To schedule AI's Move-Generation.
     AIRobot*              _aiRobot;
 
     UIActivityIndicatorView* _aiThinkingActivity;
     UIBarButtonItem*         _aiThinkingButton;
 }
 
-@property (nonatomic, retain) NSString* _tableId;
-@property (nonatomic, retain) NSTimer* _idleTimer;
+@property (nonatomic, retain) NSTimer* _aiTimer;
 
 - (IBAction)homePressed:(id)sender;
 - (IBAction)resetPressed:(id)sender;
