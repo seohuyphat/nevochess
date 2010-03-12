@@ -20,8 +20,10 @@
 #import <UIKit/UIKit.h>
 
 
-@interface AboutViewController : UIViewController {
-    IBOutlet UIWebView *webview;
+@interface AboutViewController : UIViewController
+{
+    IBOutlet UIWebView*               _webview;
+    IBOutlet UIActivityIndicatorView* _activity;
 }
 
 @end

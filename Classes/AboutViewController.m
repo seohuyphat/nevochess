@@ -35,7 +35,7 @@
     NSString *releaseVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *about_page = [NSString stringWithFormat:NSLocalizedString(@"About_NevoChess_Key", @""),
                                                                         releaseVersion, buildInfo];
-    [webview loadHTMLString:about_page baseURL:baseURL];
+    [_webview loadHTMLString:about_page baseURL:baseURL];
 }
 
 - (void)didReceiveMemoryWarning
@@ -54,11 +54,19 @@
 
 - (void)dealloc
 {
-    [webview release];
+    [_webview release];
+    [_activity release];
     [super dealloc];
 }
 
+#pragma mark -
 #pragma mark WebView delegate
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    [_activity stopAnimating];
+}
+
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
                                                  navigationType:(UIWebViewNavigationType)navigationType
 {
@@ -69,6 +77,5 @@
     }
     return YES;
 }
-
 
 @end
