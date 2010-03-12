@@ -91,8 +91,8 @@
 		AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */ = {isa = PBXBuildFile; fileRef = AFBA3CF51134460B00F8F4ED /* change-role.png */; };
 		AFC901A011386FCF00CAB0DD /* AI-avatar.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC9019F11386FCF00CAB0DD /* AI-avatar.png */; };
 		AFC901A71138708300CAB0DD /* AI-level.png in Resources */ = {isa = PBXBuildFile; fileRef = AFC901A61138708300CAB0DD /* AI-level.png */; };
+		AFE26C28114A10C700DD4DBD /* board_320x355.png in Resources */ = {isa = PBXBuildFile; fileRef = AFE26C27114A10C700DD4DBD /* board_320x355.png */; };
 		AFE46CC9113B08E000208548 /* BoardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE46CC8113B08E000208548 /* BoardViewController.m */; };
-		AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */ = {isa = PBXBuildFile; fileRef = AFEE8C3911325EF800EE7239 /* board_320x480.png */; };
 		AFF0CF2C10879DC800C81662 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = AFF0CF2B10879DC800C81662 /* Default.png */; };
 		AFF191C7111D0E2900849AEA /* MessageListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF191C6111D0E2900849AEA /* MessageListViewController.m */; };
 		AFF191D7111D118000849AEA /* MessageListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFF191D6111D118000849AEA /* MessageListView.xib */; };
@@ -217,10 +217,10 @@
 		AFBA3CF51134460B00F8F4ED /* change-role.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "change-role.png"; sourceTree = "<group>"; };
 		AFC9019F11386FCF00CAB0DD /* AI-avatar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-avatar.png"; sourceTree = "<group>"; };
 		AFC901A61138708300CAB0DD /* AI-level.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AI-level.png"; sourceTree = "<group>"; };
+		AFE26C27114A10C700DD4DBD /* board_320x355.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x355.png; sourceTree = "<group>"; };
 		AFE387D6113C2A68007B94CC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AFE46CC7113B08E000208548 /* BoardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoardViewController.h; sourceTree = "<group>"; };
 		AFE46CC8113B08E000208548 /* BoardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BoardViewController.m; sourceTree = "<group>"; };
-		AFEE8C3911325EF800EE7239 /* board_320x480.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = board_320x480.png; sourceTree = "<group>"; };
 		AFF0CF2B10879DC800C81662 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		AFF191C5111D0E2900849AEA /* MessageListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageListViewController.h; sourceTree = "<group>"; };
 		AFF191C6111D0E2900849AEA /* MessageListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageListViewController.m; sourceTree = "<group>"; };
@@ -407,7 +407,7 @@
 		AF6B21E61131C65200A2AA3A /* boards */ = {
 			isa = PBXGroup;
 			children = (
-				AFEE8C3911325EF800EE7239 /* board_320x480.png */,
+				AFE26C27114A10C700DD4DBD /* board_320x355.png */,
 				AF6B222B1131C92300A2AA3A /* board_60px.png */,
 				AF81950311456EA100CF465B /* Western.png */,
 				AF3529FD11456F0800D7E4D7 /* Western_60px.png */,
@@ -585,7 +585,6 @@
 				AF6B21ED1131C65200A2AA3A /* WOOD.png in Resources */,
 				AF6B21EE1131C65200A2AA3A /* WOOD_60px.png in Resources */,
 				AF6B222D1131C92300A2AA3A /* board_60px.png in Resources */,
-				AFEE8C3A11325EF800EE7239 /* board_320x480.png in Resources */,
 				AFBA3CF61134460B00F8F4ED /* change-role.png in Resources */,
 				AF6E173711383B5E00590B9E /* volume_on.png in Resources */,
 				AF6E1761113840BE00590B9E /* piece_22px.png in Resources */,
@@ -604,6 +603,7 @@
 				AF504FF11146209B002C5BB4 /* PlayXiangqi.png in Resources */,
 				AF9F11F811499A9A00B3A9B3 /* go-last.png in Resources */,
 				AF9F11F911499A9A00B3A9B3 /* go-first.png in Resources */,
+				AFE26C28114A10C700DD4DBD /* board_320x355.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

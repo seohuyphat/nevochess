@@ -44,7 +44,7 @@
  STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
  
- Copyright © 2007 Apple Inc. All Rights Reserved.
+ Copyright (C) 2007 Apple Inc. All Rights Reserved.
  
  */
 
@@ -207,7 +207,7 @@ BOOL layerIsGridCell( CALayer* layer ) { return [layer isKindOfClass: [GridCell 
 {
     // Custom CALayer drawing implementation. Delegates to the cells to draw themselves
     // in me; this is more efficient than having each cell have its own drawing.
-    if (!self.backgroundColor) {
+    if (_lineColor) {
         CGContextSetStrokeColorWithColor(ctx, _lineColor);
         CGContextSetLineWidth(ctx, 1.2);
         [self drawCellsInContext:ctx];

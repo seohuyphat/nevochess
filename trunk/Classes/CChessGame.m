@@ -67,9 +67,10 @@
         
         CGFloat    cellSize = 35;
         CGPoint    cellOffset = CGPointMake(0, 0);
-        CGPoint    boardPosition = CGPointMake(0, 28);
+        CGPoint    boardPosition = CGPointMake(0, 29);
         CGRect     boardFrame = CGRectMake(0, 0, 320, 352);
         CGColorRef backgroundColor = nil;
+        CGColorRef lineColor       = nil;
         CGColorRef highlightColor  = kLightBlueColor;
         CGColorRef animateColor    = kLightBlueColor;
         
@@ -105,8 +106,10 @@
             }
             default: // The custom-drawn background.
             {
-                _board.backgroundColor = GetCGPatternNamed(@"board_320x480.png");
-                boardPosition = CGPointMake(2.5, 28);
+                backgroundColor = GetCGPatternNamed(@"board_320x355.png");
+                lineColor = kLightRedColor;
+                boardPosition = CGPointMake(2.5, 29);
+                boardFrame = CGRectMake(0, 0, 320, 355);
                 break;
             }
         }
@@ -118,6 +121,7 @@
                                    spacing:spacing
                                 cellOffset:cellOffset
                            backgroundColor:backgroundColor];
+        _grid.lineColor = lineColor;
         _grid.highlightColor = highlightColor;
         _grid.animateColor = animateColor;
         
