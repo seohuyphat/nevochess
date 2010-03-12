@@ -30,6 +30,15 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     HISTORY_INDEX_BEGIN = -1
 };
 
+// NOTE: These tags are needed so that the '_game_over_msg' label can be shared
+//       more effectively.
+enum InfoLabelTag
+{
+    INFO_LABEL_TAG_NONE       = 0,
+    INFO_LABEL_TAG_GAME_OVER  = 1,  // Need to be non-zero.
+    INFO_LABEL_TAG_REPLAY     = 2
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 //    BoardViewController
@@ -87,7 +96,9 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
 
         _red_label.text = @"";
         _black_label.text = @"";
+
         _game_over_msg.hidden = YES;
+        _game_over_msg.tag = INFO_LABEL_TAG_NONE;
         _gameOver = NO;
 
         _moves = [[NSMutableArray alloc] initWithCapacity:NC_MAX_MOVES_PER_GAME];
@@ -326,21 +337,25 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     const ColorEnum      moveColor  = pMove.srcPiece.color;
     NSString*            sound      = nil;
 
-    if (   (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_RED)
-        || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_BLACK))
+    if (   result != NC_GAME_STATUS_IN_PROGRESS // NOTE: just for optimization!
+        && (![self _isInReplay] || _nthMove == [_moves count] - 1))
     {
-        sound = @"WIN";
-    }
-    else if (  (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_BLACK)
-             || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_RED))
-    {
-        sound = @"LOSS";
-    }
-    else if (result == NC_GAME_STATUS_DRAWN) {
-        sound = @"DRAW";
-    }
-    else if (result == NC_GAME_STATUS_TOO_MANY_MOVES) {
-        sound = @"ILLEGAL";
+        if (   (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_RED)
+            || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_BLACK))
+        {
+            sound = @"WIN";
+        }
+        else if (  (result == NC_GAME_STATUS_RED_WIN && ownerColor == NC_COLOR_BLACK)
+                 || (result == NC_GAME_STATUS_BLACK_WIN && ownerColor == NC_COLOR_RED))
+        {
+            sound = @"LOSS";
+        }
+        else if (result == NC_GAME_STATUS_DRAWN) {
+            sound = @"DRAW";
+        }
+        else if (result == NC_GAME_STATUS_TOO_MANY_MOVES) {
+            sound = @"ILLEGAL";
+        }
     }
     else if (pMove.checkedKing) {
         sound = (moveColor == NC_COLOR_RED ? @"Check1" : @"CHECK2");
@@ -368,6 +383,12 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     if (animated) {
         [self _playSoundAfterMove:pMove];
         [self _animateLatestMove:pMove];
+    }
+
+    if (   _game.gameResult != NC_GAME_STATUS_IN_PROGRESS
+        && (![self _isInReplay] || _nthMove == [_moves count] - 1))
+    {
+        [self onGameOver];
     }
 }
 
@@ -414,28 +435,45 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     [self _updateUIOnNewMove:pMove animated:!setup];
 }
 
+- (void) _animateInfoLabel
+{
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:1.0];
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
+                           forView:_game_over_msg cache:YES];
+    [UIView commitAnimations];
+}
+
 - (void) onGameOver
 {
-    _game_over_msg.text = NSLocalizedString(@"Game Over", @"");
-    _game_over_msg.alpha = 1.0;
-    _game_over_msg.hidden = NO;
+    if (_game_over_msg.tag != INFO_LABEL_TAG_GAME_OVER) {
+        _game_over_msg.text = NSLocalizedString(@"Game Over", @"");
+        _game_over_msg.alpha = 1.0;
+        _game_over_msg.hidden = NO;
+        _game_over_msg.tag = INFO_LABEL_TAG_GAME_OVER;
+        [self _animateInfoLabel];
+    }
     _gameOver = YES;
 }
 
 - (void) _setReplayMode:(BOOL)on
 {
-    if (_game.gameResult != NC_GAME_STATUS_IN_PROGRESS) {
-        return;  // Do nothing if Game Over.
-    }
-
     if (on) {
         _game_over_msg.text = [NSString stringWithFormat:@"%@ %d/%d",
                                NSLocalizedString(@"Replay", @""),
                                _nthMove+1, [_moves count]];
-        _game_over_msg.alpha = 0.5;
-        _game_over_msg.hidden = NO;
+        if (_game_over_msg.tag != INFO_LABEL_TAG_REPLAY) {
+            _game_over_msg.hidden = NO;
+            _game_over_msg.alpha = 0.5;
+            _game_over_msg.tag = INFO_LABEL_TAG_REPLAY;
+            [self _animateInfoLabel];
+        }
+    } else if (_game.gameResult != NC_GAME_STATUS_IN_PROGRESS) { 
+        [self onGameOver];
     } else {
+        _game_over_msg.tag = INFO_LABEL_TAG_NONE;
         _game_over_msg.hidden = YES;
+        [self _animateInfoLabel];
     }
 }
 
@@ -702,6 +740,7 @@ enum HistoryIndex // NOTE: Do not change the constants 'values below.
     _black_move_time.text = [self _allocStringFrom:_blackTime.moveTime];
 
     _game_over_msg.hidden = YES;
+    _game_over_msg.tag = INFO_LABEL_TAG_NONE;
     _gameOver = NO;
 
     [_game resetGame];

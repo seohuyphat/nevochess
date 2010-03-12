@@ -399,8 +399,6 @@ enum ActionSheetEnum
         return;
     }
 
-    [_board onGameOver];
-
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
                                                     message:msg
                                                    delegate:self 
@@ -415,12 +413,11 @@ enum ActionSheetEnum
 {
     NSMutableString* sMoves = [NSMutableString string];
 
-    if ( _game.gameResult == NC_GAME_STATUS_IN_PROGRESS ) {
-        NSMutableArray* moves = [_board getMoves];
-        for (MoveAtom *pMove in moves) {
-            if ([sMoves length]) [sMoves appendString:@","];
-            [sMoves appendFormat:@"%d",pMove.move];
-        }
+    // Always save the current game regardless of its status.
+    NSMutableArray* moves = [_board getMoves];
+    for (MoveAtom *pMove in moves) {
+        if ([sMoves length]) [sMoves appendString:@","];
+        [sMoves appendFormat:@"%d",pMove.move];
     }
 
     [[NSUserDefaults standardUserDefaults] setObject:sMoves forKey:@"pending_game"];
