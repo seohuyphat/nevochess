@@ -29,7 +29,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-@interface AIRobot (PrivateMethods)
+@interface AIRobot (/* Private interface */)
 - (void) _robotThread;
 - (void) _stopRobot;
 - (void) _resetRobot;

@@ -20,7 +20,7 @@
 #import "NetworkBoardViewController.h"
 #import "Types.h"
 
-@interface NetworkBoardViewController (PrivateMethods)
+@interface NetworkBoardViewController (/* Private interface */)
 
 - (void) _handleCommandLogout;
 - (void) _connectToNetwork;
@@ -69,8 +69,7 @@
 @synthesize _tableId;
 @synthesize ownerColor=_myColor;
 @synthesize _username, _password, _rating;
-@synthesize _redId;
-@synthesize _blackId;
+@synthesize _redId, _blackId;
 @synthesize _connection;
 @synthesize _loginController;
 @synthesize _tableListController;
@@ -100,8 +99,8 @@
     self._username = nil;
     self._password = nil;
     self._rating = nil;
-    self._redId = nil;
-    self._blackId = nil;
+    _redId = nil;
+    _blackId = nil;
     _isGameOver = NO;
     _loginCanceled = NO;
     _loginAuthenticated = NO;
@@ -771,10 +770,10 @@
         [_board setBlackLabel:playerInfo];
     } else if ([color isEqualToString:@"None"]) {
         NSLog(@"%s: Player: [%@] joined as an observer.", __FUNCTION__, playerInfo);
-        if ([pid isEqualToString:self._redId]) {
+        if ([pid isEqualToString:_redId]) {
             self._redId = nil;
             [_board setRedLabel:@"*"];
-        } else if ([pid isEqualToString:self._blackId]) {
+        } else if ([pid isEqualToString:_blackId]) {
             self._blackId = nil;
             [_board setBlackLabel:@"*"];
         }
@@ -796,10 +795,10 @@
         return;
     }
 
-    if ([pid isEqualToString:self._redId]) {
+    if ([pid isEqualToString:_redId]) {
         self._redId = nil;
         [_board setRedLabel:@"*"];
-    } else if ([pid isEqualToString:self._blackId]) {
+    } else if ([pid isEqualToString:_blackId]) {
         self._blackId = nil;
         [_board setBlackLabel:@"*"];
     }
