@@ -85,6 +85,7 @@
 "Messages" = "聊天消息";
 "Table #%@" = "棋桌 #%@";
 "Replay" = "重播";
+"[AI Disabled]" = "[AI的残疾人]";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "一般设置";

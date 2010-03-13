@@ -577,12 +577,12 @@ enum ActionSheetEnum
     [newItems replaceObjectAtIndex:SUSPEND_AI_BUTTON_INDEX
                         withObject:(_aiSuspended ? _resumeAIButton : _suspendAIButton)];
     _toolbar.items = newItems;
-    NSString* otherLabel = (_aiSuspended ? NSLocalizedString(@"Other", @"")
+    NSString* otherLabel = (_aiSuspended ? NSLocalizedString(@"[AI Disabled]", @"")
                             : [NSString stringWithFormat:@"%@ [%d]", _aiRobot.aiName, _aiRobot.aiLevel + 1]);
     if (_myColor == NC_COLOR_RED) {
-        [_board setBlackLabel:otherLabel animated:YES];
+        [_board setBlackLabel:otherLabel animated:YES highlighted:_aiSuspended];
     } else {
-        [_board setRedLabel:otherLabel animated:YES];
+        [_board setRedLabel:otherLabel animated:YES highlighted:_aiSuspended];
     }
 }
 
