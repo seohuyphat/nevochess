@@ -43,7 +43,7 @@ enum ActionSheetEnum
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-@interface AIBoardViewController (PrivateMethods)
+@interface AIBoardViewController (/* Private interface */)
 
 - (void) _handleEndGameInUI;
 - (void) _loadListOfMoves:(NSArray*)moves;
@@ -102,7 +102,7 @@ enum ActionSheetEnum
     [self _onAISuspendChanged];
 
     _aiThinkingActivity = [[UIActivityIndicatorView alloc]
-                           initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                           initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     _aiThinkingButton = [[UIBarButtonItem alloc] initWithCustomView:_aiThinkingActivity];
 
     NSString* color = [[NSUserDefaults standardUserDefaults] stringForKey:@"my_color"];

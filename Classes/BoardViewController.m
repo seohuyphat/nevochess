@@ -45,10 +45,7 @@ enum InfoLabelTag
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-//
-// Private methods (BoardViewController)
-//
-@interface BoardViewController (PrivateMethods)
+@interface BoardViewController (/* Private interface */)
 - (CGRect) _gameBoardFrame;
 - (void) _setHighlightCells:(BOOL)highlighted;
 - (void) _setPickedUpPiece:(Piece*)piece;

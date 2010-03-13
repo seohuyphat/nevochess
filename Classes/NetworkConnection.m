@@ -20,7 +20,7 @@
 #import "NetworkConnection.h"
 #import "Enums.h"
 
-@interface NetworkConnection (PrivateMethods)
+@interface NetworkConnection (/* Private interface */)
 - (void) _openIOStreams;
 - (void) _closeIOStreams;
 - (void) _flushOutgoingData:(NSString*)outStr;

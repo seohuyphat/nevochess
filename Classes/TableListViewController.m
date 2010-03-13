@@ -56,7 +56,7 @@ enum CellLabelEnum {
 @end
 
 //------------------------------------------------
-@interface TableListViewController (PrivateMethods)
+@interface TableListViewController (/* Private interface */)
 
 - (void) _parseTablesStr:(NSString *)tablesStr;
 - (void) _addNewTable;

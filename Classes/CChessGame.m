@@ -32,7 +32,7 @@
 #pragma mark -
 #pragma mark The private interface of CChessGame
 
-@interface CChessGame (PrivateMethods)
+@interface CChessGame (/* Private interface */)
 
 - (void) _createPiece:(PieceEnum)type color:(ColorEnum)color
                   row:(int)row col:(int)col;

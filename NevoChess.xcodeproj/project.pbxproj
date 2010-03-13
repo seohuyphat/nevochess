@@ -104,8 +104,8 @@
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D3623240D0F684500981E51 /* NevoChessAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NevoChessAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* NevoChessAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NevoChessAppDelegate.m; sourceTree = "<group>"; };
+		1D3623240D0F684500981E51 /* NevoChessAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NevoChessAppDelegate.h; path = Classes/NevoChessAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* NevoChessAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NevoChessAppDelegate.m; path = Classes/NevoChessAppDelegate.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* NevoChess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NevoChess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -263,10 +263,7 @@
 				AF07E8A8107A302B00FE19B7 /* Referee */,
 				AF75F8D91065B6CD002A371B /* AI */,
 				AF4C8CEE112DA68D00212667 /* Settings */,
-				4BBB5ECA1032FAFD00243E55 /* xiangqi */,
-				AFF89D0F106FEF2B00E2136D /* Enums.h */,
-				1D3623240D0F684500981E51 /* NevoChessAppDelegate.h */,
-				1D3623250D0F684500981E51 /* NevoChessAppDelegate.m */,
+				4BBB5ECA1032FAFD00243E55 /* Xiangqi */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -282,29 +279,26 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				29B97315FDCFA39411CA2CEA /* Main Sources */,
+				AFDABFEE114BF8F4008F17D1 /* Common Sources */,
 				080E96DDFE201D6D7F000001 /* Classes */,
-				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				AFF191D6111D118000849AEA /* MessageListView.xib */,
-				AF4E2AC3111D988C009E2EC8 /* ItemInputView.xib */,
-				AF0F05CC11302A00007F6981 /* SingleSelectionView.xib */,
-				AF5F8C66113A32DF00693FFD /* BoardView.xib */,
-				AF5F8C6C113A349100693FFD /* AIBoardView.xib */,
-				AF5F8D8A113A45C800693FFD /* NetworkBoardView.xib */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
 		};
-		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+		29B97315FDCFA39411CA2CEA /* Main Sources */ = {
 			isa = PBXGroup;
 			children = (
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				1D3623240D0F684500981E51 /* NevoChessAppDelegate.h */,
+				1D3623250D0F684500981E51 /* NevoChessAppDelegate.m */,
 				AF33AA9010E3DADB00C23B69 /* NevoChessVersion.h */,
 				32CA4F630368D1EE00C91783 /* NevoChess_Prefix.pch */,
-				29B97316FDCFA39411CA2CEA /* main.m */,
 			);
-			name = "Other Sources";
+			name = "Main Sources";
 			sourceTree = "<group>";
 		};
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
@@ -315,13 +309,7 @@
 				4BE40C0B10691A1B006154CC /* books */,
 				4B3454C61054EAFF00362ED5 /* sounds */,
 				4B67330E10423930009DA9E7 /* pieces */,
-				AF9F2B7C106A71D400D919B1 /* AboutViewController.xib */,
-				DE964FCC1082511E00980CF6 /* OptionsView.xib */,
-				4BBB5F891033069500243E55 /* MainMenu.xib */,
-				AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */,
-				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
-				AF534CB71111440F00067844 /* LoginView.xib */,
-				AF112F901115FAAF004C1452 /* TableListView.xib */,
+				AFDABFE7114BF835008F17D1 /* NIB Files */,
 				8D1107310486CEB800E47090 /* NevoChess-Info.plist */,
 				AF8CABE61042F7FC002D6594 /* Entitlements.plist */,
 				AFB08A12106A663E00038488 /* Localizable.strings */,
@@ -345,11 +333,9 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4BBB5ECA1032FAFD00243E55 /* xiangqi */ = {
+		4BBB5ECA1032FAFD00243E55 /* Xiangqi */ = {
 			isa = PBXGroup;
 			children = (
-				AF778B77113ABBB4005A1E31 /* Types.h */,
-				AF778B78113ABBB4005A1E31 /* Types.m */,
 				AFF58763113579BF007E5DF1 /* AIRobot.h */,
 				AFF58764113579BF007E5DF1 /* AIRobot.m */,
 				AFE46CC7113B08E000208548 /* BoardViewController.h */,
@@ -376,12 +362,8 @@
 				4BBB5F1D103303D500243E55 /* Grid.m */,
 				4BBB5F1E103303D500243E55 /* Piece.h */,
 				4BBB5F1F103303D500243E55 /* Piece.m */,
-				4BBB5F20103303D500243E55 /* QuartzUtils.h */,
-				4BBB5F21103303D500243E55 /* QuartzUtils.m */,
-				4B34546A1053DB3000362ED5 /* AudioHelper.h */,
-				4B34546B1053DB3000362ED5 /* AudioHelper.m */,
 			);
-			name = xiangqi;
+			name = Xiangqi;
 			sourceTree = "<group>";
 		};
 		AF07E8A8107A302B00FE19B7 /* Referee */ = {
@@ -485,6 +467,41 @@
 				AFA63FE4106FABD700D7B220 /* background_320x480.png */,
 			);
 			path = images;
+			sourceTree = "<group>";
+		};
+		AFDABFE7114BF835008F17D1 /* NIB Files */ = {
+			isa = PBXGroup;
+			children = (
+				AF9F2B7C106A71D400D919B1 /* AboutViewController.xib */,
+				DE964FCC1082511E00980CF6 /* OptionsView.xib */,
+				4BBB5F891033069500243E55 /* MainMenu.xib */,
+				AFB0380E112C5E5D000A9AC1 /* NetworkSettingView.xib */,
+				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				AF534CB71111440F00067844 /* LoginView.xib */,
+				AF112F901115FAAF004C1452 /* TableListView.xib */,
+				AFF191D6111D118000849AEA /* MessageListView.xib */,
+				AF4E2AC3111D988C009E2EC8 /* ItemInputView.xib */,
+				AF0F05CC11302A00007F6981 /* SingleSelectionView.xib */,
+				AF5F8C66113A32DF00693FFD /* BoardView.xib */,
+				AF5F8C6C113A349100693FFD /* AIBoardView.xib */,
+				AF5F8D8A113A45C800693FFD /* NetworkBoardView.xib */,
+			);
+			name = "NIB Files";
+			sourceTree = "<group>";
+		};
+		AFDABFEE114BF8F4008F17D1 /* Common Sources */ = {
+			isa = PBXGroup;
+			children = (
+				AFF89D0F106FEF2B00E2136D /* Enums.h */,
+				AF778B77113ABBB4005A1E31 /* Types.h */,
+				AF778B78113ABBB4005A1E31 /* Types.m */,
+				4BBB5F20103303D500243E55 /* QuartzUtils.h */,
+				4BBB5F21103303D500243E55 /* QuartzUtils.m */,
+				4B34546A1053DB3000362ED5 /* AudioHelper.h */,
+				4B34546B1053DB3000362ED5 /* AudioHelper.m */,
+			);
+			name = "Common Sources";
+			path = Classes;
 			sourceTree = "<group>";
 		};
 		DE3A5C0E11033C4D006D3CD3 /* Models */ = {

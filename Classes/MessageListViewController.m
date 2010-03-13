@@ -34,7 +34,7 @@
 @end
 
 //------------------------------------------------
-@interface MessageListViewController (PrivateMethods)
+@interface MessageListViewController (/* Private interface */)
 
 - (void) _addNewMessage;
 
