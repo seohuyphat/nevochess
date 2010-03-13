@@ -26,30 +26,14 @@
 {
     [super viewDidLoad];
     self.title = NSLocalizedString(@"About", @"");
-    NSString *path = [[NSBundle mainBundle] bundlePath];
-    NSURL *baseURL = [NSURL fileURLWithPath:path];
-    NSString *buildInfo = @"";
-//#ifdef DEBUG
-    buildInfo = [NSString stringWithUTF8String:NEVOCHESS_BUILD_INFO];
-//#endif
-    NSString *releaseVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    NSString *about_page = [NSString stringWithFormat:NSLocalizedString(@"About_NevoChess_Key", @""),
-                                                                        releaseVersion, buildInfo];
-    [_webview loadHTMLString:about_page baseURL:baseURL];
-}
-
-- (void)didReceiveMemoryWarning
-{
-	// Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-	
-	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload
-{
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
+    
+    NSString* buildInfo = [NSString stringWithUTF8String:NEVOCHESS_BUILD_INFO];
+    NSString* releaseVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    
+    NSString* souceFile = [[NSBundle mainBundle] pathForResource:@"about" ofType:@"html"];
+	NSString* rawText = [NSString stringWithContentsOfFile:souceFile encoding:NSUTF8StringEncoding error:nil];
+    NSString* renderedPage = [NSString stringWithFormat:rawText, releaseVersion, buildInfo];
+    [_webview loadHTMLString:renderedPage baseURL:nil];
 }
 
 - (void)dealloc
@@ -70,8 +54,8 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
                                                  navigationType:(UIWebViewNavigationType)navigationType
 {
-    if(navigationType == UIWebViewNavigationTypeLinkClicked) {
-        //start safari to load in page url
+    if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+        // Start the Safari browser to load in page url.
         [[UIApplication sharedApplication] openURL:[request URL]];
         return NO;
     }

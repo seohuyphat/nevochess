@@ -8,8 +8,6 @@
    Translator: Huy Phan
  */
 
-"About_NevoChess_Key" = "<body><h3>NevoChess %@</h3><div><b>NevoChess</b> is an open source XiangQi application for iPhone/iPod touch, hosted on <a href=\"http://nevochess.googlecode.com\">Google Code</a>. Please contact us at <a href=\"mailto:nevochess@playxiangqi.com\"><font face=\"Times New Roman\">nevochess@PlayXiangqi.com</font></a></div><h3>Developers</h3><div>Nevo Hua (Beijing, China) <br/>Huy Phan (San Francisco, USA) </div><h3>Acknowledgement</h3><div><p><b>XQWLight</b> is an open source AI engine written by Huang Chen at <a href=\"http://www.elephantbase.net\">elephantbase.net</a></p><p><b>HaQiKi D</b> is an AI engine written by H.G. Muller at <a href=\"http://home.hccnet.nl/h.g.muller/XQhaqikid.html\">home.hccnet.nl/h.g.muller</a></p></div><div>%@</div></body>";
-
 /* Commonly shared keys to be used across the App. */
 "Yes" = "Yes";
 "No" = "No";
