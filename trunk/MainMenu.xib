@@ -43,7 +43,7 @@
 					<object class="IBUIImageView" id="919110211">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{0, -4}, {320, 467}}</string>
+						<string key="NSFrameSize">{320, 460}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -57,7 +57,7 @@
 					<object class="IBUIButton" id="220663960">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">312</int>
-						<string key="NSFrame">{{75, 252}, {210, 52}}</string>
+						<string key="NSFrame">{{62, 252}, {245, 52}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -89,7 +89,7 @@
 					<object class="IBUIButton" id="1043031780">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">312</int>
-						<string key="NSFrame">{{75, 319}, {210, 52}}</string>
+						<string key="NSFrame">{{62, 319}, {245, 52}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -111,7 +111,7 @@
 					<object class="IBUIButton" id="391002685">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">288</int>
-						<string key="NSFrame">{{75, 399}, {210, 37}}</string>
+						<string key="NSFrame">{{62, 399}, {245, 37}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -236,9 +236,9 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="391002685"/>
 							<reference ref="220663960"/>
-							<reference ref="1043031780"/>
 							<reference ref="919110211"/>
 							<reference ref="516986560"/>
+							<reference ref="1043031780"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -288,6 +288,7 @@
 					<string>-2.CustomClassName</string>
 					<string>1.IBEditorWindowLastContentRect</string>
 					<string>1.IBPluginDependency</string>
+					<string>1.IBUserGuides</string>
 					<string>12.IBPluginDependency</string>
 					<string>13.IBPluginDependency</string>
 					<string>14.IBPluginDependency</string>
@@ -298,8 +299,16 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>MainMenuController</string>
 					<string>UIResponder</string>
-					<string>{{83, 112}, {320, 480}}</string>
+					<string>{{17, 109}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+					<object class="NSMutableArray">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="IBUserGuide">
+							<reference key="view" ref="191373211"/>
+							<double key="location">160</double>
+							<int key="affinity">0</int>
+						</object>
+					</object>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
