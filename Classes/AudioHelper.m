@@ -285,3 +285,12 @@ static AudioHelper* _sharedAudio = nil;
 }
 
 @end
+
+// we could always release the singleton instance safely
+// here, but we might be able to do that in app delegate
+// as well
+__attribute__((__destructor__))
+void releaseMySelfOnQuit() 
+{
+    [_sharedAudio release];
+}
