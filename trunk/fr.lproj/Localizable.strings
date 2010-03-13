@@ -85,6 +85,7 @@
 "Messages" = "Messages";
 "Table #%@" = "Tableau #%@";
 "Replay" = "Replay";
+"[AI Disabled]" = "[AI Handicapées]";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "General";

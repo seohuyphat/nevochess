@@ -174,32 +174,36 @@ enum InfoLabelTag
     return nil;
 }
 
-- (void) setRedLabel:(NSString*)label  { [self setRedLabel:label animated:NO]; }
-- (void) setBlackLabel:(NSString*)label { [self setBlackLabel:label animated:NO]; }
+- (void) setRedLabel:(NSString*)label  { _red_label.text = label; }
+- (void) setBlackLabel:(NSString*)label { _black_label.text = label; }
 
 - (void) _animateLabel:(UILabel*)label withText:(NSString*)newText
+           highlighted:(BOOL)highlighted
 {
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:1.0];
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
                            forView:label cache:YES];
     label.text = newText;
+    label.textColor = (highlighted ? [UIColor redColor] : [UIColor whiteColor]);
     [UIView commitAnimations];
 }
 
 - (void) setRedLabel:(NSString*)label animated:(BOOL)animated
+         highlighted:(BOOL)highlighted
 {
     if (animated) {
-        [self _animateLabel:_red_label withText:label];
+        [self _animateLabel:_red_label withText:label highlighted:highlighted];
     } else {
         _red_label.text = label;
     }
 }
 
 - (void) setBlackLabel:(NSString*)label animated:(BOOL)animated
+           highlighted:(BOOL)highlighted
 {
     if (animated) {
-        [self _animateLabel:_black_label withText:label];
+        [self _animateLabel:_black_label withText:label highlighted:highlighted];
     } else {
         _black_label.text = label;
     }
@@ -774,6 +778,9 @@ enum InfoLabelTag
     NSString* redText = _red_label.text;
     _red_label.text = _black_label.text;
     _black_label.text = redText;
+    UIColor* redColor = _red_label.textColor;
+    _red_label.textColor = _black_label.textColor;
+    _black_label.textColor = redColor;
 }
 
 @end
