@@ -48,9 +48,9 @@
 
 /* AI Levels */
 "Easy" = "简单";
-"Normal" = "正常";
+"Normal" = "普通";
 "Hard" = "困难";
-"Master" = "主人";
+"Master" = "职业";
 
 /* Game status messages. */
 "Game Over" = "游戏结束";
@@ -85,7 +85,7 @@
 "Messages" = "聊天消息";
 "Table #%@" = "棋桌 #%@";
 "Replay" = "重播";
-"[AI Disabled]" = "[AI的残疾人]";
+"[AI Disabled]" = "[AI关闭]";
 
 /* !!!!!!!!!!!!! Unused (obsolete) keys. !!!!!!!!!!!!!!!!!! */
 //"General" = "一般设置";
