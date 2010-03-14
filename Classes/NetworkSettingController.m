@@ -19,6 +19,15 @@
 
 #import "NetworkSettingController.h"
 
+enum CellSubViewTagEnum
+{
+    VIEW_TAG_NAME = 1 
+};
+
+@interface NetworkSettingController (/* private interfaces */)
+- (UITableViewCell *)tableViewCellWithReuseIdentifier:(NSString *)identifier;
+@end
+
 @implementation NetworkSettingController
 
 @synthesize delegate=_delegate;
@@ -76,37 +85,51 @@
     UILabel*         theLabel = nil;
     UIFont*          defaultFont = [UIFont boldSystemFontOfSize:17.0];
 
+    cell = [tableView dequeueReusableCellWithIdentifier:@"OptionCell"];
+    if (!cell) {
+        cell = [self tableViewCellWithReuseIdentifier:@"OptionCell"];
+    }
+    
     switch (indexPath.section)
     {
         case 0:
-            cell = _serverCell;
-            theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel = (UILabel *)[cell viewWithTag:VIEW_TAG_NAME];
             theLabel.font = defaultFont;
             theLabel.text  = NSLocalizedString(@"Server", @"");
+            UILabel *value = [[[UILabel alloc] init] autorelease];
+            value.text = @"PlayXiangqi.com";
+            value.font = defaultFont;
+            value.adjustsFontSizeToFitWidth = YES;
+            value.textColor = [UIColor blueColor];
+            value.frame = CGRectMake(137, 4, 156, 31);
+            [cell.contentView addSubview:value];
             break;
         case 1:
         {
             if (indexPath.row == 0) {
-                cell = _usernameCell;
-                theLabel = (UILabel *)[cell viewWithTag:1];
+                theLabel = (UILabel *)[cell viewWithTag:VIEW_TAG_NAME];
                 theLabel.font = defaultFont;
                 theLabel.text  = NSLocalizedString(@"Username", @"");
                 _usernameText.text = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_username"];
+                _usernameText.frame = CGRectMake(136,  5, 158, 31);
+                [cell.contentView addSubview:_usernameText];
             } else {
-                cell = _passwordCell;
-                theLabel = (UILabel *)[cell viewWithTag:1];
+                theLabel = (UILabel *)[cell viewWithTag:VIEW_TAG_NAME];
                 theLabel.font = defaultFont;
                 theLabel.text  = NSLocalizedString(@"Password", @"");
                 _passwordText.text = [[NSUserDefaults standardUserDefaults] stringForKey:@"network_password"];
+                _passwordText.frame = CGRectMake(136,  5, 158, 31);
+                [cell.contentView addSubview:_passwordText];
             }
             break;
         }
         case 2:
-            cell = _autoConnectCell;
-            theLabel = (UILabel *)[cell viewWithTag:1];
+            theLabel = (UILabel *)[cell viewWithTag:VIEW_TAG_NAME];
             theLabel.font = defaultFont;
             theLabel.text  = NSLocalizedString(@"Auto Connect", @"");
             _autoConnectSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"network_autoConnect"];
+            _autoConnectSwitch.frame = CGRectMake(194, 8, 94, 27);
+            [cell.contentView addSubview:_autoConnectSwitch];
             break;
     }
 
@@ -141,6 +164,28 @@
     if ([_passwordText isFirstResponder]) { [_passwordText resignFirstResponder]; }
 
     [[NSUserDefaults standardUserDefaults] setBool:_autoConnectSwitch.on forKey:@"network_autoConnect"];
+}
+
+#pragma mark Private methods
+- (UITableViewCell *)tableViewCellWithReuseIdentifier:(NSString *)identifier 
+{
+	UITableViewCell *cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier] autorelease];
+    
+	UILabel *label;
+	CGRect rect;
+	
+	rect = CGRectMake(10, 9, 100, 21);
+	label = [[UILabel alloc] initWithFrame:rect];
+	label.tag = VIEW_TAG_NAME;
+	label.font = [UIFont boldSystemFontOfSize:17];
+	label.adjustsFontSizeToFitWidth = YES;
+	[cell.contentView addSubview:label];
+	label.highlightedTextColor = [UIColor blackColor];
+	[label release];
+	
+    cell.accessoryType = UITableViewCellAccessoryNone;
+	
+	return cell;
 }
 
 @end

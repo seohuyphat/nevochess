@@ -30,11 +30,6 @@
 @interface NetworkSettingController : UITableViewController
 {
     id<NetworkSettingDelegate> _delegate;
-
-    IBOutlet UITableViewCell* _serverCell;
-    IBOutlet UITableViewCell* _usernameCell;
-    IBOutlet UITableViewCell* _passwordCell;
-    IBOutlet UITableViewCell* _autoConnectCell;
     
     IBOutlet UITextField* _usernameText;
     IBOutlet UITextField* _passwordText;
