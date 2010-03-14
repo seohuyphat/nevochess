@@ -24,13 +24,6 @@
 @interface OptionsViewController : UITableViewController <SingleSelectionDelegate,
                                                           NetworkSettingDelegate>
 {
-    IBOutlet UITableViewCell* _soundCell;
-    IBOutlet UITableViewCell* _boardCell;
-    IBOutlet UITableViewCell* _pieceCell;
-    IBOutlet UITableViewCell* _aiLevelCell;
-    IBOutlet UITableViewCell* _aiTypeCell;
-    IBOutlet UITableViewCell* _networkCell;
-
     IBOutlet UISwitch*        _soundSwitch;
 
     // --- Piece Style.
